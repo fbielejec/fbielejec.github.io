@@ -33,7 +33,7 @@ You can quickly reboot an instance using the command line if you have ([configur
 
 `aws ec2 reboot-instances --instance-ids instance-id --region region`
 
-or with the Amazon EC2 console <https://signin.aws.amazon.com/console>.
+or with the ([EC2 console](https://signin.aws.amazon.com/console).
 
 1. Open the Amazon EC2 console.
 2. In the navigation pane, choose Instances.
