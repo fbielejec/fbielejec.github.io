@@ -38,7 +38,7 @@ or with the Amazon EC2 console <https://signin.aws.amazon.com/console>.
 3. Select the instance and choose Actions, Instance State, Reboot.
 4. Choose Yes, Reboot when prompted for confirmation.
 
-### Step2) did it work?
+### Step2) so did it work?
 
 Check if the instance is back online:
 
@@ -46,11 +46,11 @@ Check if the instance is back online:
 
 SSH to it and you can use this ([script](https://github.com/speed47/spectre-meltdown-checker.git)) which does a wonderful job at checking the kernel susceptibility to all known variants of Spectre/Meltdown.
 
-```
+```bash
 wget https://raw.githubusercontent.com/speed47/spectre-meltdown-checker/master/spectre-meltdown-checker.sh
 chmod a+x spectre-meltdown-checker.sh
 sudo ./spectre-meltdown-checker.sh
 ```
 You should see something similar to the screenshot below:
 
-![_config.yml]({{ site.baseurl }}/images/018-1-11-aws-meltdown/screenshot.jpg)
+![_config.yml]({{ site.baseurl }}/images/2018-1-11-aws-meltdown/screenshot.jpg)
