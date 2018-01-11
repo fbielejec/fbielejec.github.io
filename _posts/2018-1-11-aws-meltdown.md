@@ -3,7 +3,9 @@ layout: post
 title: Patching your AWS EC2 instance for the Meltdown/Spectre vulnerabilities
 ---
 
-<!-- TODO: Intro -->
+# Intro
+
+The patches we will be applying bring the KPTI (kernel page-table isolation), a Linux kernel feature that mitigates the Meltdown security vulnerability. The title of this post is therefore a misnomer - there are no Spectre patches _yet_, but by convention all three known variants of these vulnerabilities are jointly referred to as Meltdown/Spectre. I will update this post when this changes.
 
 # Updating the instance with the patched kernel
 
@@ -13,7 +15,7 @@ The most up-to-date information on Spectre and Meltdown for Ubuntu can be found 
 <https://wiki.ubuntu.com/SecurityTeam/KnowledgeBase/SpectreAndMeltdown>
 It also contains recommended kernel images for various distro versions.
 
-### Step1) SSH into your instance:
+### Step 1) SSH into your instance:
 
 `ssh ubuntu@instance.region.compute.amazonaws.com`
 
@@ -27,20 +29,20 @@ As of writing this post Canonical recommends kernel image 3.13.0-139.188 for Ubu
 sudo apt-get install linux-headers-4.4.0-109 linux-headers-4.4.0-109-generic linux-image-4.4.0-109-generic linux-image-extra-4.4.0-109-generic --fix-missing
 ~~~~
 
-### Step2) reboot you instance
+### Step 2) reboot you instance
 
-You can quickly reboot an instance using the command line if you have ([configured AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)):
+You can quickly reboot an instance using the command line if you have [configured AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html):
 
 `aws ec2 reboot-instances --instance-ids instance-id --region region`
 
-or with the ([EC2 console](https://signin.aws.amazon.com/console).
+or with the [EC2 console](https://signin.aws.amazon.com/console).
 
 1. Open the Amazon EC2 console.
 2. In the navigation pane, choose Instances.
 3. Select the instance and choose Actions, Instance State, Reboot.
 4. Choose Yes, Reboot when prompted for confirmation.
 
-### Step2) so did it work?
+### Step 3) so did it work?
 
 Check if the instance is back online:
 
