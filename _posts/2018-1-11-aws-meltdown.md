@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Patching your AWS EC2 instance for the Meltdown vulnerability
+title: Patching your AWS EC2 instance for the Meltdown/Spectre vulnerabilities
 ---
 
 <!-- TODO: Intro -->
@@ -23,7 +23,9 @@ Update the repositories:
 
 As of writing this post Canonical recommends kernel image 3.13.0-139.188 for Ubuntu 14.04 using 3.13 and 4.4.0-109.132 if you are using the xenial kernel backport (4.4.0), so let's install those:
 
-`sudo apt-get install linux-headers-4.4.0-109 linux-headers-4.4.0-109-generic linux-image-4.4.0-109-generic linux-image-extra-4.4.0-109-generic --fix-missing`
+~~~~
+sudo apt-get install linux-headers-4.4.0-109 linux-headers-4.4.0-109-generic linux-image-4.4.0-109-generic linux-image-extra-4.4.0-109-generic --fix-missing
+~~~~
 
 ### Step2) reboot you instance
 
@@ -44,7 +46,7 @@ Check if the instance is back online:
 
 `aws ec2 describe-instance-status --instance-id instance-id --region region`
 
-SSH to it and you can use this ([script](https://github.com/speed47/spectre-meltdown-checker.git)) which does a wonderful job at checking the kernel susceptibility to all known variants of Spectre/Meltdown.
+SSH to it and you can use this ([script](https://github.com/speed47/spectre-meltdown-checker.git)) which does a wonderful job at checking the kernel susceptibility to all known variants of Spectre/Meltdown:
 
 ```bash
 wget https://raw.githubusercontent.com/speed47/spectre-meltdown-checker/master/spectre-meltdown-checker.sh
