@@ -43,7 +43,7 @@ Spec has a special function `clojure.spec/fdef` for defining the input and outpu
 
 Let's go ahead and write a function spec for the *divide* function. We want the input to be integers, but not 0, the output a floating precision number, and the relationship between them is multiplication.
 
-```
+```Clojure
 (use '[clojure.spec.alpha :as s])
 
 (s/fdef divide
@@ -57,13 +57,13 @@ Let's go ahead and write a function spec for the *divide* function. We want the 
 
 Once we have the spec we can write the function itself:
 
-```clojure
+```Clojure
 (defn divide [x y] (/ x y))
 ```
 
 To turn on validation of the arguments, i.e. runtime checks that the function is being called correctly we call `clojure.spec.test/instrument`:
 
-```clojure
+```Clojure
 (use '[clojure.spec.test.alpha :as st])
 
 (st/instrument `divide)
@@ -75,21 +75,21 @@ To turn on validation of the arguments, i.e. runtime checks that the function is
 
 So far so good. BUt what if somewhere in the code we have this lurking:
 
-```clojure
+```Clojure
 (defn divide-by-foo []
   (divide 6 :foo))
 ```
 
 we won't know of the problem right until the function `divide-by-foo` is called. Solution? Wrap the function inside a macro (macros are always checked during macro expansion time):
 
-```clojure
+```Clojure
 (defmacro typed-divide [arg1 arg2]
   (divide arg1 arg2))
 ```
 
 Now try to compile the function below in your REPL session:
 
-```clojure
+```Clojure
 (defn typed-divide-by-foo []
   (typed-divide 6 :foo))
 ```
