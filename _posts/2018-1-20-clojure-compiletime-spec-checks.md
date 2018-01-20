@@ -43,7 +43,7 @@ Spec has a special function `clojure.spec/fdef` for defining the input and outpu
 
 Let's go ahead and write a function spec for the *divide* function. We want the input to be integers, but not 0, the output a floating precision number, and the relationship between them is multiplication.
 
-```clojure
+```
 (use '[clojure.spec.alpha :as s])
 
 (s/fdef divide
