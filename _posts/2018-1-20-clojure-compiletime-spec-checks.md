@@ -1,6 +1,11 @@
 ---
 layout: post
 title: Compile time spec checking with Clojure
+comments: true
+categories:
+- Clojure
+- spec
+- macros
 ---
 
 # Intro
@@ -51,7 +56,7 @@ Let's go ahead and write a function spec for the *divide* function. We want the 
                      (fn [{:keys [:x :y]}]
                        (not (contains? #{0} y))))
         :ret number?
-        :fn (fn [{{x :x y :y} :args z :ret}]
+        :fn (fn [{ {x :x y :y} :args z :ret}]
               (= x (* z y))))
 ```
 
