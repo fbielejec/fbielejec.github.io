@@ -62,13 +62,13 @@ Let's go ahead and write a function spec for the *divide* function. We want the 
 
 Once we have the spec we can write the function itself:
 
-```Clojure
+{% highlight clojure %}
 (defn divide [x y] (/ x y))
-```
+{% endhighlight %}
 
 To turn on validation of the arguments, i.e. runtime checks that the function is being called correctly we call `clojure.spec.test/instrument`:
 
-```Clojure
+{% highlight clojure %}
 (use '[clojure.spec.test.alpha :as st])
 
 (st/instrument `divide)
@@ -76,28 +76,28 @@ To turn on validation of the arguments, i.e. runtime checks that the function is
 (divide 6 3)
 
 (divide 6 :foo)
-```
+{% endhighlight %}
 
-So far so good. BUt what if somewhere in the code we have this lurking:
+So far so good. But what if somewhere in the code we have this lurking:
 
-```Clojure
+{% highlight clojure %}
 (defn divide-by-foo []
   (divide 6 :foo))
-```
+{% endhighlight %}
 
 we won't know of the problem right until the function `divide-by-foo` is called. Solution? Wrap the function inside a macro (macros are always checked during macro expansion time):
 
-```Clojure
+{% highlight clojure %}
 (defmacro typed-divide [arg1 arg2]
   (divide arg1 arg2))
-```
+{% endhighlight %}
 
 Now try to compile the function below in your REPL session:
 
-```Clojure
+{% highlight clojure %}
 (defn typed-divide-by-foo []
   (typed-divide 6 :foo))
-```
+{% endhighlight %}
 
 You should see a nice spec'd error message like the one below:
 
