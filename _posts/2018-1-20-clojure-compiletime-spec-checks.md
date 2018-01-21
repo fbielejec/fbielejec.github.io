@@ -11,7 +11,7 @@ categories:
 # Intro
 
 Many things have been said on typed vs untyped languages, so I'm not going to repeat them here.
-Clojure is an inherently a dynamic language, yet to have some sort of safety especially at you system's boundaries it's answer was the introduction of the [clojure.spec](https://clojure.org/guides/spec) library.
+Clojure is an inherently a dynamic language, yet to have some sort of safety especially at the system's boundaries it's answer was the introduction of the [clojure.spec](https://clojure.org/guides/spec) library.
 
 Spec allows one to specify the structure of data (and functions), parse and validate the data as well as generate test data from a given specification.
 Spec in that sense serves as documentation of your program, can give better error messages and better error handling in general, facilitate testing and increase the extensibility of programs.
@@ -21,14 +21,14 @@ There are same similarities and differences between spec and types, and I tried 
 #### Similarities
 
 * types provide semantic information from the compiler
-* enforce strictness
-* force the system design
-* provide stronger guarantees (even spec generators can't guarantee a whole spectrum of possible values)
+* types enforce strictness
+* types force the system design
+* types provide stronger guarantees (even spec generators can't guarantee a whole spectrum of possible values)
 * types are checked at compile time
 
 #### Differences
 
-* optional: when and how to verify inputs is up to you
+* spec is optional: when and how to verify inputs is up to you
 * specs favour being expressive: expressivity > proofs
 * specs are less efficient performance wise
 * specs are checked at runtime
