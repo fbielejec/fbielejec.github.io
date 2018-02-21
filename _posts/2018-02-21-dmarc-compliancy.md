@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Complying with DMARC (AWS Route 53 and G Suite)
+title: Complying with DMARC (AWS Route 53 and Gmail)
 comments: true
 categories:
 - AWS
@@ -13,15 +13,13 @@ categories:
 
 # Intro
 
-#### What exactly is DMARC and why do you want it?
-
-
-Before we dive into DMARC talk about what happens when an SMTP email gets sent:
+What exactly is DMARC and why do you want it?
+Before we dive into DMARC lets talk about what happens when an SMTP email gets sent:
 
 ---
 **NOTE**
 
-SMTP has no facility to authenticate senders or message content. This fact is often used in **emails spoofing**, i.e. creating emails with forged sender address. By analogy to the traditional snail-mail, the addressing information in email is called the *envelope addresing* and contains two pieces of information:
+SMTP has no facility to authenticate senders or message content. This fact is often used in **email spoofing**, i.e. creating emails with forged sender address. By analogy to the traditional snail-mail, the addressing information in email is called the *envelope addresing* and contains two pieces of information:
 
 * **Return-Path:** header - normally not visible to the end user, and by default no checks are done that the sending server is authorized to send emails on behalf of that address.
 
@@ -33,7 +31,6 @@ If the receiving mail server doesn't detect any problems with either if these he
 * **Reply-to:** and (sometimes) **Sender** - similarly not checked.
 
 The end-result is that the end user sees the email as coming from the address in the *From:* header, but this is not neccesserily so, see this excerpt from headers of a spoofed email:
-
 ```
 Return-Path: <filip@example.com>
 Received: from mail05.parking.ru (mail05.parking.ru. [195.128.120.25])
@@ -42,7 +39,8 @@ Received: from mail05.parking.ru (mail05.parking.ru. [195.128.120.25])
         Tue, 20 Feb 2018 07:26:55 -0800 (PST)
 ```
 
-`195.128.120.25` has sent an email on behalf of `filip@example.com` to `filip@mydomain.com`, but I never authorized it to do so.
+Here we can see that `195.128.120.25` has sent an email on behalf of `filip@example.com` to `filip@mydomain.com`, but hey - I never authorized it to do so.
+
 ---
 
 Enter DMARC - domain-based Message Authentication, Reporting & Conformance.
@@ -84,7 +82,7 @@ We will also comply with DMARC via both SPF and DKIM, since well, you should.
 #### Create SPF record
 
 SPF (Sender Policy Framework) is a type of DNS record that identifies which mail servers are permitted to send email on behalf of your domain.
-Go to [AWS console](https://console.aws.amazon.com/route53), select Hosted Zones, select the domain name you wish to set the policy for and create a following record to [authorize Gmail to send emails on your behalf](https://support.google.com/a/answer/178723?hl=en):
+Go to [AWS console](https://console.aws.amazon.com/route53), select *Hosted Zones*, select the domain name you wish to set the policy for and create a following record to [authorize Gmail to send emails on your behalf](https://support.google.com/a/answer/178723?hl=en):
 
 ```
 Name: example.io
@@ -93,16 +91,17 @@ Value: "v=spf1 include:_spf.google.com ~all"
 Routing Policy: Simple
 ```
 
-If you wish add more mail servers add their IP4 or IP6 addresses before, for example: `"v=spf1 ip4:192.168.0.1/16 include:_spf.google.com ~all"`
+If you wish add more mail servers add their IP4 or IP6 addresses before, for example:
+`"v=spf1 ip4:192.168.0.1/16 include:_spf.google.com ~all"`
 Consult [SPF record syntax help](http://www.openspf.org/SPF_Record_Syntax) for details.
 
 This is more or less what you should see as a record:
 
-![_config.yml]({{ site.baseurl }}/images/2018-02-21-dmarc-compliancy/screenshot1.png)
+![_config.yml]({{ site.baseurl }}/images/2018-02-21-dmarc-compliancy/screenshot1.jpg)
 
 #### Authenticate email with DKIM
 
-DKIM (DomainKeys Identified Mail) is a standard that allows senders to sign their email messages and ISPs to use those signatures to verify that those messages are legitimate, and have not been modified by a third party in transit. An email message that is sent using DKIM includes a DKIM-Signature header. Example:
+DKIM (DomainKeys Identified Mail) is a standard that allows senders to sign their email messages and ISPs to use those signatures to verify that those messages are legitimate, and have not been modified by a third party in transit. An email message that is sent using DKIM includes a **DKIM-Signature:** header. Example:
 
 ```
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
@@ -137,7 +136,7 @@ Routing Policy: Simple
 
 Which should look like this:
 
-![_config.yml]({{ site.baseurl }}/images/2018-02-21-dmarc-compliancy/screenshot2.png)
+![_config.yml]({{ site.baseurl }}/images/2018-02-21-dmarc-compliancy/screenshot2.jpg)
 
 Note that we are setting the policy to `p=-none`, which means only gather repots and send them to postmarc email (`rua=` entry), but take no action.
 The best practice is you should start with this policy and afterward progress to `p=quarantine` (put messages failing the DMARC policy into SPAM) and finally `p=reject` (do not deliver offending messages).
@@ -162,4 +161,5 @@ Postapp has also an [HTTP API](https://dmarc.postmarkapp.com/api/) if you like t
 
 Congratulations! Now you have full control over who is sending email messages on your behlaf.
 
+---
 <a name="footnote1">1</a>: Sounds proud!
