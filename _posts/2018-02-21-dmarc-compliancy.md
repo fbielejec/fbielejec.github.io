@@ -14,23 +14,25 @@ categories:
 # Intro
 
 What exactly is DMARC and why do you want it?
-Before we dive into DMARC lets talk about what happens when an SMTP email gets sent:
+Before we dive into it lets talk about what happens when an SMTP email gets sent:
 
 ---
 **NOTE**
 
-SMTP has no facility to authenticate senders or message content. This fact is often used in **email spoofing**, i.e. creating emails with forged sender address. By analogy to the traditional snail-mail, the addressing information in email is called the *envelope addresing* and contains two pieces of information:
+SMTP has no facility to authenticate senders or message content. This fact is often used in **email spoofing**, i.e. creating emails with forged sender address.
+
+By an analogy to the traditional snail-mail, the addressing information in email is called the *envelope addresing* and contains two pieces of information:
 
 * **Return-Path:** header - normally not visible to the end user, and by default no checks are done that the sending server is authorized to send emails on behalf of that address.
 
 * **Received:** header - also normally not visible to the end user, specifies which email address the email is delivered to.
 
-If the receiving mail server doesn't detect any problems with either if these headers it proceeds by sending a **DATA** command and sends several other headers including:
+If the receiving mail server doesn't detect any problems with either if these headers, it proceeds by sending a **DATA** command and sends several other headers including:
 
 * **From:** - this is the address visible to the recipient, but again not verified in any way.
 * **Reply-to:** and (sometimes) **Sender** - similarly not checked.
 
-The end-result is that the end user sees the email as coming from the address in the *From:* header, but this is not neccesserily so, see this excerpt from headers of a spoofed email:
+The end-result is that the end user sees the email as coming from the address in the **From:** header, but this is not neccesserily so, see this excerpt from headers of a spoofed email:
 ```
 Return-Path: <filip@example.com>
 Received: from mail05.parking.ru (mail05.parking.ru. [195.128.120.25])
@@ -39,16 +41,18 @@ Received: from mail05.parking.ru (mail05.parking.ru. [195.128.120.25])
         Tue, 20 Feb 2018 07:26:55 -0800 (PST)
 ```
 
-Here we can see that `195.128.120.25` has sent an email on behalf of `filip@example.com` to `filip@mydomain.com`, but hey - I never authorized it to do so.
+Here we can see that `195.128.120.25` has sent an email on behalf of `filip@example.com` to `filip@mydomain.com`.
+But hey - I never authorized it to do so!
 
 ---
 
 Enter DMARC - domain-based Message Authentication, Reporting & Conformance.
-DMARC is an email validation framework designed to detect, prevent (and provide reporting of) email spoofing.
-As such it is all about the verification of the **From:** header field.
+DMARC is an email validation framework designed to detect, prevent and provide reporting of email spoofing.
+
+And as such it is all about the verification of the **From:** header field.
 Implementing DMARC (Domain-based Message Authentication Reporting and Conformance) is the best way to defend from phishing and spoofing attacks.
 
-# DMARC compliancy
+# [DMARC compliancy](#compliancy)
 
 DMARC prevents direct domain spoofing, by notifying receiving server that their messages are protected by [SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework) and/or [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail) policies and what to do with the message if it fails these policy checks (we will discuss what those two are soon).
 It also has a built in reporting mechanism, capable of generating reports of messages sent on behalf of the protected domain that fail or comply the DMARC.
@@ -62,7 +66,7 @@ Return-Path: filip@example.com
 From: filip@subdomain.example.com
 ```
 
-If DMARC is set to protect `example.com` in strict mode an email from subdomain.example.com would fail as the domains do not match exactly. However, in relaxed alignment mode DMARC would pass, because the root domain matches. Notice that in both cases SPF itself would pass.
+If DMARC is set to protect the `example.com` domain in a strict mode an email from `subdomain.example.com` would fail as the domains do not match exactly. However, in relaxed alignment mode DMARC would pass, because the root domain matches. Notice that in both cases SPF itself would pass.
 
 In the case of DKIM, identifier alignment means that the domain specified by the `d=` field of the DKIM headers has to pass and align to the domain found in the **From:** header. For example:
 
@@ -140,6 +144,8 @@ Which should look like this:
 
 Note that we are setting the policy to `p=-none`, which means only gather repots and send them to postmarc email (`rua=` entry), but take no action.
 The best practice is you should start with this policy and afterward progress to `p=quarantine` (put messages failing the DMARC policy into SPAM) and finally `p=reject` (do not deliver offending messages).
+We also specify `aspf=r` which stands for the *relaxed* alignment mode we talked about [here](#compliancy).
+Official DMARC [documentation](https://dmarc.org/overview/) doesn a great job of explaining the syntax.
 
 After the TTL time you specified the you can check if your DMARC record has been published:
 
