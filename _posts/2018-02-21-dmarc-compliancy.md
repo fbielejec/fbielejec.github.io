@@ -21,16 +21,16 @@ Before we dive into it lets talk about what happens when an SMTP email gets sent
 
 SMTP has no facility to authenticate senders or message content. This fact is often used in **email spoofing**, i.e. creating emails with forged sender address.
 
-By an analogy to the traditional snail-mail, the addressing information in email is called the *envelope addresing* and contains two pieces of information:
+By an analogy to the traditional snail-mail, the addressing information in email is called the *envelope addressing* and contains two pieces of information:
 
 * **Return-Path:** header - normally not visible to the end user, and by default no checks are done that the sending server is authorized to send emails on behalf of that address.
 
-* **Received:** header - also normally not visible to the end user, specifies which email address the email is delivered to.
+* **Received:** header - also normally not visible to the end user, specifies to which address the email is delivered to.
 
 If the receiving mail server doesn't detect any problems with either if these headers, it proceeds by sending a **DATA** command and sends several other headers including:
 
 * **From:** - this is the address visible to the recipient, but again not verified in any way.
-* **Reply-to:** and (sometimes) **Sender** - similarly not checked.
+* **Reply-to:** and (sometimes) **Sender:** - similarly not checked.
 
 The end-result is that the end user sees the email as coming from the address in the **From:** header, but this is not neccesserily so, see this excerpt from headers of a spoofed email:
 ```
@@ -42,14 +42,14 @@ Received: from mail05.parking.ru (mail05.parking.ru. [195.128.120.25])
 ```
 
 Here we can see that `195.128.120.25` has sent an email on behalf of `filip@example.com` to `filip@mydomain.com`.
-But hey - I never authorized it to do so!
+But I never authorized it to do so!
 
 ---
 
 Enter DMARC - domain-based Message Authentication, Reporting & Conformance.
 DMARC is an email validation framework designed to detect, prevent and provide reporting of email spoofing.
 
-And as such it is all about the verification of the **From:** header field.
+As such it is all about the verification of the **From:** header field.
 Implementing DMARC is the best way to defend from phishing and spoofing attacks.
 
 # [DMARC compliancy](#compliancy)
