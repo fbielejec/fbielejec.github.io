@@ -50,14 +50,14 @@ Enter DMARC - domain-based Message Authentication, Reporting & Conformance.
 DMARC is an email validation framework designed to detect, prevent and provide reporting of email spoofing.
 
 And as such it is all about the verification of the **From:** header field.
-Implementing DMARC (Domain-based Message Authentication Reporting and Conformance) is the best way to defend from phishing and spoofing attacks.
+Implementing DMARC is the best way to defend from phishing and spoofing attacks.
 
 # [DMARC compliancy](#compliancy)
 
-DMARC prevents direct domain spoofing, by notifying receiving server that their messages are protected by [SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework) and/or [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail) policies and what to do with the message if it fails these policy checks (we will discuss what those two are soon).
-It also has a built in reporting mechanism, capable of generating reports of messages sent on behalf of the protected domain that fail or comply the DMARC.
+DMARC prevents direct domain spoofing, by notifying receiving server that their messages are protected by [SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework) and/or [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail) policies and telling them what to do with a message if it fails these policy checks (we will discuss SPF and DKIM soon).
+DMARC also has a built in reporting mechanism, capable of generating bulk reports of messages sent on behalf of the protected domain that fail or comply the DMARC policies.
 
-DMARC also has the concept of identifiers alignment.
+DMARC has also the concept of *identifiers alignment*.
 In the case of SPF it means that the domain portion of the **Return-Path:** has to align with the domain found in the **From:** header.
 For example:
 
@@ -66,9 +66,10 @@ Return-Path: filip@example.com
 From: filip@subdomain.example.com
 ```
 
-If DMARC is set to protect the `example.com` domain in a strict mode an email from `subdomain.example.com` would fail as the domains do not match exactly. However, in relaxed alignment mode DMARC would pass, because the root domain matches. Notice that in both cases SPF itself would pass.
+If DMARC is set to protect the `example.com` domain in a *strict mode*, an email from `subdomain.example.com` would fail as the domains do not match exactly. However, in the *relaxed alignment mode* DMARC would pass, because the root domain matches.
+Notice that in both cases SPF itself would pass.
 
-In the case of DKIM, identifier alignment means that the domain specified by the `d=` field of the DKIM headers has to pass and align to the domain found in the **From:** header. For example:
+In the case of DKIM, identifier alignment means that the domain specified by the `d=` field of the DKIM headers has to pass, and align to the domain found in the **From:** header. For example:
 
 ```
 d= "example.io"
@@ -76,7 +77,11 @@ From header: filip@subdomain.example.io
 ```
 
 In the above example, DMARC would fail both in strict and relaxed mode.
-To sum up this rather long introduction to be DMARC compliant, an email from a certain domain needs to pass DKIM and/or SPF and have it's identifiers aligned according to one or both of the policies.
+
+To sum up this rather long introduction - to be DMARC compliant, an email from a certain domain needs to
+
+1. Pass DKIM and/or SPF
+2. Have it's identifiers aligned according to one or both of the policies.
 
 # Practical example
 
@@ -96,7 +101,8 @@ Routing Policy: Simple
 ```
 
 If you wish add more mail servers add their IP4 or IP6 addresses before, for example:
-`"v=spf1 ip4:192.168.0.1/16 include:_spf.google.com ~all"`
+`"v=spf1 ip4:192.168.0.1/16 include:_spf.google.com ~all"`.
+
 Consult [SPF record syntax help](http://www.openspf.org/SPF_Record_Syntax) for details.
 
 This is more or less what you should see as a record:
@@ -120,16 +126,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
          ysjA==
 ```
 
-Good news is Gmail allows the admin account to turn DKIM in a [few simple steps](https://support.google.com/a/answer/180504?hl=en), which I won't repeat here.
+Good news is Gmail allows the admin account to turn DKIM in a [few simple steps](https://support.google.com/a/answer/180504?hl=en), so I won't repeat them here.
 
 #### Publishing DMARC
 
-Interestingly enough (technically) you don't need to comply with SPF or DKIM to publish a DMARC record, in which case however you only get the reporting capabilities without any actionable results.
+---
+**NOTE**
+
+Interesting enough technically you don't need to comply with SPF or DKIM or even have your identifiers aligned to publish a DMARC record - in which case however you only get the reporting capabilities, without any actionable results.
+
+---
 
 We will use a DMARC aggregator app to get weekly reports, instead of annoying daily raw status reports.
-Go to https://dmarc.postmarkapp.com/ and register with an email that you want to use for receiving reports, this could be a specific email or your (the DevOps <sup>[1](#footnote1)</sup>) email.
+Go to https://dmarc.postmarkapp.com/ and register with an email that you want to use for receiving reports.
+This could be a specific email or your (the DevOps <sup>[1](#footnote1)</sup>) email.
 
-Now create a following DNS record in AWS Console:
+Next create a following DNS record in the AWS Console:
 
 ```
 Name: _dmarc.example.com
@@ -142,12 +154,14 @@ Which should look like this:
 
 ![_config.yml]({{ site.baseurl }}/images/2018-02-21-dmarc-compliancy/screenshot2.jpg)
 
-Note that we are setting the policy to `p=-none`, which means only gather repots and send them to postmarc email (`rua=` entry), but take no action.
-The best practice is you should start with this policy and afterward progress to `p=quarantine` (put messages failing the DMARC policy into SPAM) and finally `p=reject` (do not deliver offending messages).
-We also specify `aspf=r` which stands for the *relaxed* alignment mode we talked about [here](#compliancy).
-Official DMARC [documentation](https://dmarc.org/overview/) doesn a great job of explaining the syntax.
+Note that we are setting the policy to `p=none`, which translates to *"only gather reports and send them to the postmarc email"* (`rua=` entry), but take no action.
+The best practice is you should start with this policy, and only afterwards progress to `p=quarantine` (put messages failing the DMARC policy into SPAM) and finally `p=reject` (do not deliver offending messages).
+This way you can gradually assure nothing wrong is happening to your organisations email communications.
 
-After the TTL time you specified the you can check if your DMARC record has been published:
+We also specify `aspf=r` which stands for the *relaxed* alignment mode we talked about [here](#compliancy).
+Official DMARC [documentation](https://dmarc.org/overview/) does a great job of explaining the syntax.
+
+After the TTL time you specified in the DNS record, you can check if your DMARC record has been published with:
 
 ```
 $ nslookup -type=TXT _dmarc.district0x.io
@@ -163,9 +177,10 @@ Non-authoritative answer:
 _dmarc.example.com	text = "v=DMARC1; p=none; pct=100; rua=mailto:re+scylh8xq0nc@dmarc.postmarkapp.com; sp=none; aspf=r;"
 ```
 
+Which correpsonds to the published settings.
 Postapp has also an [HTTP API](https://dmarc.postmarkapp.com/api/) if you like to automate things that you do with your reports (and who doesn't).
 
-Congratulations! Now you have full control over who is sending email messages on your behlaf.
+Congratulations! Now you have full control over who is sending email messages on your behalf.
 
 ---
 <a name="footnote1">1</a>: Sounds proud!
