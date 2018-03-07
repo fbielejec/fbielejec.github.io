@@ -9,7 +9,7 @@ categories:
 - terminal
 ---
 
-# Intro
+# <a name="into"> Intro
 
 This will be a short, yet hopefully usefull entry.
 
@@ -33,7 +33,7 @@ user=> (while true
 That is why I was very happy when [Bruce Hauman](https://github.com/bhauman) (of [Figwheel](https://github.com/bhauman/lein-figwheel) fame) announced he created [rebel-readline](https://github.com/bhauman/rebel-readline).
 You can think of it as of a full REPL development experience, one command in the terminal away.
 
-# Lets install it
+# <a name="install"> Lets install it
 
 ---
 **NOTE**
