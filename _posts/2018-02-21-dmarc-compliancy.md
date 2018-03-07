@@ -14,6 +14,12 @@ categories:
 # Intro
 
 What exactly is DMARC and why do you want it?
+DMARC stands for domain-based Message Authentication, Reporting & Conformance.
+DMARC is an email validation framework designed to detect, prevent and provide reporting of email spoofing.
+
+As such it is all about the verification of the **From:** emaial header field.
+Implementing DMARC is the best way to defend from phishing and spoofing attacks.
+
 Before we dive into it lets talk about what happens when an SMTP email gets sent:
 
 ---
@@ -45,12 +51,6 @@ Here we can see that `195.128.120.25` has sent an email on behalf of `filip@exam
 But I never authorized it to do so!
 
 ---
-
-Enter DMARC - domain-based Message Authentication, Reporting & Conformance.
-DMARC is an email validation framework designed to detect, prevent and provide reporting of email spoofing.
-
-As such it is all about the verification of the **From:** header field.
-Implementing DMARC is the best way to defend from phishing and spoofing attacks.
 
 # [DMARC compliancy](#compliancy)
 
