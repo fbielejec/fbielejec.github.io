@@ -11,7 +11,7 @@ categories:
 - DKIM
 ---
 
-# <a name="intro"> Intro
+# <a name="intro"> Intro </a>
 
 What exactly is DMARC and why do you want it?
 DMARC stands for **Domain-based Message Authentication, Reporting & Conformance**.
@@ -52,7 +52,7 @@ But I never authorized it to do so!
 
 ---
 
-# <a name="compliancy"> DMARC compliancy
+# <a name="compliancy"> DMARC compliancy </a>
 
 DMARC prevents direct domain spoofing, by notifying receiving server that their messages are protected by [SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework) and/or [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail) policies and telling them what to do with a message if it fails these policy checks (we will discuss SPF and DKIM soon).
 DMARC also has a built in reporting mechanism, capable of generating bulk reports of messages sent on behalf of the protected domain that fail or comply the DMARC policies.
@@ -83,7 +83,7 @@ To sum up this rather long introduction - to be DMARC compliant, an email from a
 1. Pass DKIM and/or SPF
 2. Have it's identifiers aligned according to one or both of the policies.
 
-# <a name="example"> Practical example
+# <a name="example"> Practical example</a>
 
 For this example we will assume Amazon Route 53 is used for the DNS, and Gmail for mail, which is a pretty standard setup for most organisations.
 We will also comply with DMARC via both SPF and DKIM, since well, you should.
