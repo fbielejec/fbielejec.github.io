@@ -29,20 +29,20 @@ user=> (while true
   #_=>   (do :a)^[[D^[[D^[[D
 ```
 
-No Sir Ree Bob! You don't even have basic syntax navigation capabilities, let alone fancy things like code completion.
+**No Sir Ree Bob!** You don't even have basic syntax navigation, let alone fancy capabilities like code completion.
 That is why I was very happy when [Bruce Hauman](https://github.com/bhauman) (of Figwheel fame) announced he created [rebel-readline](https://github.com/bhauman/rebel-readline).
 You can think of it as of a full REPL development experience availiable at one command.
 
-# Install it!
+# Now lets install it
 
 ---
 **NOTE**
 
-We will assume an arbitrary GNU/Linux distrubution for this example and the presence of basic depndencies - bash, curl, rlwrap, and Java.
+_We will assume an arbitrary GNU/Linux distrubution for this example and the presence of basic dependencies - bash, curl, rlwrap, and Java._
 
 ---
 
-Assuming you haven't already let's begin by installing Clojure CLI (Clojure + REPL):
+Assuming you haven't already, let's begin by installing Clojure CLI (Clojure + REPL):
 
 ```bash
 curl -O https://download.clojure.org/install/linux-install-1.9.0.358.sh
