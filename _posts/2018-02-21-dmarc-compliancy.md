@@ -14,7 +14,7 @@ categories:
 # Intro
 
 What exactly is DMARC and why do you want it?
-DMARC stands for domain-based Message Authentication, Reporting & Conformance.
+DMARC stands for **Domain-based Message Authentication, Reporting & Conformance**.
 DMARC is an email validation framework designed to detect, prevent and provide reporting of email spoofing.
 
 As such it is all about the verification of the **From:** emaial header field.
