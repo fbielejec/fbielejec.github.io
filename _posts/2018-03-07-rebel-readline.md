@@ -1,6 +1,6 @@
 ---
 layout: post
-title: HowTo: Install and use rebel-readline terminal editor for Clojure
+title: Install and use rebel-readline terminal editor for Clojure
 comments: true
 categories:
 - Clojure
