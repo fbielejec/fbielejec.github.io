@@ -120,11 +120,9 @@ This is what we need in the end:
   "scripts": {
     "compile": "shadow-cljs compile dev",
     "release": "shadow-cljs release dev",
-    "serve": "http-server public/",
     "delete": "rm -r public/js/* out/*",
   },
   "devDependencies": {
-    "http-server": "^0.11.1",
     "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-cljs-test": "^0.1.0",
