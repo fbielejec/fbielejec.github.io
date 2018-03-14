@@ -1,6 +1,6 @@
 ---
 layout: post
-title: shadow-cljs and cider integration
+title: shadow-cljs and Emacs/Cider integration
 comments: true
 categories:
 - clojurescript
@@ -10,27 +10,29 @@ categories:
 
 # <a name="into"/>Intro
 
-In this post I will cover [shadow-cljs](https://github.com/shadow-cljs/), a ClojureScript compiler replacement with focus on simplicity and ease of use.
-Grossly simplifying you can think of it as a cljsbuild and figwheel replacement.
+In this post I will cover [shadow-cljs](https://github.com/shadow-cljs/), a ClojureScript compiler with focus on simplicity and ease of use.
+Grossly simplifying, you can think of it as a cljsbuild and Figwheel replacement.
 
-The main selling point for me was the npm integration, which works out-of-the-box but there are also other advantages. You can find other selling points in the introduction to the official [UserGuide](https://shadow-cljs.github.io/docs/UsersGuide.html).
+The main selling point for me was the npm integration, which works out-of-the-box, but there are also other strong advantages.
+You can find other selling points in the introduction to the official [UserGuide](https://shadow-cljs.github.io/docs/UsersGuide.html).
 
 ---
 **NOTE**
 
-We will assume you are using a GNU/Emacs or a similar editor flavour with Cider installed. If you have not yet, then you can quickly install it with:
+We will assume you are using a GNU/Emacs or a similar editor flavour with Cider installed. If you have not yet you can quickly install it with:
 
-```bash
+```
 M+x package-install
 cider
 ```
-We will also assume [yarn](https://yarnpkg.com) is used as npm dependency management tool, but `npm` would also work just fine.
+We will also assume [yarn](https://yarnpkg.com) is used as npm dependency management tool, but `npm` would work just as fine.
 
 ---
 
 # <a name="howto"/> Integrating shadow-cljs and emacs-cider
 
 There are multiple workflows when using shadow-cljs. You could use the [command-line](https://shadow-cljs.github.io/docs/UsersGuide.html#_command_line) tools only, however to get the full interactive development experience use an editor and integrated REPL. This is where [cider](https://github.com/clojure-emacs/cider) enters.
+Below we will specify the config files needed to get the Emacs-cider and shadow-cljs working together.
 
 ## <a name="shadow-cljs.edn">shadow-cljs.edn
 
@@ -53,14 +55,14 @@ Start by creating a `shadow-cljs.edn`, a config file which specifies build targe
 
 * `:lein true` means the dependencies and sources will be managed by leiningen.
 
-The `:app` build is build for the browser (other option is `:node-script` if we're targeting node):
+The `:app` build is a build targeting the browser (other option is `:node-script` if we're targeting node):
 
 * compiled JS files will be in *public/js* directory
 * the entry point is in the `app.core` namespace.
 * Everything that is in the *public* directory is served on local port 4040
 * There are two (optional) functions to be run when code is hot-reloaded.
 
-The `:ci` build is build for [karma]() test runner
+The `:ci` build is for the [karma](karma-runner.github.io) test runner.
 
 * compiled JS files will be in *out/* directory.
 * runners wil be created for all source files in the classpath which end with *-test*.
@@ -70,7 +72,7 @@ The `:ci` build is build for [karma]() test runner
 This config file is well known to every CLojure developer.
 We need to add all the *dependencies* and specify all the *source-paths* the builds specified in [shadow-cljs.edn](#shadow-cljs.edn):
 
-```
+```clojure
 (defproject shadow-cljs-demo "1.0.0-SNAPSHOT"
   :description "demo app"
   :url "http://example.com/FIXME"
@@ -138,7 +140,7 @@ This is what we need in the end:
 * `karma` is needed for tests.
 * no project is complete withoud a `left-pad` as a dependency.
 
-## <a name="karma">karma config
+## <a name="karma">The karma config
 
 This is a typical config file for the karma test runner:
 
@@ -165,7 +167,7 @@ module.exports = function (config) {
 * We will run the test in the *Chrome* browser.
 * compiled JS files (*ci.js*) for the runner are in the *out* directory.
 
-## <a name="user">user namespace
+## <a name="user">The user namespace
 
 We will use this namespace as an utility to start the shadow-cljs server, get the watcher for hot-reloading and finally give us the cljs REPL:
 
@@ -180,48 +182,48 @@ We will use this namespace as an utility to start the shadow-cljs server, get th
   (shadow.cljs.devtools.api/nrepl-select :app))
 ```
 
-## <a name="repl">Give me the REPL
+## <a name="repl">Give me the REPL!
 
 With all that in place we can have a REPL running in a four simple steps:
 
-1) Install npm dependencies:
+1. Install npm dependencies:
 
 ```bash
 yarn
 ```
 
-2) Start the clj REPL:
+2. Start the clj REPL:
 
 ```emacs
 M+x cider-jack-in
 ```
 
-3) Start the server, build watcher and get the cljs REPL:
+3. Start the server, build watcher and get the cljs REPL:
 
 ```clojure
 (watch-app!)
 ```
 
-4) Point your browser to `localhost:4040`
+4. Point your browser to `localhost:4040`
 
 Similarly you can run watch and run the tests as you change the code by:
 
-1) Starting the server and the watcher:
+1. Starting the server and the watcher:
 
 ```bash
 yarn shadow-cljs watch ci
 ```
 
-2) Starting the karma runner:
+2. Starting the karma runner:
 
 ```bash
 yarn karma start
 ```
 
-## <a name="code">Show me the code
+## <a name="code">Show me the code!
 
 A complete application is availiable as a [GitHub repository](https://github.com/fbielejec/shadow-cljs-demo).
-It shows a couple of things not mentioned in this post, i.e.
+It shows a couple of things not covered in this post, i.e.
 
 * how to include macros in a namespace compiled with shadow-cljs.
 * how to include npm dependencies.
