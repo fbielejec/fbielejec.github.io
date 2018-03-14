@@ -138,7 +138,7 @@ This is what we need in the end:
 
 * The `shadow-cljs` devDependency is needed for running the *scripts* commands.
 * `karma` is needed for tests.
-* no project is complete withoud a `left-pad` as a dependency.
+* No project is complete withoud a `left-pad` as a dependency.
 
 ## <a name="karma">The karma config
 
@@ -165,7 +165,7 @@ module.exports = function (config) {
 ```
 
 * We will run the test in the *Chrome* browser.
-* compiled JS files (*ci.js*) for the runner are in the *out* directory.
+* Compiled JS files (*ci.js*) for the runner are in the *out* directory.
 
 ## <a name="user">The user namespace
 
@@ -188,7 +188,7 @@ With all that in place we can have a REPL running in a four simple steps:
 
 1. Install npm dependencies:
 
-```bash
+```shell
 yarn
 ```
 
@@ -210,13 +210,13 @@ Similarly you can run watch and run the tests as you change the code by:
 
 1. Starting the server and the watcher:
 
-```bash
+```shell
 yarn shadow-cljs watch ci
 ```
 
 2. Starting the karma runner:
 
-```bash
+```shell
 yarn karma start
 ```
 
@@ -225,7 +225,7 @@ yarn karma start
 A complete application is availiable as a [GitHub repository](https://github.com/fbielejec/shadow-cljs-demo).
 It shows a couple of things not covered in this post, i.e.
 
-* how to include macros in a namespace compiled with shadow-cljs.
-* how to include npm dependencies.
+* How to include macros in a namespace compiled with shadow-cljs.
+* How to include npm dependencies.
 
 Thank you for reading!
