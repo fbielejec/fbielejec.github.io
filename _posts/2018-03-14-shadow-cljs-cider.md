@@ -36,7 +36,7 @@ Below we will specify the config files needed to get the Emacs-cider and shadow-
 
 ## <a name="shadow-cljs.edn">shadow-cljs.edn
 
-Start by creating a `shadow-cljs.edn`, a config file which specifies build targets. In this example we will have two builds there, an `:app` or *main* build and `:ci` (a test build):
+Start by creating a `shadow-cljs.edn`, a config file which specifies build targets. In this example we will have two builds there, an `:app` build and `:ci` (a test build):
 
 ```clojure
 {:lein true
@@ -55,22 +55,22 @@ Start by creating a `shadow-cljs.edn`, a config file which specifies build targe
 
 * `:lein true` means the dependencies and sources will be managed by leiningen.
 
-The `:app` build is a build targeting the browser (other option is `:node-script` if we're targeting node):
+The `:app` build is targeting the browser (other option is `:node-script` if we're targeting node):
 
-* compiled JS files will be in *public/js* directory
-* the entry point is in the `app.core` namespace.
-* Everything that is in the *public* directory is served on local port 4040
+* Compiled JS files will go to the *public/js* directory
+* The entry point is in the `app.core` namespace.
+* Everything that is in the *public* directory is served on local port 4040.
 * There are two (optional) functions to be run when code is hot-reloaded.
 
-The `:ci` build is for the [karma](karma-runner.github.io) test runner.
+The `:ci` build is for the [karma](karma-runner.github.io) test runner:
 
 * compiled JS files will be in *out/* directory.
-* runners wil be created for all source files in the classpath which end with *-test*.
+* runners will be created for all source files in the classpath which end with *-test* (another option is to specify the test runner namespace see [here](https://shadow-cljs.github.io/docs/UsersGuide.html#target-browser-test).)
 
 ## <a name="project.clj">project.clj
 
 This config file is well known to every CLojure developer.
-We need to add all the *dependencies* and specify all the *source-paths* the builds specified in [shadow-cljs.edn](#shadow-cljs.edn):
+We need to add all the *dependencies* and specify all the *source-paths* for the `:app` and `:ci` builds created in [shadow-cljs.edn](#shadow-cljs.edn):
 
 ```clojure
 (defproject shadow-cljs-demo "1.0.0-SNAPSHOT"
@@ -96,8 +96,8 @@ We need to add all the *dependencies* and specify all the *source-paths* the bui
 
 ## <a name="package.json">package.json
 
-Since in this project we will include packages from npm repository, those dependencies need to be in the package.json.
-You can run `yarn init` you will get an interactive prompt to help you specify the config.
+Since in this project we will include packages from npm repository, those dependencies need to be in the `package.json` config file.
+If you run `yarn init` you will get an interactive prompt to help you specify the config.
 
 ---
 **NOTE**
