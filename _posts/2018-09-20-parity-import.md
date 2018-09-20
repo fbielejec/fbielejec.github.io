@@ -15,10 +15,12 @@ categories:
 In this post we will go over importing an existing ethereum account into Parity.
 Unfortunately there is no standard for exporting and importing ethereum accounts between MetaMask, Geth and Parity, table below summarizes what is currently supported by the software:
 
+<div class="datatable-begin"></div>
 |               |                 | Metamask  | go-ethereum | parity |
 |---------------|-----------------|:---------:|:-----------:|:------:|
 | private key   | import / export |+/+        |+/-          |-/-     |
 | keystore file | import / export |+/-        |+/+          |+/      |
+<div class="datatable-end"></div>
 
 ---
 **What is a keystore file?**
@@ -36,7 +38,7 @@ We will assume this account belongs to the ethereum [Ropsten](https://ropsten.et
 
 You will also need [geth](https://github.com/ethereum/go-ethereum) ethereum implementation, which you can install with:
 
-```bash
+```console
 sudo add-apt-repository -y ppa:ethereum/ethereum
 sudo apt-get update
 sudo apt-get install ethereum
@@ -56,7 +58,7 @@ Copy the private key and paste it into a file called `pass.txt`
 
 Import the acount private key into geth:
 
-```bash
+```console
 geth --testnet account import ~/pass.txt
 ```
 
@@ -69,13 +71,13 @@ Geth will create a keystore file in `~/.ethereum/testnet/keystore/`
 
 You can now use the `import` command to import the keystore file into parity, which expects a path to the directory containing the file(s):
 
-```bash
+```console
 parity --chain=ropsten account import ~/.ethereum/testnet/keystore/
 ```
 
 If you see:
 
-``` bash
+``` console
 1 account(s) imported
 ```
 then everything went fine.
@@ -85,7 +87,7 @@ Parity stores the keystore files in:
 Go ahead and start syncing the chain.
 To unlock the account you will need to paste the passphrase into a separate tet file `pass.txt` and give parity the path to it:
 
-```bash
+```console
 parity --chain=ropsten --unlock 0x76136f7a41e4cec95f1dffe5a8cf4a73bcd5727b --password ~/pass.txt
 ```
 
@@ -94,4 +96,5 @@ parity --chain=ropsten --unlock 0x76136f7a41e4cec95f1dffe5a8cf4a73bcd5727b --pas
 
 You can feed you account with some fake ETH using the testnet faucet here:
 https://faucet.ropsten.be/
+
 ---
