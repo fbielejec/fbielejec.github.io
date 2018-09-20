@@ -23,7 +23,10 @@ Unfortunately there is no standard for exporting and importing ethereum accounts
 ---
 **What is a keystore file?**
 
-An Ethereum keystore file is a file in JOSN format which is an encrypted version wof your unique Ethereum private key. Together with a passphrase they form the private key. For that exact reason it is safer to access your funds protected with a keystore file and a passphrase, rather than directly with an unencrypted private key.
+An Ethereum keystore file is a file in JSON format which is an encrypted version of your unique Ethereum private key. 
+Basically together with a passphrase this file forms the private key. 
+For that exact reason it is safer to access your funds with a keystore file and a passphrase, rather than directly with an unencrypted private key.
+
 ---
 
 # <a name="prerequisites"> Prerequisites </a>
@@ -32,6 +35,7 @@ You will need a browser with a [MetaMask](https://metamask.io/) extension, and a
 We will assume this account belongs to the ethereum [Ropsten](https://ropsten.etherscan.io/) testnet, but exactly the same steps can be followed for a mainnet account.
 
 You will also need [geth](https://github.com/ethereum/go-ethereum) ethereum implementation, which you can install with:
+
 ```bash
 sudo add-apt-repository -y ppa:ethereum/ethereum
 sudo apt-get update
@@ -42,9 +46,9 @@ Finally you need [Parity](https://github.com/paritytech/parity-ethereum/releases
 
 # <a name="export"> Exporting MetaMask private key </a>
 
-From MetaMask select "Export private key":
+From MetaMask select **Export private key**:
 
-![_config.yml]({{ site.baseurl }}/images/2018-09-20-1537453850_screenshot_1920x1080.jpg)
+![_config.yml]({{ site.baseurl }}/images/2018-09-20-parity-import/2018-09-20-1537453850_screenshot_1920x1080.jpg)
 
 Copy the private key and paste it into a file called `pass.txt`
 
@@ -57,8 +61,9 @@ geth --testnet account import ~/pass.txt
 ```
 
 Geth will prompt (twice) for a passphrase to encypt the keystore file.
-Choose or better yet generate one and store it offline in a password manager..
-This will create a keystore file in `~/.ethereum/testnet/keystore/`
+Choose, or better yet generate, and store it offline with a password manager.
+
+Geth will create a keystore file in `~/.ethereum/testnet/keystore/`
 
 # <a name="parity-import"> Import the keystore file into parity </a>
 
@@ -81,7 +86,7 @@ Go ahead and start syncing the chain.
 To unlock the account you will need to paste the passphrase into a separate tet file `pass.txt` and give parity the path to it:
 
 ```bash
-parity --chain=ropsten --unlock c4e0b92df2de77c077d060e49ec63dc196980716 --password ~/pass.txt
+parity --chain=ropsten --unlock 0x76136f7a41e4cec95f1dffe5a8cf4a73bcd5727b --password ~/pass.txt
 ```
 
 ---
