@@ -73,6 +73,12 @@ You can now use the `import` command to import the keystore file into parity, wh
 parity --chain=ropsten account import ~/.ethereum/testnet/keystore/
 ```
 
+for MacOS:
+
+```bash
+parity --chain=ropsten account import ./Library/Ethereum/testnet/keystore
+```
+
 If you see:
 
 ``` bash
