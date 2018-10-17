@@ -23,9 +23,9 @@ Unfortunately there is no standard for exporting and importing ethereum accounts
 ---
 **What is a keystore file?**
 
-An Ethereum keystore file is a file in JSON format which is an encrypted version of your unique Ethereum private key. 
-Basically together with a passphrase this file forms the private key. 
-For that exact reason it is safer to access your funds with a keystore file and a passphrase, rather than directly with an unencrypted private key.
+A Ethereum keystore file is a file in JSON format which is an encrypted version of your unique Ethereum private key. 
+Together with a passphrase this file forms the private key. 
+For this exact reason it is safer to access your funds with a keystore file and a passphrase, rather than directly with an unencrypted private key.
 
 ---
 
@@ -42,7 +42,7 @@ sudo apt-get update
 sudo apt-get install ethereum
 ```
 
-Finally you need [Parity](https://github.com/paritytech/parity-ethereum/releases) software insatlled and on you `PATH`.
+Finally you need [Parity](https://github.com/paritytech/parity-ethereum/releases) installed and on you `PATH`.
 
 # <a name="export"> Exporting MetaMask private key </a>
 
@@ -54,7 +54,7 @@ Copy the private key and paste it into a file called `pass.txt`
 
 # <a name="geth-import"> Import the private key to geth </a>
 
-Import the acount private key into geth:
+Import the accounts private key into geth:
 
 ```bash
 geth --testnet account import ~/pass.txt
@@ -84,9 +84,9 @@ If you see:
 ``` bash
 1 account(s) imported
 ```
-then everything went fine.
+That means everything went fine.
 Parity stores the keystore files in:
-`/home/filip/.local/share/io.parity.ethereum/keys/test`
+`/.local/share/io.parity.ethereum/keys/test`
 
 Go ahead and start syncing the chain.
 To unlock the account you will need to paste the passphrase into a separate tet file `pass.txt` and give parity the path to it:
