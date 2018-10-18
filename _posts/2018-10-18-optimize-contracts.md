@@ -54,4 +54,4 @@ The parameter `n` can take any positive integer value between `0` and +infinity 
 Simplifyng a bit we can say it represents how many times the contract will be run after it is deployed.
 
 For example if the contract is to be invoked only once and then subsequently destroyed, a good value would be `1`.
-But if the contract is going to get executed hundreds of times than increasing that parameter from its default value of `200` to refelect that is a good idea.
+But if the contract is going to get executed hundreds of times, than increasing that value (from its default of `200`) to refelect that is a good idea.
