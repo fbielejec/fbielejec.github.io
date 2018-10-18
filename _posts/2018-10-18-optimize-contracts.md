@@ -13,7 +13,7 @@ categories:
 ---
 
 # <a name="intro"/> Intro
-Recently when working on a set of smart contracts I ran into an issue, where several of them could not be deployed because the overflow the block gas limit.
+Recently when working on a set of smart contracts I ran into an issue, where several of them could not be deployed because they would overflow the block gas limit.
 
 ---
 **What are the costs of deploying a contract?**
@@ -21,12 +21,14 @@ Recently when working on a set of smart contracts I ran into an issue, where sev
 As per the [Yellow Paper](https://github.com/ethereum/yellowpaper) there is a `21000` gas **Gtransaction** fee paid on all transaction on the Ethereum network.
 To this we need to add `32000` **Gcreate** fee for a contract creation transaction.
 Finaly we pay for the transaction data size, that is for the bytecode size of the compiled contract binary, which is respectively:
-* **Gtxdatazero** costs of `4` gas per zero byte
-* **Gtxdatanonzero** costs of `68` gas per non-zero byte
+* **Gtxdatazero** costs of `4` gas per zero byte.
+* **Gtxdatanonzero** costs of `68` gas per non-zero byte.
 
 ---
 
-This prompted me to add the support for to the optimizer to the <!-- [lein-solc]({% post_url 2018-05-21-lein-solc %})  --> [lein-solc](https://www.blog.nodrama.io/lein-solc/) plugin to ensure that they can be deployed free and clear.
+This prompted me to add the support for to the optimizer to the
+<!-- [lein-solc]({% post_url 2018-05-21-lein-solc %})  -->
+[lein-solc](https://www.blog.nodrama.io/lein-solc/) plugin, to ensure that they can be deployed free and clear.
 
 # <a name="using"/> Using the optimizer
 
@@ -49,7 +51,7 @@ To activate the optimizer for the contracts that rely on it you pass a map with 
 
 # <a name="value"/> Choosing the parameter value
 
-`solc` optimizer works with a linear trade-off between the size of the code (which in turn increases the deployment costs) and the runtime costs (costs of transacting with the contract).
+[`solc`](https://solidity.readthedocs.io/en/latest/using-the-compiler.html) optimizer works with a linear trade-off between the size of the code (which in turn increases the deployment costs) and the runtime costs (costs of transacting with the contract).
 The parameter `n` can take any positive integer value between `0` and +infinity that represents this tradeoff.
 Simplifyng a bit we can say it represents how many times the contract will be run after it is deployed.
 
