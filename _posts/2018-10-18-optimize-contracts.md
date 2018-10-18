@@ -26,7 +26,7 @@ Finaly we pay for the transaction data size, that is for the bytecode size of th
 
 ---
 
-This prompted me to add the support for to the optimizer to the [lein-solc]({% post_url 2018-05-21-lein-solc %}) plugin to ensure that they can be deployed free and clear.
+This prompted me to add the support for to the optimizer to the <!-- [lein-solc]({% post_url 2018-05-21-lein-solc %})  --> [lein-solc](https://www.blog.nodrama.io/lein-solc/) plugin to ensure that they can be deployed free and clear.
 
 # <a name="using"/> Using the optimizer
 
