@@ -1,0 +1,10 @@
+language: ruby
+rvm:
+- 2.1
+script: "bundle exec jekyll build"
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+    recipients:
+    - fbielejec@gmail.com
