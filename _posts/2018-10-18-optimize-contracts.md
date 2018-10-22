@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Optimize contract code
+title: Optimize smart contract code for bytecode size
 comments: true
 categories:
 - Clojure
@@ -10,6 +10,9 @@ categories:
 - blockchain
 - ethereum
 - optimizations
+- deploying
+- smart contracts
+- size
 ---
 
 # <a name="intro"/> Intro
@@ -30,7 +33,7 @@ This prompted me to add the support for to the optimizer to the [lein-solc](http
 
 # <a name="using"/> Using the optimizer
 
-Optimizer is suported since version `1.0.2` of the plugin:
+Optimizer is supported since the version `1.0.2` of the plugin:
 
 ```clojure
 :plugins [[lein-solc "1.0.2"]]
