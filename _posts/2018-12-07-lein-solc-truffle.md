@@ -16,9 +16,9 @@ categories:
 # <a name="intro">Intro</a>
 
 [Truffle](https://truffleframework.com/truffle) is a part of a larger smart contract development framework.
-It bring many benefits, but it really shines when it comes to smart contract deployment and migration.
+Like a sort of swiss-army-knife for smart-contracts development it bring many benefits, but it really shines when it comes to smart contract deployment and migration.
 
-Truffle lets you write simple deployment scripts and will keep track of deployed contracts and their addresses against all the configured ethereum networks.
+Truffle lets you write simple deployment scripts and will keep track of deployed contracts and their addresses against all of the configured ethereum networks.
 For details best consult truffle's comprehensive [documentation](https://truffleframework.com/docs/truffle/getting-started/running-migrations).
 
 There are some downsides though.
@@ -27,7 +27,7 @@ There are some downsides though.
 - There is no _watch_ mode for `truffle compile` to autocompile the contracts on source code changes.
 - Current stable version of truffle (`4.X` at the time of writing) uses [solc.js](https://www.npmjs.com/package/solc), rather than the native compiler, which is significantly slower. Future versions of Truffle (since `5.X` should support [setting custom compiler](https://github.com/trufflesuite/truffle/issues/265)).
 
-All of these problems can be mitigated by using [lein-solc](https://github.com/district0x/lein-solc) plugin for compiling smart-contract code and truffle solely for deploying them.
+All of these problems can be mitigated by using [lein-solc](https://github.com/district0x/lein-solc) plugin for compiling smart-contract code, and relying on truffle just for deploying them.
 In this post we will go over setting up a workflow that allows to do just that.
 
 # <a name="requirements">Requirements</a>
@@ -40,8 +40,8 @@ sudo wget -P /bin https://github.com/ethereum/solidity/releases/download/v0.4.24
 sudo chmod a+x /bin/solc-static-linux
 sudo ln -s /bin/solc-static-linux /usr/bin/solc
 ```
-We will also assume that [leiningen] (https://leiningen.org/) is present.
-Obviously you will also be needing *truffle* and [ganache](https://github.com/trufflesuite/ganache-cli) testrpc:
+We will also assume that [leiningen](https://leiningen.org/) is installed.
+Obviously you will also be needing *truffle* and the [ganache](https://github.com/trufflesuite/ganache-cli) testrpc:
 
 ```bash
 npm install -g truffle
@@ -79,7 +79,7 @@ contract TestContract {
 }
 ```
 
-Let's create a migration script `2_lein_solc_migration.js` inside the *migrations/* directory:
+We now need a migration script, which we can call `2_lein_solc_migration.js`, created inside the *migrations/* directory:
 
 ```javascript
 var TestContract = artifacts.require ('TestContract');
@@ -108,7 +108,7 @@ module.exports = {
 
 # <a name="lein-solc">Compiling smart contracts with lein-solc</a>
 
-To bring lein-solc to the project we need to create `project.clj` file with the config:
+To bring lein-solc to the project we need to create `project.clj` file with the plugins config:
 
 ```clojure
 (defproject lein-solc-truffle "1.0.0"
@@ -116,30 +116,30 @@ To bring lein-solc to the project we need to create `project.clj` file with the 
   :plugins [[lein-solc "1.0.11"]]
 
   :solc {:src-path "contracts"
-         :build-path "build/contracts/" 
+         :build-path "build/contracts/"
          :abi? false
-         :bin? false 
+         :bin? false
          :truffle-artifacts? true
          :contracts :all})
 ```
 
-Truffle artifacts are supported since version `1.0.11` of the plugin, we also give it the path where contract sources reside, tell it where to output the resulting artifacts and to skip generating separate files with the bytecode and abi. 
+Truffle artifacts are supported since version `1.0.11` of the plugin, and that's the version we will usem we also give it the path where contract sources reside, tell it where to output the resulting artifacts and to skip generating separate files with the bytecode and abi.
 For the other options and the explanation you can consult the official [documentation](https://github.com/district0x/lein-solc#usage).
 
-With that in place we can compile the contract:
+With that in place we can compile the contracts:
 
 ```bash
-lein solc once
+lein solc
 ```
 
 To start the plugin in watch mode and autocompile on changes:
 
 ```bash
-lein solc auto 
+lein solc auto
 ```
 
 After it finishes the `TestContract.json` artifact is created inside the *`build-path`* directory.
-If we examine it, truffle artifacts are just json envelopes around the compiled *abi* and *bytecode*.
+If we examine it, truffle artifacts are just JSON envelopes around the compiled *abi* and *bytecode*, with some additional information truffle uses for book-keeping of the deployed contracts.
 
 # <a name="deploying">Deploying the contracts</a>
 
@@ -155,11 +155,12 @@ To run the migration script and deploy the contracts we invoke truffle, specifyi
 truffle migrate --network ganache --reset
 ```
 
-Any changes to the contracts will be recompiled by the lein-solc in watch mode, and we can redeploy them again with trufle, speeding up the development cycle.  
+Any changes to the contracts will be recompiled by the lein-solc, provided it is running in the watch mode, and we can redeploy them again with truffle, speeding up the development cycle.
 
 # <a name="conclusions">Conclusions</a>
 
 Proposed workflow is obviously just one of many, but hopefully you can find it usefull.
+
 I maintain a [repository](https://github.com/fbielejec/lein-solc-truffle/blob/master/project.clj) with an extended version of the example that we just went through.
 There are several contracts deployed, and the migration script covers some more advanced deployment steps, like linking contracts via their bytecode and using `delegatecall` in MutableForwarder to create updateable instances of the contracts.
 
