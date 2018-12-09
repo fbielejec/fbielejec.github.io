@@ -25,7 +25,7 @@ There are some downsides though.
 
 - Truffle has no `--no-compile` flag and will start by compiling the contracts before migrating them at the start of the session.
 - There is no _watch_ mode for `truffle compile` to autocompile the contracts on source code changes.
-- Current stable version of truffle (`4.X` at the time of writing) uses [solc.js](https://www.npmjs.com/package/solc), rather than the native compiler, which is significantly slower. Future versions of Truffle (since `5.X` should support [setting custom compiler](https://github.com/trufflesuite/truffle/issues/265)).
+- Current stable version of truffle (`4.X` at the time of writing) uses [solc.js](https://www.npmjs.com/package/solc), rather than the native compiler, which is significantly slower. Future versions of Truffle (since `5.X`) should support [setting custom compiler](https://github.com/trufflesuite/truffle/issues/265).
 
 All of these problems can be mitigated by using [lein-solc](https://github.com/district0x/lein-solc) plugin for compiling smart-contract code, and relying on truffle just for deploying them.
 In this post we will go over setting up a workflow that allows to do just that.
@@ -156,6 +156,22 @@ truffle migrate --network ganache --reset
 ```
 
 Any changes to the contracts will be recompiled by the lein-solc, provided it is running in the watch mode, and we can redeploy them again with truffle, speeding up the development cycle.
+
+# <a name="interacting">Interacting the contracts</a>
+
+To confirm the dpeloyment went fine, and the contracts are availiable on the network we can open the truffle JS console:
+
+```bash
+truffle console --network ganache
+```
+
+Truffle injects all the deployed contracts, so we can simply call:
+
+```javascript
+TestContract.at(TestContract.address).value();
+```
+
+and get the `value` set in the contract's constructor as a response.
 
 # <a name="conclusions">Conclusions</a>
 
