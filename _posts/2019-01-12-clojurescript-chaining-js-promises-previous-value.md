@@ -15,7 +15,7 @@ categories:
 
 # <a name="intro"> Intro </a>
 
-When writing asynchronous code in ClojureScript, or working with JavaScript libraries we often have to work with native JS Promises.
+When writing asynchronous code in ClojureScript, or dealing with JavaScript libraries we often have to work with native JS Promises.
 If you'd like to make your code more readable and idiomatic, here's a macro you could use:
 
 ``` clojure
@@ -61,12 +61,12 @@ Here is a basic example of using the macro to chain two promises:
                   (prn "I like fast!")
                   (resolve "fast!")))))
 
-  (promise-> (slow-promise)
-             fast-promise)
+(promise-> (slow-promise)
+           fast-promise)
 
 ```
 
-The output from evaluating above code:
+The output from evaluating the above code:
 
 ```
 "I like slooow"
@@ -74,10 +74,10 @@ The output from evaluating above code:
 "fast!"
 ```
 
-`fast-promise` had to wait with it's execution for the `slow-promise`, the return value is that of the last promise in chain.
-We will revisit the problem and talk about returning the [previous value](#previous) as well.
+The `fast-promise` had to wait with it's execution for the `slow-promise`, the return value printed is that of the last promise in the chain.
+We will revisit this problem and talk about returning the [previous value](#previous) as well.
 
-There is nothing stopping you from using the macro to evaluate nested Promise chains, and writing code like this:
+There is nothing stopping you from using the macro to evaluate nested Promise chains, and writing code that looks like this:
 
 ```clojure
 (promise-> (promise-> (js/Promise.resolve (prn "a"))
@@ -87,7 +87,7 @@ There is nothing stopping you from using the macro to evaluate nested Promise ch
 
 # <a name="rejection"> Handling Promise rejection </a>
 
-If one of the promises in the chain encounters an error than the macro handles that.
+If one of the promises in the chain encounters an error, the macro handles that in its `catch` block.
 Here is an example:
 
 ```clojure
@@ -100,7 +100,7 @@ Here is an example:
            fast-promise)
 ```
 
-If you evaluate that you get:
+If you evaluate this code you would get:
 
 ```
 "I like slooow"
