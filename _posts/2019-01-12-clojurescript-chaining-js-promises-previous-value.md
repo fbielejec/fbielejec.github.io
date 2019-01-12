@@ -4,6 +4,7 @@ title: Chaining JS Promises in Clojurescript and the problem of the previous val
 comments: true
 categories:
 - clojurescript
+- asynchronous
 - async
 - promise
 - JS
@@ -138,7 +139,7 @@ Result:
 
 # <a name="callback"> From a callback to a promise </a>
 
-Finally, what if some asynchronopus API works with callbacks rather that JS Promises?
+Finally, what if some asynchronous API works with callbacks, rather that JS Promises?
 We can easily convert a callback-style code into a Promise based one:
 
 ```clojure
