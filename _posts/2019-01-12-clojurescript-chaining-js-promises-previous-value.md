@@ -110,7 +110,7 @@ If you evaluate this code you would get:
 
 Rejection was gracefully handled, app did not crash.
 
-# <a name="previous"> Chaining with a previous value </a>
+# <a name="previous"> Chaining Promises with a previous value </a>
 
 What if you need to pass the data between the Promises in the chain?
 One example would be a chain of calls to multiple servers, or simply a step-wise calculation.
@@ -137,7 +137,24 @@ Result:
 {:val1 1, :val2 2}
 ```
 
-# <a name="callback"> From a callback to a promise </a>
+# <a name="collection"> Collection of Promises </a>
+
+If we need to wait untill all of the promises are resolved we can use the macro in combination with `Promise.all`, passing a collection of Promise objects: 
+
+```clojure
+(promise-> (js/Promise.all
+              [(js/Promise.resolve "FU")
+               (js/Promise.resolve "BAR")])
+             prn)
+```
+
+Result:
+
+```
+["FU" "BAR"]
+```
+
+# <a name="callback"> From a callback to a Promise </a>
 
 Finally, what if some asynchronous API works with callbacks, rather that JS Promises?
 We can easily convert a callback-style code into a Promise based one:
