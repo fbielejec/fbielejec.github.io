@@ -27,7 +27,7 @@ There are some downsides though.
 - There is no _watch_ mode for `truffle compile` to autocompile the contracts on source code changes.
 - Current stable version of truffle (`4.X` at the time of writing) uses [solc.js](https://www.npmjs.com/package/solc), rather than the native compiler, which is significantly slower. Future versions of Truffle (since `5.X`) should support [setting custom compiler](https://github.com/trufflesuite/truffle/issues/265).
 
-All of these problems can be mitigated by using [lein-solc](https://github.com/district0x/lein-solc) plugin for compiling smart-contract code, and relying on truffle just for deploying them.
+All of these problems can be mitigated by using [lein-solc](https://github.com/fbielejec/lein-solc) plugin for compiling smart-contract code, and relying on truffle just for deploying them.
 In this post we will go over setting up a workflow that allows to do just that.
 
 # <a name="requirements">Requirements</a>
@@ -124,7 +124,7 @@ To bring lein-solc to the project we need to create `project.clj` file with the 
 ```
 
 Truffle artifacts are supported since version `1.0.11` of the plugin, and that's the version we will usem we also give it the path where contract sources reside, tell it where to output the resulting artifacts and to skip generating separate files with the bytecode and abi.
-For the other options and the explanation you can consult the official [documentation](https://github.com/district0x/lein-solc#usage).
+For the other options and the explanation you can consult the official [documentation](https://github.com/fbielejec/lein-solc#usage).
 
 With that in place we can compile the contracts:
 
