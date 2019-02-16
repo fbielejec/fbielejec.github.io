@@ -105,7 +105,7 @@ script: lein test
 
 This very basic file contains i.e. information on the language of the repository and the test command.
 
-Travis supports storing encrypted values in this file, such as environment variables, only readable by Travis CI, meaning the repositroy owner does not need to keep any private keys.
+Travis supports storing encrypted values in this file, such as environment variables, only readable by Travis CI, meaning the repository owner does not need to keep any private keys.
 We will use this to store the credentials to access Clojars during CI/CD build.
 
 Start by installing the travis-cli and its dependencies:
