@@ -123,8 +123,8 @@ For some basic container orchestration you might also be interested in installin
 Following command encrypts these credentials with the public key attached to your repository, and adds them to the `travis.yml` file.
 
 ```bash
-travis encrypt DOCKER_USERNAME=<docker-username> --add
-travis encrypt DOCKER_PASSWORD=<docker-password> --add
+travis encrypt DOCKER_USERNAME=<dockerhub-username> --add
+travis encrypt DOCKER_PASSWORD=<dockerhub-password> --add
 ```
 
 Now let's look at the deploy script which builds and deploys the application image.
