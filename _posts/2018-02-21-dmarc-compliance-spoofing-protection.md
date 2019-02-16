@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Complying with DMARC (AWS Route 53 and Gmail)
+title: Protect you domains from spoofing using DMARC (AWS Route 53 and Gmail)
 comments: true
 categories:
 - AWS

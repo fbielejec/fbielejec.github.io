@@ -90,7 +90,7 @@ Therefore the best practice is to explicitely tag the last built with the *lates
 docker tag nodrama/app:7eba7eda97513e01f5421d05059cebcb861fd805 nodrama/app:latest
 ```
 
-If we follow this practice, there should be no suprises, as the image tagged as the latest will always correspond to the semanically last known build.  
+If we follow this practice, there should be no suprises, as the image tagged as the latest will always correspond to the semanically last known build.
 
 # <a name="travis">Pushing to Dockerhub from Travis CI</a>
 
