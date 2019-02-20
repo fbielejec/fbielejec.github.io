@@ -36,7 +36,7 @@ Yuu should be able to adopt these steps for different settings/repositoreis used
 # <a name="dockerfile">Writing a Dockerfile</a>
 
 Let's assume our project is shipped as a jar file, and needs a JRE environment to run.
-In that case all we need can be is a following `Dockerfile`:
+In that case all we need is a following `Dockerfile`:
 
 ```
 FROM adoptopenjdk/openjdk8:latest
@@ -58,7 +58,7 @@ docker build -t nodrama/app -f docker-builds/Dockerfile .
 
 Risking sounding opinionated I believe that Docker is to DevOps what GitHub is to development, which is why the *right way* to version Docker images is with the hashes corresponding to commits on the master branch.
 
-If you follow the healthy git practices of working with feature branches, squashing commits before merging them and never reverting commits on the master branch you can immediately see the gains.
+If you follow the healthy practices of working with feature branches, squashing commits before merging them and never reverting commits on the master branch, you can immediately see the gains.
 You can track back running containers to the merged features, immediately roll-back containers in your environments to a known point (should something break), finally if they pass the QA phase you can deploy them to the production and be sure that no unknown bugs are shipped.
 
 So how exactly do we tag the Docker images with commit hashes?
