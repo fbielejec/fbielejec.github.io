@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Optimize smart contract code for bytecode size
+author: Filip Bielejec
 comments: true
 categories:
 - Clojure

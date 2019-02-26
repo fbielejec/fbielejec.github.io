@@ -1,6 +1,7 @@
 ---
 layout: post
 title: shadow-cljs and Emacs/Cider integration
+author: Filip Bielejec
 comments: true
 categories:
 - clojurescript

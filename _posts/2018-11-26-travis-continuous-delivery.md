@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Setting up a Continuous Delivery pipeline
+author: Filip Bielejec
 comments: true
 categories:
 - automation

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Compile time spec checking with Clojure
+author: Filip Bielejec
 comments: true
 categories:
 - Clojure

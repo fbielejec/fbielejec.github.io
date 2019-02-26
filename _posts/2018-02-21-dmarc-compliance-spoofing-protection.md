@@ -2,6 +2,7 @@
 layout: post
 title: Protect you domains from spoofing using DMARC (AWS Route 53 and Gmail)
 comments: true
+author: Filip Bielejec
 categories:
 - AWS
 - email

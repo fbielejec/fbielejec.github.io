@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Chaining JS Promises in Clojurescript and the problem of the previous value
+author: Filip Bielejec
 comments: true
 categories:
 - clojurescript

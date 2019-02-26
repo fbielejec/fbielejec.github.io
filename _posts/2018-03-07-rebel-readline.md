@@ -2,6 +2,7 @@
 layout: post
 title: Install and use rebel-readline terminal editor for Clojure
 comments: true
+author: Filip Bielejec
 categories:
 - Clojure
 - tooling

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: How to import raw private keys into Parity?
+author: Filip Bielejec
 comments: true
 categories:
 - blockchain

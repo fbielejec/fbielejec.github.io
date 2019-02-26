@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Using lein-solc with truffle
+author: Filip Bielejec
 comments: true
 categories:
 - ethereum

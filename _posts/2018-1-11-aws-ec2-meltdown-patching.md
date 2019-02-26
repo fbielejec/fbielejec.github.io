@@ -1,6 +1,8 @@
 ---
 layout: post
 title: Patching your AWS EC2 instance for the Meltdown/Spectre vulnerabilities
+author: Filip Bielejec
+comments: true
 ---
 
 # Intro
