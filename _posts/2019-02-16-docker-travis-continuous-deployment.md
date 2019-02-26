@@ -2,6 +2,7 @@
 layout: post
 title: Setting up a Continuous Deployment pipeline with Docker and Travis
 comments: true
+author: Filip Bielejec
 categories:
 - Continuous Deployment
 - Docker
