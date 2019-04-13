@@ -3,14 +3,9 @@ layout: post
 title: Developing re-natal iOS apps on GNU/Linux
 author: Filip Bielejec
 comments: true
-categories:
-- clojurescript
-- re-natal
-- react-native
-- iOS
-- linux
-- xcode
-- virtualbox
+categories: [clojurescript, re-natal, react-native, iOS, mobile development, linux, xcode, virtualbox]
+tags: [clojurescript, iOS, linux, xcode]
+summary: "How to develop mobile iOS applications on Linux"
 ---
 
 # <a name="intro"> Intro </a>

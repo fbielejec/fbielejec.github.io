@@ -3,18 +3,9 @@ layout: post
 title: Setting up a Continuous Deployment pipeline with Docker and Travis
 comments: true
 author: Filip Bielejec
-categories:
-- Continuous Deployment
-- Docker
-- Travis
-- Watchtower
-- automation
-- DevOps
-- CI
-- CD
-- CI/CD
-- git
-- Github
+categories: [DevOps, ContinuousDeployment, automation, CI, CD, CI/CD, git]
+tags: [docker, travis, watchtower, github]
+summary: "In this entry I will describe how to setup a pipeline for a Continuous Deliver of an entire project"
 ---
 
 # <a name="intro">Intro</a>
