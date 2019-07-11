@@ -12,9 +12,9 @@ summary: "How to develop mobile iOS applications on Linux"
 
 If you are a developer writing mobile applications in the year 2019, chances are you are working with React Native.
 React Native workflow is split into two separate steps.
-One is the packager, an engine which lets you work with native mobile UI components through JavaScript, that reloads every time you save your JavaScript code.
-
+One is the packager, an engine which lets you work with the native mobile UI components through JavaScript, that reloads every time you save your JavaScript code.
 The other is the simulator.
+
 Unfortunately, to run the iOS simulator and do any kind of iOS development you need a macOS and the XCode IDE.
 If you're like me, my Linux setup is just paramount to my productivity and I can't imagine working without e.g. a tiling window manager or keyboard shortcuts perfected by the years of practice :)
 
@@ -87,7 +87,7 @@ brew install socat
 ```
 We are done with the guest for now, lets go to the host and create our project.
 
-# <a name="re-natal"> Create project </a>
+# <a name="re-natal"> Creating the project </a>
 
 Lets start by installing re-natal and react-native.
 Both come as convenient node packages, that we can install globally:
