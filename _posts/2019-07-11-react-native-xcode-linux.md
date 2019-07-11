@@ -1,6 +1,6 @@
 ---
 layout: post
-title:
+title: Using shadow-cljs to compile React Native for iOS on GNU/Linux
 comments: true
 author: Filip Bielejec
 categories: [clojurescript, cljs, shadow-cljs, react-native, iOS, mobile, linux, xcode, virtualbox ]
