@@ -28,16 +28,35 @@ Start by adding the it to your dependencies:
 :dependencies [[fbielejec/cljs-firebase-client "0.0.9"]]
 ```
 
-An here's how you could use it to get a paginated Firebase query statement:
+Here's how you can store in a Firestore db for a social app the fact that Tamara started following Billy:
 
+```clojure
+(defn follow
+  "Tamara follows Billy:
+  (follow "Tamara" "Billy")"
+  [follower-id followed-id]
+  (promise->
+   (db/document-set {:collection "followers"
+                     :id followed-id
+                     :document {follower-id true}}
+                    {:merge true})
+   (db/document-set {:collection "following"
+                     :id follower-id
+                     :document {followed-id true}}
+                    {:merge true})))
+```
+
+We've set created two documents, one under the  "followers/Billy" path with contents {"Tamara" true}, another under the "following/Tamara" path with contents {"Billy" true}.
+Due to the NO SQL based nature of Firestore this allows for a quick bi-directional retrieval of documents.
+
+And here's how you could use it to get a paginated Firebase query statement retrieving all Billy's followers:
 
 ```clojure
 (ns my-app
-  (:require [firebase.firestore :as db]
-            [firebase.auth :as auth]))
+  (:require [firebase.firestore :as db]))
 
 (let [batch-size 3
-      user-id (.-uid (auth/current-user))
+      user-id "Billy)
       first-batch (-> (db/coll-ref "following")
                       (db/where ">=" user-id true)
                       (db/order-by user-id)
