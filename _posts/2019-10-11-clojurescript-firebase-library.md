@@ -56,7 +56,7 @@ And here's how you could use it to get a paginated Firebase query statement retr
   (:require [firebase.firestore :as db]))
 
 (let [batch-size 3
-      user-id "Billy)
+      user-id "Billy")
       first-batch (-> (db/coll-ref "following")
                       (db/where ">=" user-id true)
                       (db/order-by user-id)
