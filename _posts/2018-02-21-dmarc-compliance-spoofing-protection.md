@@ -147,7 +147,7 @@ Next create a following DNS record in the AWS Console:
 ```
 Name: _dmarc.example.com
 Type: TXT
-Value: "v=DMARC1; p=none; pct=100; rua=mailto:re+scylh8xq0nc@dmarc.postmarkapp.com; sp=none; aspf=r;"
+Value: "v=DMARC1; p=none; pct=100; rua=mailto:re+scylh8xq0nc@dmarc.postmarkapp.com; sp=none; aspf=r; adkim=s;"
 Routing Policy: Simple
 ```
 
@@ -159,7 +159,7 @@ Note that we are setting the policy to `p=none`, which translates to *"only gath
 The best practice is you should start with this policy, and only afterwards progress to `p=quarantine` (put messages failing the DMARC policy into SPAM) and finally `p=reject` (do not deliver offending messages).
 This way you can gradually assure nothing wrong is happening to your organisations email communications.
 
-We also specify `aspf=r` which stands for the *relaxed* alignment mode we talked about [here](#compliancy).
+We also specify `aspf=r` which stands for the *relaxed* alignment mode we talked about [here](#compliancy) and `adkim=s` which is a strict DKIM policy. 
 Official DMARC [documentation](https://dmarc.org/overview/) does a great job of explaining the syntax.
 
 After the TTL time you specified in the DNS record, you can check if your DMARC record has been published with:
