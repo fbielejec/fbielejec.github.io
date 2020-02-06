@@ -5,7 +5,7 @@ author: Filip Bielejec
 comments: true
 categories: [clojurescript, serverless, graphql]
 tags: [clojurescript, shadow-cljs, serverless, aws, lambda, cloud]
-summary: ""
+summary: "In this blog post we will look into creating a serverless application, by writing a graphQL endpoint running as a function on cloud infrastructure"
 ---
 
 # <a name="intro"/> Intro
