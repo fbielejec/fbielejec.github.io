@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Creating serverless application in Clojurescript
+title: Creating a serverless application in ClojureScript
 author: Filip Bielejec
 comments: true
 categories: [clojurescript, serverless, graphql]
