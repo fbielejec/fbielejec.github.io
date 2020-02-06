@@ -10,34 +10,36 @@ summary: ""
 
 # <a name="intro"/> Intro
 
-Serverless is a has been gaining a lot of tracktion recently, thanks to the promise of infrastructure-as-code computing model, where your applications run in ephemeral, stateless, pay-as-you-go cloud containers.
-As such they are suitable for service a large API, or for your next toy-project.
+Serverless frameworks have been gaining a lot of tracktion recently, delivering on the the promise of infrastructure-as-code computing model, where your applications run in ephemeral, stateless, pay-as-you-go cloud containers.
+As such they are equally suitable for large APIs, as well as for your next toy-project.
 
-In this blog post we will look into creating a serverless application, by writing a graphql endpoint running as a lambda function on cloud infrastructure.
-We will focus on AWS Lambda, although in principle the same application could be deployed to many more cloud vendor servers.
-We will use [ClojureScript](https://clojurescript.org/) and [shadow-cljs](http://shadow-cljs.org/) to write the application code and [serverless](https://serverless.com/) to deploy it.
+In this blog post we will look into creating a serverless application, by writing a graphql endpoint running as a function on cloud infrastructure.
+We will focus on AWS Lambda, although in principle the same application could be deployed to any other cloud vendor server.
+For writing the application code we will use [ClojureScript](https://clojurescript.org/), for compiling it [shadow-cljs](http://shadow-cljs.org/) and finally we will use the [serverless](https://serverless.com/) framework to deploy it.
 
 # <a name="prerequisites"/> Prerequisites
 
-For the duration of this tutorial I will assume you have an AWS account set up, as well as some very, very basic knowledge of how to move around the AWS console.
+For the duration of this tutorial I will assume you have an AWS, as well as some basic knowledge of how to move around the AWS console.
 
-Let's start by creating a serverless account by navigating to https://dashboard.serverless.com/.
-Next from your dashboard go ahead and create your first application.
-This what you should see once finished:
+Let's start by creating a serverless account by navigating to [https://dashboard.serverless.com/](https://dashboard.serverless.com/).
+From this dashboard go ahead and create your first application.
+This what you should be able to see once finished:
 
 ![_config.yml]({{ site.baseurl }}/images/2020-02-06-clojurescript-serverless-graphql/2020-02-06-1580999181.jpg)
 
-Once done we need to install two npm packages:
+Now install the `serverless` CLI tool distributed as an npm packages:
 
 ```bash
-npm install --global serverless serverless-offline
+npm install --global serverless
 ```
 
-`serverles` is a CLI tool for managing your applications and `serverless-offline` is a plugin we can use to get a local runtime environment during development.
+It's a CLI tool for running task and managing your applications.
+
+<!-- is a plugin we can use to get a local runtime environment during development. -->
 
 # <a name="application"/> Writing the application code
 
-Perfect! Now lets write the code for our application.
+Now lets write the code for our application.
 As mentioned in the [introduction](#intro) we will use shadow-cljs to compile the application, so lets start by creating shadow-cljs configuration file `shadow-cljs.edn`:
 
 ```clojure
@@ -62,7 +64,7 @@ As mentioned in the [introduction](#intro) we will use shadow-cljs to compile th
 This is a pretty standard configuration, but what is important we will use a `:node-library` target, together with a named export to avoid name munging by the compiler.
 What this means is that the nodejs runtime environment will be able to access the compiled code by this exact name. e.g:
 
-```node
+```javascript
 var handler = require('./api/graphql.js').handler;
 ```
 
@@ -88,12 +90,12 @@ Next thing we need is npm dependencies for the development as well as some handy
 
 ## <a name="graphql"/> GraphQL resolvers
 
-The purpose of this post isn't to introduce GraphQL, so if you need a refresher there's plenty of resources that do an excelent job of describing it.
+The purpose of this post isn't to introduce GraphQL, so if you need a refresher there's plenty of resources online that do an excelent job of just that.
 Lets just say that a backend utilizing one of the GraphQL frameworks will typically consist of:
 - a schema that describes how to ask for the data.
 - some type of web-server that replies (or manipulates) to these queries with existing data.
 
-Our toy API will have only one endpoint called `hello`, which given a list of names responds with a greeting (a classic hello-world of sorts).
+Our toy API will have only one endpoint called `hello`, which given a list of names as an argument responds with a greeting (a classic hello-world of sorts).
 Here's the schema:
 
 ```graphql
@@ -136,12 +138,12 @@ And here's how we can create a web-server running in an AWS lambda environment u
 
 ## <a name="serverless"/> Configuring Serverless
 
-At the beginning of this [section](#application) we have talked about splitting the development and runtime dependencies and we used some of the shadow-cljs configuration options to make this happen.
-Before we can run or deploy our application we still need to define those dependencies as well as configure serverless.
+At the beginning of this [section](#application) we talked about splitting the development and runtime dependencies using shadow-cljs configuration options.
+Before we can run or deploy our application we still need to define those dependencies, as well as configure serverless.
 
-Inside the output directory we defined as `api`, where shadow-cljs produces the compiled artifacts, create `package.json` file:
+Inside the `api/` output directory, where shadow-cljs produces the compiled artifacts, create `package.json` file:
 
-```
+```json
 {
   "name": "api",
   "version": "0.0.1",
@@ -159,10 +161,10 @@ Inside the output directory we defined as `api`, where shadow-cljs produces the 
 ```
 
 `apollo-server-lambda` is the sole runtime dependency we need in order to create the apollo [graphql server](#graphql).
-`offline` is how we can run the project locally, and we pass the `skipCacheInvalidation` flag to avoid confusing shadows's hot-reload.
+`serverless-offline` is a plugin which make sit possible to run the project locally, and we pass the `skipCacheInvalidation` flag to avoid confusing shadow-cljs hot-reloading.
 
 Moving on it's time to configure serverless.
-Serverless configs are (unfortunately) written in yaml:
+Serverless configuration files are (unfortunately) written in yaml:
 
 ```yaml
 org: fbielejec
@@ -195,10 +197,10 @@ custom:
     port: 4000
 ```
 
-To sum up this config file we define a `api` service, which is a part of the app we created in the serverless [dashboard](#prerequisites).
-We deploy it on AWS as a lambda function called `graphql`.
-`handler` corresponds to the export we defined when [configuring shadow-cljs](#application) and is formatted as <FILENAME>.<HANDLER>.
-At the end of the config file we specify how to run the project in the development mode on port `4000`.
+To sum up this config file we define an `api` service, which is a part of the app we previously created in the serverless [dashboard](#prerequisites).
+We deploy it on AWS as a lambda (function) called `graphql`.
+`handler` corresponds to the export we defined when [configuring shadow-cljs](#application) and is formatted as `<FILENAME>.<HANDLER>`.
+At the end of the config file we specify how to run the project in the development (offline) mode on port `4000`.
 
 # <a name="offline-mode"/> Testing the project in offline mode
 
@@ -209,7 +211,7 @@ yarn && yarn api:watch
 cd api/ && yarn offline
 ```
 
-You can now open the graphql console on http://localhost:4000/graphql and ask the server your first query:
+You can now open the graphql console on [http://localhost:4000/graphql](http://localhost:4000/graphql) and ask the server your first query:
 
 ```
 query {
@@ -222,16 +224,17 @@ query {
 
 # <a name="deploying"/> Deploying application
 
-Let's see how we can actually deploy the application to the AWS cloud.
-You should start by naviagting to the AWS [IAM console](https://console.aws.amazon.com/iam/home?region=us-east-2) and creating a user account.
-Make sure it has `AdministratorAccess` permission, either attached directly or using a group and generate an access key for that account form the Security Credentials tab.
+Let's see how we can actually deploy this application to the AWS cloud.
+You should start by naviagting to the AWS [IAM console](https://console.aws.amazon.com/iam/home?region=us-east-2) and creating a separate user account.
+Make sure it has `AdministratorAccess` permission, either attached directly or by using a group.
+For programmatic access generate an access key for that account from the Security Credentials tab.
 
 ![_config.yml]({{ site.baseurl }}/images/2020-02-06-clojurescript-serverless-graphql/2020-02-06-1581011735.jpg)
 
 For security reasons you can also disable the AWS console access for this account.
-Don't forget to copy the acces key id and secret, you will need them later.
+Don't forget to copy the acces key id and secret, you will need them later!
 
-You can now configure serverless with the AWS credentials you just created:
+You can now configure serverless with the AWS credentials  that you just created:
 
 ```bash
 serverless config credentials --provider aws --key <AWS_ACCESS_KEY_ID> --secret <AWS_SECRET_ACCESS_KEY>
@@ -247,7 +250,7 @@ cd api && yarn deploy
 
 Once finished you should see something similar to the output below:
 
-```
+```shell
 $ Serverless: Stack update finished...
 $ Service Information
 $ service: api
@@ -284,6 +287,7 @@ $ {"data":{"hello":[{"text":"hello Janusz"}]}}
 ```
 
 If you navigate to the serverless dashboard, you can also see some basic logs and information about the service:
+
 ![_config.yml]({{ site.baseurl }}/images/2020-02-06-clojurescript-serverless-graphql/2020-02-06-1581014339.jpg)
 
 # <a name="followup"/> Future steps
