@@ -9,19 +9,19 @@ summary: "With this setup I should be able to enjoy the crisp graphics provided 
 
 # <a name="intro"/> Intro
 
-When working couple of years ago at the [University of Leuven](https://www.kuleuven.be/kuleuven/) I have been using Nvidia cards a lot for numerical computations, utilizing their GPGPU capabilities.
+When working a couple of years ago at the [University of Leuven](https://www.kuleuven.be/kuleuven/) I have been using Nvidia cards a lot, utilizing their GPGPU capabilities for numerical computations,
 
-Since [Linux kernel](https://www.kernel.org/doc/html/v4.13/admin-guide/thunderbolt.html) has been fully suporting Thunderbolt 3 for some time now and a lot of used eGPUs started surfacing I couldn't help but snatch one and arm it with a similarly bargained GTX 1050 Ti.
-My goal was to connect it to the Intel Nuc via the Thunderbolt port to drive one of the displays, keeping the hdmi port on other display driven by the discrete Intel card.
+Since [Linux kernel](https://www.kernel.org/doc/html/v4.13/admin-guide/thunderbolt.html) has been fully supporting Thunderbolt 3 for some time now and a lot of used eGPUs started surfacing I couldn't help but snatch one up (a [Razer Core X](https://www.razer.com/eu-en/gaming-laptops/razer-core-x)) and arm it with a similarly bargained GTX 1050 Ti.
+My goal was to connect it to the Intel NUC via the Thunderbolt port to drive one of the displays, keeping the second display connected with an hdmi and driven by the discrete Intel graphics device.
 
-With this setup I should be able to both enjoy the crisp graphics provided by the GPU or unplug it from the display and use the other monitor if I want to keep the card solely for some number crunching.
+With this setup I should be able to both enjoy the crisp graphics provided by the GPU or unplug it from the display and use the other monitor if I want to keep the card solely for numbers crunching.
 
-I remembered that initial setup of Nvidia drivers was always a bit of a battle, so I expected the same here.
+I remember the initial setup of Nvidia drivers to be a hassle, and I expected the same here.
 Fortunately as time has passed things had improved quite a bit.
 
 # <a name="plugging"/> Plugging in the card
 
-Initial setup could not be easier - slide out the enclosure, put the card into a PCI slot, close it, connect power, HDMI and thunderbolt cables slide the enclosure back in.
+Initial setup could not be easier - slide out the enclosure, put the card into a PCI slot, close it, connect power, HDMI and thunderbolt cables and slide the enclosure back in.
 
 ![_config.yml]({{ site.baseurl }}/images/2020-04-25-razer-core-egpu-linux/IMG_20200425_164511.jpg)
 
@@ -33,7 +33,6 @@ filip@filip-Meerkat:~$ boltctl
    ├─ type:          peripheral
    ├─ name:          Core
    ├─ vendor:        Razer
-   ├─ uuid:          10f3b038-7e53-8680-ffff-ffffffffffff
    ├─ status:        authorized
    │  ├─ domain:     domain0
    │  └─ authflags:  boot
@@ -44,7 +43,7 @@ filip@filip-Meerkat:~$ boltctl
       └─ key:        no
 ```
 
-Card is listed among the PCI devices:
+Nvidia GPU is listed among the PCI devices:
 
 ```shell
 filip@filip-Meerkat:~$ lspci
@@ -84,9 +83,9 @@ filip@filip-Meerkat:~$ lspci
 
 # <a name="drivers"/> Installing the drivers
 
-Distributions like Ubuntu and [Linux Mint](https://www.linuxmint.com/) come with a [`ubuntu-drivers`](https://launchpad.net/ubuntu/+source/ubuntu-drivers-common) package which makes installing proprietary drivers a lot easier, so that you don't have to deal with clunky ever-changing Nvidia installers and get them installed staright from the repositories.
+Distributions like Ubuntu and [Linux Mint](https://www.linuxmint.com/) come with a [`ubuntu-drivers`](https://launchpad.net/ubuntu/+source/ubuntu-drivers-common) package, which makes installing proprietary drivers a lot easier, so that you don't have to deal with clunky ever-changing Nvidia installers and get them straight from the distributions repositories.
 
-You can list the drivers:
+You can list the availiable drivers like this:
 
 ```shell
 filip@filip-Meerkat:~$ sudo ubuntu-drivers devices
@@ -107,13 +106,13 @@ driver   : xserver-xorg-video-nouveau - distro free builtin
 ```
 
 And install the recommended versions (here *nvidia-driver-435*) with `sudo ubuntu-drivers install`.
-I also added the nvidia utility program:
+I also installed the *nvidia-settings* program:
 
 ```bash
 sudo apt install nvidia-settings
 ```
 
-If you're interested in CUDA development you should also install:
+If you're interested in CUDA development you should be installing the compiler and the toolkit:
 
 ```bash
 sudo apt-get install nvidia-cuda-dev nvidia-cuda-toolkit
@@ -138,7 +137,7 @@ Section "Device"
 EndSection
 ```
 
-If you're interested in the AllowExternalGpu flag you can read about it in the driver [documentation](https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/xconfigoptions.html#AllowExternalGpus).
+If you're interested in what the *AllowExternalGpu* flag does you can read about it in the [drivers documentation](https://download.nvidia.com/XFree86/Linux-x86_64/435.21/README/xconfigoptions.html#AllowExternalGpus).
 
 # <a name="enjoy"/> Enjoy!
 
@@ -174,6 +173,6 @@ GPU #0:
 **NOTE**
 
 There is no hot-plug functionality and you will need to remove the created [xorg.conf](#xorg.conf) to be able start xserver after unplugging the device, but I'll take it.
-I have not looked into them, but there are projects aiming at bringing the hot-plugging functionality, for example: https://github.com/karli-sjoberg/gswitch.
+I have not looked into them, but there are projects aiming at bringing the hot-plugging functionality, for example: [https://github.com/karli-sjoberg/gswitch.](https://github.com/karli-sjoberg/gswitch).
 
 ---
