@@ -1,6 +1,6 @@
 ---
 layout: post
-title: How to setup Razer Core external GPU on Linux
+title: How to setup Razer Core external GPU on GNU/Linux
 author: Filip Bielejec
 comments: true
 categories: [GPU, Linux, Nvidia]
@@ -83,7 +83,7 @@ filip@filip-Meerkat:~$ lspci
 
 # <a name="drivers"/> Installing the drivers
 
-Distributions like Ubuntu and [Linux Mint](https://www.linuxmint.com/) come with a [`ubuntu-drivers`](https://launchpad.net/ubuntu/+source/ubuntu-drivers-common) package, which makes installing proprietary drivers a lot easier, so that you don't have to deal with clunky ever-changing Nvidia installers and get them straight from the distributions repositories.
+GNU/Linux distributions like Ubuntu and [Linux Mint](https://www.linuxmint.com/) come with a [`ubuntu-drivers`](https://launchpad.net/ubuntu/+source/ubuntu-drivers-common) package, which makes installing proprietary drivers a lot easier, so that you don't have to deal with clunky ever-changing Nvidia installers and get them straight from the distributions repositories.
 
 You can list the availiable drivers like this:
 
