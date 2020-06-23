@@ -102,4 +102,10 @@ fn detect_faces (frame : &Mat,
 
 <!-- <video src="http://s3.imathis.com/video/zero-to-fancy-buttons.mp4" poster="http://s3.imathis.com/video/zero-to-fancy-buttons.png" width="320" height="200" controls preload></video> -->
 
-{% raw %}{% video "https://youtu.be/dQw4w9WgXcQ" %}{% endraw %}
+<!-- {% raw %}{% video "https://youtu.be/dQw4w9WgXcQ" %}{% endraw %} -->
+
+<div class="video">
+  <figure>
+    <iframe width="640" height="480" src="//www.youtube.com/embed/prFohBWIdQg" frameborder="0" allowfullscreen></iframe>
+  </figure>
+</div>
