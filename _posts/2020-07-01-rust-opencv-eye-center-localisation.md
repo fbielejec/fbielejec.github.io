@@ -16,7 +16,7 @@ This inspired me to create a tool which can track your eye movements and transla
 I reckoned Rust would be a perfect choice for writing performant, numerical code.
 First step would be to implement an algorithm responsible for tracking the location of eye center in a frame (the pupil), and this blog post is describing one possible approach.
 
-I started researching the subject and quickly found that the state-of-the art is described in [Timm and Barth](https://www.inb.uni-luebeck.de/fileadmin/files/PUBPDFS/TiBa11b.pdf).
+I started researching the subject and quickly found that the state-of-the art is described in [Timm and Barth, 2011](https://www.inb.uni-luebeck.de/fileadmin/files/PUBPDFS/TiBa11b.pdf).
 I highly recommend reading the paper.
 A bit more searching revealed that [trishume](https://github.com/trishume/eyeLike) did all the hard work of implementing their algorithm in C++ using OpenCV.
 Armed with this reference implementation and the original paper I could easily implement it in Rust.
@@ -62,6 +62,10 @@ For the edge rows the gradient value is the difference between the value and the
 # <a name="implementation"/> Implementation
 
 I decided to deviate a bit from the reference implementation.
-<!-- Similar to what the paper describes I start by detecting the face region using viola-jones -->
+Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection).
 
-{% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %}
+<video width="640" height="480" controls="controls">
+  <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4">
+</video>
+
+<!-- {% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %} -->
