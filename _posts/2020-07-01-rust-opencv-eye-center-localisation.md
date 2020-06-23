@@ -64,6 +64,9 @@ For the edge rows the gradient value is the difference between the value and the
 I decided to deviate a bit from the reference implementation.
 Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection).
 
+```
+```
+
 <video width="640" height="480" controls="controls">
   <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4">
 </video>
