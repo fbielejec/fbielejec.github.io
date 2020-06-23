@@ -31,15 +31,37 @@ where $$\mathbf{c}$$ is a possible center.
 
 Formally:
 
-$$c^{*}= \underset{c}{\textup{arg max}} \left \{ \frac{1}{N} \sum_{i=1}^{N}w_{c}\left ( \mathbf{d}_{i}^T\mathbf{g}_{i} \right )^2 \right \}$$
+$$c^{*}= \underset{c}{\text{arg max}} \left \{ \frac{1}{N} \sum_{i=1}^{N}w_{c}\left ( \mathbf{d}_{i}^T\mathbf{g}_{i} \right )^2 \right \}$$
 
 The weights $$\mathbf{w}_c$$ are a way of incorporating prior knowledge: since the pupil is darker than the sclera or facial skin, darker pixels are more likely to be the centers.
 If we consider that $I^*$ is the (smoothed and greyscale, as per paper's suggestion) input frame, than at pixel with coordinates $$(c_x, c_y)$$ we have that: $$\mathbf{w}_c=I^*\left ( 255-c_x,255-c_y \right )$$.
 
-# <a name="gradients"/> Computing image gradients
+# <a name="gradients"/> Computing frame gradients
 
+An image gradient is a directional change in the or color intensity of the image.
+At each pixel point of the frame, the gradient is a vector that points in the direction of the largest intensity increase, and the length of this vector corresponds to the rate of the change.
 
+More formally the gradient of a two variable function $$f(x,y):\mathbb{R}^2\rightarrow \mathbb{R}$$ is defined as a vector of partial derivatives of that function in each direction:
 
-<!-- We derive a simple objective function, which only consists of dot products. The maximum -->
-<!-- of this function corresponds to the location where most gradient vectors intersect and thus to the eye’s centre. -->
-<!-- Although simple, our method is invariant to changes in scale, pose, contrast and variations in illumination. -->
+$$\nabla f= {\begin{bmatrix}g_{x}\\g_{y}\end{bmatrix}}={\begin{bmatrix}{\frac {\partial f}{\partial x}}\\{\frac {\partial f}{\partial y}}\end{bmatrix}$$
+
+Since the intensity function of a digital image is known only at discrete points, derivatives of this function cannot be defined, unless we assume some known, differentiable function which has been sampled at these points.
+
+This is why typically the derivative of an image is approximated using [finite differences](https://en.wikipedia.org/wiki/Finite_difference)
+The [implementation by trishume](https://github.com/trishume/eyeLike) implements a procedure where for inner rows of a given frame $$I$$ which calculates the gradient for inner rows as a central difference.
+<!-- For $$\forall (i,j), \: i\neq j$$ the gradient in direction $$x$$ is: -->
+
+$$ \frac{\partial I(i,j))}{\partial x}=\frac{1}{2}\left ( \left ( I(i,j+1) - I(i,j) \right )  + \left ( I(i+1,j) - I(i+1,j+1) \right )\right )$$
+
+and in direction $$y$$:
+
+$$\frac{\partial I(i,j))}{\partial y}=\frac{1}{2}\left ( \left ( I(i+1,j) - I(i,j) \right )  + \left ( I(i+1,j+1) - I(i+1,j+1) \right )\right )$$
+
+For the edge rows the gradient value is the difference between the value and the adjacent position.
+
+# <a name="implementation"/> Implementation
+
+I decided to deviate a bit from the reference implementation.
+<!-- Similar to what the paper describes I start by detecting the face region using viola-jones -->
+
+{% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %}
