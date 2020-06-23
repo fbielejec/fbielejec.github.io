@@ -4,7 +4,7 @@ title: Tracking eye centers location with Rust & OpenCV
 author: Filip Bielejec
 comments: true
 categories: [Rust, opencv]
-summary: ""
+summary: "Tool which can track eye movements and translate it to mouse cursor movements"
 ---
 
 # <a name="intro"/> Intro
@@ -12,7 +12,7 @@ summary: ""
 Ever since finding [OpenCV Rust bindings](https://github.com/twistedfall/opencv-rust/) I've been looking for a good project to try it out.
 Than a [friend](https://github.com/jpmonettas/) sparked my curiosity when talking about gesture recognition project he was implementing.
 
-This inspired me to create a tool which can track your eye movements and translate it to mouse cursor movements.
+This inspired me to create a tool which can read frames from the camera, track eye movements and translate them to mouse cursor movements.
 I reckoned Rust would be a perfect choice for writing performant, numerical code.
 First step would be to implement an algorithm responsible for tracking the location of eye center in a frame (the pupil), and this blog post is describing one possible approach.
 
@@ -36,59 +36,61 @@ $$c^{*}= \underset{c}{\text{arg max}} \left \{ \frac{1}{N} \sum_{i=1}^{N}w_{c}\l
 The weights $$\mathbf{w}_c$$ are a way of incorporating prior knowledge: since the pupil is darker than the sclera or facial skin, darker pixels are more likely to be the centers.
 If we consider that $I^*$ is the (smoothed and greyscale, as per paper's suggestion) input frame, than at pixel with coordinates $$(c_x, c_y)$$ we have that: $$\mathbf{w}_c=I^*\left ( 255-c_x,255-c_y \right )$$.
 
-# <a name="gradients"/> Computing frame gradients
+# <a name="gradients"/> Computing image gradients
 
 An image gradient is a directional change in the or color intensity of the image.
-At each pixel point of the frame, the gradient is a vector that points in the direction of the largest intensity increase, and the length of this vector corresponds to the rate of the change.
+<!-- At each pixel point of the frame, the gradient is a vector that points in the direction of the largest intensity increase, and the length of this vector corresponds to the rate of the change. -->
 
-More formally the gradient of a two variable function $$f(x,y):\mathbb{R}^2\rightarrow \mathbb{R}$$ is defined as a vector of partial derivatives of that function in each direction:
+<!-- More formally the gradient of a two variable function $$f(x,y):\mathbb{R}^2\rightarrow \mathbb{R}$$ is defined as a vector of partial derivatives of that function in each direction: -->
 
-$$\nabla f= {\begin{bmatrix}g_{x}\\g_{y}\end{bmatrix}}={\begin{bmatrix}{\frac {\partial f}{\partial x}}\\{\frac {\partial f}{\partial y}}\end{bmatrix}$$
+<!-- $$\nabla f= {\begin{bmatrix}g_{x}\\g_{y}\end{bmatrix}}={\begin{bmatrix}{\frac {\partial f}{\partial x}}\\{\frac {\partial f}{\partial y}}\end{bmatrix}$$ -->
 
-Since the intensity function of a digital image is known only at discrete points, derivatives of this function cannot be defined, unless we assume some known, differentiable function which has been sampled at these points.
+<!-- Since the intensity function of a digital image is known only at discrete points, derivatives of this function cannot be defined, unless we assume some known, differentiable function which has been sampled at these points. -->
 
-This is why typically the derivative of an image is approximated using [finite differences](https://en.wikipedia.org/wiki/Finite_difference)
-The [implementation by trishume](https://github.com/trishume/eyeLike) implements a procedure where for inner rows of a given frame $$I$$ which calculates the gradient for inner rows as a central difference.
-<!-- For $$\forall (i,j), \: i\neq j$$ the gradient in direction $$x$$ is: -->
+<!-- This is why typically the derivative of an image is approximated using [finite differences](https://en.wikipedia.org/wiki/Finite_difference) -->
+<!-- The [implementation by trishume](https://github.com/trishume/eyeLike) implements a procedure where for inner rows of a given frame $$I$$ which calculates the gradient for inner rows as a central difference. -->
+<!-- <\!-- For $$\forall (i,j), \: i\neq j$$ the gradient in direction $$x$$ is: -\-> -->
 
-$$ \frac{\partial I(i,j))}{\partial x}=\frac{1}{2}\left ( \left ( I(i,j+1) - I(i,j) \right )  + \left ( I(i+1,j) - I(i+1,j+1) \right )\right )$$
+<!-- $$ \frac{\partial I(i,j))}{\partial x}=\frac{1}{2}\left ( \left ( I(i,j+1) - I(i,j) \right )  + \left ( I(i+1,j) - I(i+1,j+1) \right )\right )$$ -->
 
-and in direction $$y$$:
+<!-- and in direction $$y$$: -->
 
-$$\frac{\partial I(i,j))}{\partial y}=\frac{1}{2}\left ( \left ( I(i+1,j) - I(i,j) \right )  + \left ( I(i+1,j+1) - I(i+1,j+1) \right )\right )$$
+<!-- $$\frac{\partial I(i,j))}{\partial y}=\frac{1}{2}\left ( \left ( I(i+1,j) - I(i,j) \right )  + \left ( I(i+1,j+1) - I(i+1,j+1) \right )\right )$$ -->
 
-For the edge rows the gradient value is the difference between the value and the adjacent position.
+<!-- For the edge rows the gradient value is the difference between the value and the adjacent position. -->
 
-# <a name="implementation"/> Implementation
+<!-- # <a name="implementation"/> Implementation -->
 
-I decided to deviate a bit from the reference implementation.
-Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection):
+<!-- I decided to deviate a bit from the reference implementation. -->
+<!-- Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection): -->
 
-```rust
-fn detect_faces (frame : &Mat,
-                 face_model : &mut objdetect::CascadeClassifier)
-                 -> opencv::Result<types::VectorOfRect> {
-    let mut faces = types::VectorOfRect::new();
+<!-- ```rust -->
+<!-- fn detect_faces (frame : &Mat, -->
+<!--                  face_model : &mut objdetect::CascadeClassifier) -->
+<!--                  -> opencv::Result<types::VectorOfRect> { -->
+<!--     let mut faces = types::VectorOfRect::new(); -->
 
-    face_model.detect_multi_scale(
-        &frame, // input image
-        &mut faces, // output : vector of rects
-        1.1, // scaleFactor: The classifier will try to upscale and downscale the image by this factor
-        2, // minNumNeighbors: How many true-positive neighbor rectangles do you want to assure before predicting a region as a face? The higher this face, the lower the chance of detecting a non-face as face, but also lower the chance of detecting a face as face.
-        objdetect::CASCADE_SCALE_IMAGE,
-        core::Size {
-            width: 150,
-            height: 150
-        }, // min_size. Objects smaller than that are ignored (poor quality webcam is 640 x 480, so that should do it)
-        core::Size {
-            width: 0,
-            height: 0
-        } // max_size
-    )?;
+<!--     face_model.detect_multi_scale( -->
+<!--         &frame, // input image -->
+<!--         &mut faces, // output : vector of rects -->
+<!--         1.1, // scaleFactor: The classifier will try to upscale and downscale the image by this factor -->
+<!--         2, // minNumNeighbors: How many true-positive neighbor rectangles do you want to assure before predicting a region as a face? The higher this face, the lower the chance of detecting a non-face as face, but also lower the chance of detecting a face as face. -->
+<!--         objdetect::CASCADE_SCALE_IMAGE, -->
+<!--         core::Size { -->
+<!--             width: 150, -->
+<!--             height: 150 -->
+<!--         }, // min_size. Objects smaller than that are ignored (poor quality webcam is 640 x 480, so that should do it) -->
+<!--         core::Size { -->
+<!--             width: 0, -->
+<!--             height: 0 -->
+<!--         } // max_size -->
+<!--     )?; -->
 
-    Ok (faces)
-}
-```
+<!--     Ok (faces) -->
+<!-- } -->
+<!-- ``` -->
+
+
 
 <!-- <video width="640" height="480" controls="controls"> -->
 <!--   <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4"> -->
