@@ -62,13 +62,36 @@ For the edge rows the gradient value is the difference between the value and the
 # <a name="implementation"/> Implementation
 
 I decided to deviate a bit from the reference implementation.
-Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection).
+Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection):
 
+```rust
+fn detect_faces (frame : &Mat,
+                 face_model : &mut objdetect::CascadeClassifier)
+                 -> opencv::Result<types::VectorOfRect> {
+    let mut faces = types::VectorOfRect::new();
+
+    face_model.detect_multi_scale(
+        &frame, // input image
+        &mut faces, // output : vector of rects
+        1.1, // scaleFactor: The classifier will try to upscale and downscale the image by this factor
+        2, // minNumNeighbors: How many true-positive neighbor rectangles do you want to assure before predicting a region as a face? The higher this face, the lower the chance of detecting a non-face as face, but also lower the chance of detecting a face as face.
+        objdetect::CASCADE_SCALE_IMAGE,
+        core::Size {
+            width: 150,
+            height: 150
+        }, // min_size. Objects smaller than that are ignored (poor quality webcam is 640 x 480, so that should do it)
+        core::Size {
+            width: 0,
+            height: 0
+        } // max_size
+    )?;
+
+    Ok (faces)
+}
 ```
-```
 
-<video width="640" height="480" controls="controls">
-  <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4">
-</video>
+<!-- <video width="640" height="480" controls="controls"> -->
+<!--   <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4"> -->
+<!-- </video> -->
 
-<!-- {% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %} -->
+{% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %}
