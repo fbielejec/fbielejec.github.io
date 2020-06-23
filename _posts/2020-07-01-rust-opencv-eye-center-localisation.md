@@ -98,4 +98,8 @@ fn detect_faces (frame : &Mat,
 
 <!-- {% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %} -->
 
-<video src="http://s3.imathis.com/video/zero-to-fancy-buttons.mp4" poster="http://s3.imathis.com/video/zero-to-fancy-buttons.png" width="320" height="200" controls preload></video>
+<video width="480" height="320" controls="controls">
+  <source src="http://s3.imathis.com/video/zero-to-fancy-buttons.mp4" type="video/mp4">
+</video>
+
+<!-- <video src="http://s3.imathis.com/video/zero-to-fancy-buttons.mp4" poster="http://s3.imathis.com/video/zero-to-fancy-buttons.png" width="320" height="200" controls preload></video> -->
