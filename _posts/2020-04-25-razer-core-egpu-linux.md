@@ -7,18 +7,6 @@ categories: [GPU, Linux, Nvidia]
 summary: "With this setup I should be able to enjoy the crisp graphics provided by the GPU"
 ---
 
-# <a name="intro"/> Intro
-
-When working a couple of years ago at the [University of Leuven](https://www.kuleuven.be/kuleuven/) I have been using Nvidia cards a lot, utilizing their GPGPU capabilities for numerical computations,
-
-Since [Linux kernel](https://www.kernel.org/doc/html/v4.13/admin-guide/thunderbolt.html) has been fully supporting Thunderbolt 3 for some time now and a lot of used eGPUs started surfacing I couldn't help but snatch one up (a [Razer Core X](https://www.razer.com/eu-en/gaming-laptops/razer-core-x)) and arm it with a similarly bargained GTX 1050 Ti.
-My goal was to connect it to the Intel NUC via the Thunderbolt port to drive one of the displays, keeping the second display connected with an hdmi and driven by the discrete Intel graphics device.
-
-With this setup I should be able to both enjoy the crisp graphics provided by the GPU or unplug it from the display and use the other monitor if I want to keep the card solely for numbers crunching.
-
-I remember the initial setup of Nvidia drivers to be a hassle, and I expected the same here.
-Fortunately as time has passed things had improved quite a bit.
-
 # <a name="plugging"/> Plugging in the card
 
 Initial setup could not be easier - slide out the enclosure, put the card into a PCI slot, close it, connect power, HDMI and thunderbolt cables and slide the enclosure back in.
@@ -80,6 +68,18 @@ filip@filip-Meerkat:~$ lspci
 6d:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD Controller SM981/PM981
 6e:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. RTS522A PCI Express Card Reader (rev 01)
 ```
+
+# <a name="intro"/> Intro
+
+When working a couple of years ago at the [University of Leuven](https://www.kuleuven.be/kuleuven/) I have been using Nvidia cards a lot, utilizing their GPGPU capabilities for numerical computations,
+
+Since [Linux kernel](https://www.kernel.org/doc/html/v4.13/admin-guide/thunderbolt.html) has been fully supporting Thunderbolt 3 for some time now and a lot of used eGPUs started surfacing I couldn't help but snatch one up (a [Razer Core X](https://www.razer.com/eu-en/gaming-laptops/razer-core-x)) and arm it with a similarly bargained GTX 1050 Ti.
+My goal was to connect it to the Intel NUC via the Thunderbolt port to drive one of the displays, keeping the second display connected with an hdmi and driven by the discrete Intel graphics device.
+
+With this setup I should be able to both enjoy the crisp graphics provided by the GPU or unplug it from the display and use the other monitor if I want to keep the card solely for numbers crunching.
+
+I remember the initial setup of Nvidia drivers to be a hassle, and I expected the same here.
+Fortunately as time has passed things had improved quite a bit.
 
 # <a name="drivers"/> Installing the drivers
 
