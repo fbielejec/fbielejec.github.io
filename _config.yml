@@ -82,6 +82,7 @@ plugins:
    - jekyll-feed # Create an Atom feed using the official Jekyll feed gem
    - jemoji # use emojis
    - jekyll-seo-tag # optimize your site for search engines and social media networks
+   - octopress-video-tag
 
 # Exclude these files from your production _site
 exclude:
