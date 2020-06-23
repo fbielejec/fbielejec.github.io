@@ -25,7 +25,7 @@ Armed with this reference implementation and the original paper I could easily i
 
 The algorithm described in the paper, which I will colloquially refer to as Timm-Barth aims at finding a centre of a circular object.
 It does so by optimizing (finding  maximum) of an objective function, which is a (weighted) sum of dot products of two vectors:
-- the normalized gradient vector $$\mathbf{g}_{i}$$ at pixel position $$\matbf{x}_{i},\:i \in \{1,\dots, N\}$$ such that $$\forall i:\:\left \| \mathbf{g}_{i} \right \|=\mathbf{1}$$ and
+- the normalized gradient vector $$\mathbf{g}_{i}$$ at pixel position $$\mathbf{x}_{i},\:i \in \{1,\dots, N\}$$ such that $$\forall i:\:\left \| \mathbf{g}_{i} \right \|=\mathbf{1}$$ and
 - the displacement vector $$\mathbf{d}_{i}=\frac{\mathbf{x}_{i}-\mathbf{c}}{\left \| \mathbf{x}_{i}-\mathbf{c} \right \|_2 }$$
 where $$\mathbf{c}$$ is a possible center.
 
@@ -104,8 +104,8 @@ fn detect_faces (frame : &Mat,
 
 <!-- {% raw %}{% video "https://youtu.be/dQw4w9WgXcQ" %}{% endraw %} -->
 
-<div class="video">
-  <figure>
-    <iframe width="640" height="480" src="//www.youtube.com/embed/prFohBWIdQg" frameborder="0" allowfullscreen></iframe>
-  </figure>
-</div>
+<!-- <div class="video"> -->
+<!--   <figure> -->
+<!--     <iframe width="640" height="480" src="//www.youtube.com/embed/prFohBWIdQg" frameborder="0" allowfullscreen></iframe> -->
+<!--   </figure> -->
+<!-- </div> -->
