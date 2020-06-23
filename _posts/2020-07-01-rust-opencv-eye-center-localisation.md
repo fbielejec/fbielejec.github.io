@@ -23,7 +23,22 @@ Armed with this reference implementation and the original paper I could easily i
 
 # <a name="details"/> Details of the algorithm
 
-The algorithm described in the paper, which I will colloquially refer to as Timm-Barth, works by optimizing (finding a maximum) of an objective function, which is a (weighted) sum of dot products of two vectors: the gradient vector $$g_{i}$$
+The algorithm described in the paper, which I will colloquially refer to as Timm-Barth aims at finding a centre of a circular object.
+It does so by optimizing (finding  maximum) of an objective function, which is a (weighted) sum of dot products of two vectors:
+- the normalized gradient vector $$\mathbf{g}_{i}$$ at pixel position $$\matbf{x}_{i},\:i \in \{1,\dots, N\}$$ such that $$\forall i:\:\left \| \mathbf{g}_{i} \right \|=\mathbf{1}$$ and
+- the displacement vector $$\mathbf{d}_{i}=\frac{\mathbf{x}_{i}-\mathbf{c}}{\left \| \mathbf{x}_{i}-\mathbf{c} \right \|_2 }$$
+where $$\mathbf{c}$$ is a possible center.
+
+Formally:
+
+$$c^{*}= \underset{c}{\textup{arg max}} \left \{ \frac{1}{N} \sum_{i=1}^{N}w_{c}\left ( \mathbf{d}_{i}^T\mathbf{g}_{i} \right )^2 \right \}$$
+
+The weights $$\mathbf{w}_c$$ are a way of incorporating prior knowledge: since the pupil is darker than the sclera or facial skin, darker pixels are more likely to be the centers.
+If we consider that $I^*$ is the (smoothed and greyscale, as per paper's suggestion) input frame, than at pixel with coordinates $$(c_x, c_y)$$ we have that: $$\mathbf{w}_c=I^*\left ( 255-c_x,255-c_y \right )$$.
+
+# <a name="gradients"/> Computing image gradients
+
+
 
 <!-- We derive a simple objective function, which only consists of dot products. The maximum -->
 <!-- of this function corresponds to the location where most gradient vectors intersect and thus to the eye’s centre. -->
