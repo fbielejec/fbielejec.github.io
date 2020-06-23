@@ -94,4 +94,6 @@ fn detect_faces (frame : &Mat,
 <!--   <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4"> -->
 <!-- </video> -->
 
-{% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %}
+{% video http://s3.imathis.com/video/zero-to-fancy-buttons.mp4 640 320 http://s3.imathis.com/video/zero-to-fancy-buttons.png %}
+
+<!-- {% video {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4 640 480 {{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png %} -->
