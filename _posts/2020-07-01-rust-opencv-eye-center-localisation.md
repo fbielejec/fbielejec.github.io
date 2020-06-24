@@ -64,36 +64,73 @@ For the edge rows the gradient value is the difference between the value and the
 I decided to deviate a bit from the reference implementation.
 Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection):
 
-```rust
-fn detect_faces (frame : &Mat,
-                 face_model : &mut objdetect::CascadeClassifier)
-                 -> opencv::Result<types::VectorOfRect> {
-    let mut faces = types::VectorOfRect::new();
 
-    face_model.detect_multi_scale(
-        &frame, // input image
-        &mut faces, // output : vector of rects
-        1.1, // scaleFactor: The classifier will try to upscale and downscale the image by this factor
-        2, // minNumNeighbors: How many true-positive neighbor rectangles do you want to assure before predicting a region as a face? The higher this face, the lower the chance of detecting a non-face as face, but also lower the chance of detecting a face as face.
-        objdetect::CASCADE_SCALE_IMAGE,
-        core::Size {
+```rust
+let face_detector_name : &str = "/opt/opencv/opencv-4.2.0/data/haarcascades/haarcascade_frontalface_alt.xml";
+let camera_window_name = "camera";
+
+highgui::named_window(camera_window_name, highgui::WINDOW_AUTOSIZE)?;
+
+let face_features = core::find_file(face_detector_name, true, false)?,
+let mut face_model : objdetect::CascadeClassifier = objdetect::CascadeClassifier::new(&face_features)?;
+
+let mut frame = Mat::default()?;
+cam.read(&mut frame)?;
+
+face_model.detect_multi_scale(
+    &frame, // input image
+    &mut faces, // output : vector of rects
+    1.1, // scaleFactor: The classifier will try to upscale and downscale the image by this factor
+    2, // minNumNeighbors: How many true-positive neighbor rectangles do you want to assure before predicting a region as a face? The higher this face, the lower the chance of detecting a non-face as face, but also lower the chance of detecting a face as face.
+    objdetect::CASCADE_SCALE_IMAGE,
+    core::Size {
             width: 150,
             height: 150
-        }, // min_size. Objects smaller than that are ignored (poor quality webcam is 640 x 480, so that should do it)
-        core::Size {
+    }, // min_size. Objects smaller than that are ignored (poor quality webcam is 640 x 480, so that should do it)
+    core::Size {
             width: 0,
             height: 0
-        } // max_size
-    )?;
+    } // max_size
+  )?;
+```
 
-    Ok (faces)
+The article posits selecting the eye regions as fractions of the face region.
+I opted for using viola-jones algorithm again, but this time with a model trained to detect eyes in the face region:
+
+```rust
+if faces.len () > 0 {
+  // region of interest (submatrix), first detected face
+  let face_region = Mat::roi (&enhanced_frame, faces.get (0)?)?;
+  let face = faces.get (0)?;
+  // calls viola-jones eyes classifier
+  let eyes = detect_eyes (&face_region,
+                          &mut eyes_model)?;
+ }
+```
+
+Finally for each detected eye I apply the implemented Timm-Barth algorithm:
+
+```rust
+if eyes.len () == 2 {
+  let left_eye = eyes.get (0)?;
+  let left_eye_region = Mat::roi (&face_region, left_eye)?;
+  let left_eye_center = timm_barth::find_eye_center (&left_eye_region, left_eye.width)?;
+
+  let right_eye = eyes.get (1)?;
+  let right_eye_region = Mat::roi (&face_region, right_eye)?;
+  let right_eye_center = timm_barth::find_eye_center (&right_eye_region, right_eye.width)?;
 }
 ```
 
+The implementation itself can be found in a repository [here](https://github.com/fbielejec/rust-opencv/blob/master/src/timm_barth.rs#L142),
+and pretty-much follows the reference implementation.
+The same repository contains the working code, as well as instructions on installing the OpenCV framework (see [README](https://github.com/fbielejec/rust-opencv#install-image-and-video-io-libraries)).
 
-<!-- <video width="640" height="480" controls="controls"> -->
-<!--   <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4"> -->
-<!-- </video> -->
+Here is a video of the algorithm in action:
+
+<video width="640" height="480" controls="controls">
+  <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4">
+</video>
 
 
 <!-- <video src="http://s3.imathis.com/video/zero-to-fancy-buttons.mp4" poster="http://s3.imathis.com/video/zero-to-fancy-buttons.png" width="320" height="200" controls preload></video> -->
