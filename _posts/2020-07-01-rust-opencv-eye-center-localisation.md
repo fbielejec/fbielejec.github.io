@@ -43,7 +43,8 @@ At each pixel point of the frame, the gradient is a vector that points in the di
 
 More formally the gradient of a two variable function $$f(x,y):\mathbb{R}^2\rightarrow \mathbb{R}$$ is defined as a vector of partial derivatives of that function in each direction:
 
-$$\nabla f= {\begin{bmatrix}g_{x}\\g_{y}\end{bmatrix}}={\begin{bmatrix}{\frac {\partial f}{\partial x}}\\{\frac {\partial f}{\partial y}}\end{bmatrix}$$
+<!-- $$\nabla f = {\begin{bmatrix}g_{x}\\g_{y}\end{bmatrix}}={\begin{bmatrix}{\frac {\partial f}{\partial x}}\\{\frac {\partial f}{\partial y}}\end{bmatrix}$$ -->
+![_config.yml]({{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/CodeCogsEqn.gif)
 
 Since the intensity function of a digital image is known only at discrete points, derivatives of this function cannot be defined, unless we assume some known, differentiable function which has been sampled at these points.
 
@@ -63,7 +64,6 @@ For the edge rows the gradient value is the difference between the value and the
 
 I decided to deviate a bit from the reference implementation.
 Similar to what the paper describes I start by detecting the face region using framework descibed by [Viola and Jones, 2004](https://www.researchgate.net/publication/220660094_Robust_Real-Time_Face_Detection):
-
 
 ```rust
 let face_detector_name : &str = "/opt/opencv/opencv-4.2.0/data/haarcascades/haarcascade_frontalface_alt.xml";
@@ -128,10 +128,10 @@ The same repository contains the working code, as well as instructions on instal
 
 Here is a video of the algorithm in action:
 
-<video width="640" height="480" controls="controls">
+<video width="640" height="480" controls="controls" poster="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.mp4">
   <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4">
+    Your browser does not support the video tag.
 </video>
-
 
 <!-- <video src="http://s3.imathis.com/video/zero-to-fancy-buttons.mp4" poster="http://s3.imathis.com/video/zero-to-fancy-buttons.png" width="320" height="200" controls preload></video> -->
 
