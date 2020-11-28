@@ -128,7 +128,7 @@ The same repository contains the working code, as well as instructions on instal
 Here is a video of the algorithm in action:
 
 <video width="640" height="480" controls="controls" poster="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screenshot.png">
-  <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast_2.mp4" type="video/mp4">
+  <source src="{{ site.baseurl }}/images/2020-07-01-rust-opencv-eye-center-localisation/screencast.mp4" type="video/mp4">
     Your browser does not support the video tag.
 </video>
 
