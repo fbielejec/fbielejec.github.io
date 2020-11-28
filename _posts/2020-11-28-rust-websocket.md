@@ -47,30 +47,32 @@ The arguments can be passed on the command line, for example to open 3 concurren
 
 And this is the output you should see:
 
-```bash
-INFO  ws_load_test Running with config Config {
-        gateway_url: Url {
-            scheme: "ws",
-            host: Some(
-                Domain(
-                    "echo.websocket.org",
-                ),
-            ),
-            port: None,
-            path: "/",
-            query: None,
-            fragment: None,
-        },
-        n_connections: 3,
-        verbosity: "debug",
-    }
-[2020-11-28T14:14:36Z DEBUG tungstenite::handshake::client] Client handshake done.
-[2020-11-28T14:14:36Z DEBUG tungstenite::handshake::client] Client handshake done.
-[2020-11-28T14:14:36Z DEBUG tungstenite::handshake::client] Client handshake done.
-[2020-11-28T14:14:36Z DEBUG ws_load_test] Client 1 on ThreadId(10) received Text("PING")
-[2020-11-28T14:14:36Z INFO  ws_load_test] N: 1 Min: 99 Mean: 99.00ms Max: 99
-[2020-11-28T14:14:36Z DEBUG ws_load_test] Client 0 on ThreadId(7) received Text("PING")
-[2020-11-28T14:14:36Z INFO  ws_load_test] N: 2 Min: 98 Mean: 98.50ms Max: 99
-[2020-11-28T14:14:36Z DEBUG ws_load_test] Client 2 on ThreadId(8) received Text("PING")
-[2020-11-28T14:14:36Z INFO  ws_load_test] N: 3 Min: 98 Mean: 98.67ms Max: 99
-```
+![_config.yml]({{ site.baseurl }}/images/2020-11-28-rust-websocket/screencast.gif)
+
+<!-- ```bash -->
+<!-- INFO  ws_load_test Running with config Config { -->
+<!--         gateway_url: Url { -->
+<!--             scheme: "ws", -->
+<!--             host: Some( -->
+<!--                 Domain( -->
+<!--                     "echo.websocket.org", -->
+<!--                 ), -->
+<!--             ), -->
+<!--             port: None, -->
+<!--             path: "/", -->
+<!--             query: None, -->
+<!--             fragment: None, -->
+<!--         }, -->
+<!--         n_connections: 3, -->
+<!--         verbosity: "debug", -->
+<!--     } -->
+<!-- [2020-11-28T14:14:36Z DEBUG tungstenite::handshake::client] Client handshake done. -->
+<!-- [2020-11-28T14:14:36Z DEBUG tungstenite::handshake::client] Client handshake done. -->
+<!-- [2020-11-28T14:14:36Z DEBUG tungstenite::handshake::client] Client handshake done. -->
+<!-- [2020-11-28T14:14:36Z DEBUG ws_load_test] Client 1 on ThreadId(10) received Text("PING") -->
+<!-- [2020-11-28T14:14:36Z INFO  ws_load_test] N: 1 Min: 99 Mean: 99.00ms Max: 99 -->
+<!-- [2020-11-28T14:14:36Z DEBUG ws_load_test] Client 0 on ThreadId(7) received Text("PING") -->
+<!-- [2020-11-28T14:14:36Z INFO  ws_load_test] N: 2 Min: 98 Mean: 98.50ms Max: 99 -->
+<!-- [2020-11-28T14:14:36Z DEBUG ws_load_test] Client 2 on ThreadId(8) received Text("PING") -->
+<!-- [2020-11-28T14:14:36Z INFO  ws_load_test] N: 3 Min: 98 Mean: 98.67ms Max: 99 -->
+<!-- ``` -->
