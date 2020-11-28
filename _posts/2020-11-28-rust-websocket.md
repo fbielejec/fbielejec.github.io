@@ -1,10 +1,10 @@
 ---
 layout: post
-title: ws-load-test: rust tool for torturing websocket APIs
+title: Torturing websocket APIs with Rust
 author: Filip Bielejec
 comments: true
 categories: [rust, websockets, API, gateway, performance, testing, histograms]
-summary: ""
+summary: "ws-load-test is a high-throughput tool written in Rust for testing websocket APIs"
 ---
 
 # <a name="intro"/> Intro
