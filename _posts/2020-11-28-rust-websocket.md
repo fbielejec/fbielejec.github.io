@@ -7,7 +7,7 @@ categories: [rust, websockets, API, gateway, performance, testing, histograms]
 summary: "ws-load-test is a high-throughput tool written in Rust for testing websocket APIs"
 ---
 
-# <a name="repo"/> Project repository
+# <a name="repo"/> TL;DR Project repository
 
 - [https://github.com/fbielejec/ws-load-test](https://github.com/fbielejec/ws-load-test)
 
@@ -46,7 +46,7 @@ cargo build --release
 The arguments can be passed on the command line, for example to open 3 concurrent client connections to the [echo](ws://echo.websocket.org) public websocket endpoint: 
 
 ```bash
-./target/release/ws-load-test -v true -c 3 -g ws://echo.websocket.org
+./target/release/ws-load-test -c 3 -g ws://echo.websocket.org
 ```
 
 And this is the output you should see:
