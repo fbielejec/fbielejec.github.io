@@ -4,12 +4,12 @@ title: CQRS and Event Sourcing
 author: Filip Bielejec
 comments: true
 categories: [rust, kafka, cqrs, event sourcing, event streaming, messaging]
-summary: "."
+summary: "Study in an event-driven architecture implementation in Rust"
 ---
 
 # <a name="tldr"/> TL;DR
 
-In this I will go over an architectural pattern that is a part of a broader spectrum of event based architectures.
+In this blog post I will go over an architectural pattern which is a part of a broader spectrum of event based architectures.
 It is inspired by a [StrangeLoop talk by Bobby Calderwood](https://www.youtube.com/watch?v=B1-gS0oEtYc).
 
 Companion repository can be found here: [with-kafka](https://github.com/fbielejec/with-kafka).
@@ -17,38 +17,40 @@ Companion repository can be found here: [with-kafka](https://github.com/fbieleje
 # <a name="name"/> CQRS and Event Sourcing: what's in the name?
 
 [CQRS](https://udidahan.com/2009/12/09/clarified-cqrs/) (Command/Query Responsibility Segregation) is a pattern which separates writes from the reads.
-In another words updating information uses a different model that reading that information, as opposed to the prevalent [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) APIs, where the same view of your data is being used throughout.
+In another words updating information uses a different model that reading that information, as opposed to the prevalent [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) APIs, where the same model is being used throughout.
 
 This separation of concerns fits many domains, albeit [not all](https://martinfowler.com/bliki/CQRS.html).
-Note that the separation says nothing of how these two models communicate - they may take entirely different paths in your system and run on a different hardware, or they may even share the same database and the same process.
 
-The advantage is still the same : by separating reads from the writes you can evolve them in and independent manner.
+Note that the separation says nothing of how these two models should communicate - they may take entirely different paths in your system and run on a different hardware, or they may share the same database or even the same process.
+
+The advantage is still the same : by separating reads from the writes you can evolve them in an independent manner.
 
 ---
 **NOTE**
 
-If you think that the [GraphQL](https://graphql.org/) language concepts bear some resemblance, you will be right, although I would argue that the semantical split between *qutations* and *queries* is not enough to constitute a real separation.
-Therefore depending on the details of a GrapQL based system we could (or could not) be talking of fitting the description of CQRS, but the tow are compatible.
+If you think that the [GraphQL](https://graphql.org/) language concept bears some resemblance, you will be right, although I would argue that a semantic split between *mutations* and *queries* is not enough to constitute a real separation.
+Therefore depending on the details of a GraphQL based system we could (or not) be talking of fitting the description of CQRS, but the two are definitely compatible.
 
 ---
 
 As already mentioned CQRS makes for a good fit with event-based architectures.
-The read/write model separation, that is the defining pillar of CQRS, allows to combine it with the other hero of this blog entry title: the [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) pattern.
+The read/write model separation, which is the defining pillar of CQRS, allows to combine it with the other hero of this blogs entry title: the [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) pattern.
 
-The idea of this pattern is that every state-altering action in your system is recorded and stored forever in a time-ordered event log, rather than as an aggregate of all the changes as they were happening over time.
+The fundamental idea behind this pattern is that every state-altering action in your system is recorded and stored, forever, in a time-ordered event log, rather than as an aggregate of all the changes as they were happening over time in a single database.
+Intersting enough databses **are** build on top of event logs, stored on disk therefore this concept has been touted as [turning the database inside out](https://martin.kleppmann.com/2015/11/05/database-inside-out-at-oredev.html) by some of the greats.
 
 The advantages of this approach are many-fold:
 - There is now an audit log of everything that happened in the system at any given point in time.
 - The aggregate views of your events (persisted in e.g. relational data-base) can be now recreated by replaying those events one-by-one.
-- By constructing the materialized view of the data **after** the event is stored, we can change our interpretation of it in the future, or even construct different aggregates of those events and server them concurrently to the clients.
+- By constructing the materialized view of the data **after** the event is stored, we can change our interpretation of it in the future, or even construct different aggregates of those events and serve them concurrently to the clients.
 
 Astute reader might observe that Event Sourcing defined above *de facto* must separate the read paths from the write paths, and that is correct.
-Therefore we could be talking of systems utlizing *just* the CQRS pattern, but not about systems utilizing *Event Sourcing (ES)* without some type of command and query separation (Greg Young mentions this in his [talk](https://www.youtube.com/watch?v=JHGkaShoyNs)).
+Therefore we could be talking of systems utilizing *just* the CQRS pattern, but not about systems utilizing *Event Sourcing (ES)* without some type of command and query separation (Greg Young mentions this in his [talk](https://www.youtube.com/watch?v=JHGkaShoyNs)).
 
 # <a name="implementation"/> Implementation
 
 For some people, and I definitely subscribe to that camp, it is easier to be learning something by practicing it.
-Therefore after reading and reseraching the vast literature on the topic (including but not limited to [Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html), [Greg Young](http://codebetter.com/gregyoung/2010/02/16/cqrs-task-based-uis-event-sourcing-agh/), [Martin Kleppmann](https://www.youtube.com/watch?v=avi-TZI9t2I)) I decided to create a toy example (not built to scale nor painted) which implements some of these concepts.
+Therefore after reading and researching some the vast literature on the topic (including but not limited to talks and write-ups [Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html), [Greg Young](http://codebetter.com/gregyoung/2010/02/16/cqrs-task-based-uis-event-sourcing-agh/), [Martin Kleppmann](https://www.youtube.com/watch?v=avi-TZI9t2I)) I decided to create a toy example (not built to scale nor painted) which implements some of these concepts.
 
 Our domain will be a distributed calculator of sorts, fairly easy to reason about as well as assert the correctness of.
 
@@ -57,7 +59,7 @@ Below a simplified diagram of the system finds itself:
 ![_config.yml]({{ site.baseurl }}/images/2021-02-11-cqrs-and-event-sourcing/architecture_diagram.png)
 
 As an entry point we have a web service, exposing various endpoints.
-In the said application the API utlizes [REST + HTTP/JSON](https://en.wikipedia.org/wiki/Representational_state_transfer), but it could just as easily be a (already mentioned) GraphQL API.
+In the said application the API utilizes [REST + HTTP/JSON](https://en.wikipedia.org/wiki/Representational_state_transfer), but it could just as easily be a (already mentioned) GraphQL API.
 
 The *Commander* component is responsible for:
 - Accepting commands / mutations (client intentions).
@@ -101,7 +103,7 @@ The said **commands** topic is consumed by the *Command Processor*, a central co
 ```
 
 The emitted events are consumed by what the diagram collectively refers to as the `events consumers`.
-These microservices are generating read optimized aggregate views of the data.
+These micro-services are generating read optimized aggregate views of the data.
 They are free to share the same database or each keep it's own, they can subscribe to re-partitioned events or vanilla topic, write to and communicate using additional topics etc.
 Main point being there is now an infinite number of ways to materialize a view of your data stored as events.
 
@@ -109,7 +111,7 @@ There is also a subscriptions component, where clients can listen to for the sta
 
 # <a name="runit"/> Let's see it in action
 
-If you fork the [repository](https://github.com/fbielejec/with-kafka) there is a `docker-compose.yml` file at the root that you can use to get a Kafka broker and zookeper started:
+If you fork the [repository](https://github.com/fbielejec/with-kafka) there is a `docker-compose.yml` file at the root that you can use to get a Kafka broker and Zookeper started:
 
 ``` bash
 docker-compose -f docker-compose.yml up
