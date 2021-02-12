@@ -12,6 +12,19 @@ summary: "Study in an event-driven architecture implementation in Rust"
 In this blog post I will go over an architectural pattern which is a part of a broader spectrum of event based architectures.
 It is inspired by a [StrangeLoop talk by Bobby Calderwood](https://www.youtube.com/watch?v=B1-gS0oEtYc).
 
+--
+**TLDR**
+- *CQRS* involves splitting an application into two parts internally: the *command* side ordering the system to update state and the *query* side that gets the information without changing state.
+- by decoupling the write and read paths, you can decouple the teams responsible for the business logic of the write and read paths.
+
+Here is a summary of the *Event Sourcing* architecture:
+- Commands represent user intentions
+- Command Processors implement business logic and generate Events
+- Events represents what happened and the *final truth*
+- Other auxiliary services can be based on that
+
+--
+
 Companion repository can be found here: [with-kafka](https://github.com/fbielejec/with-kafka).
 
 # <a name="name"/> CQRS and Event Sourcing: what's in the name?
@@ -195,3 +208,43 @@ Therefore you can kill the process in which the components run and start it agai
 In practice, given that such a re-sync is single-threaded and potentially time consuming, one would rather let it persist it's offset and state, so that it can start where it left off in case of a crash.
 
 Potentially a copy could be created in a separate process, allowed to rebuild the *Events* log topic in a background and the system could switch to it with no visible downtime, to use a new, updated "state of the world".
+
+<!-- TODO -->
+# <a name="problems"/> Some problems of this architecture
+
+---
+**NOTE**
+A word of caution:
+This is the most subjective and opinionated part of this article, based on **my** understanding of the topic (and I have been wrong in the past).
+It should therefore be taken with a grain of salt.
+
+---
+
+The strengths of the architecture are also constituting some of it's weaknesses.
+
+Having a single thread and synchronously processing all incoming commands is a nice property, easy to reason about, albeit it does not scale.
+The unit of concurrency in Kafka is a partition, with multiple consumers able to consume and process topic partitions in parallel.
+
+But how do we partition the commands or the derived events topic, without loosing the ever-important time ordering?
+
+< The most important rule is that any events that need to stay in a fixed order must go in the same topic, and they must also use the same partitioning key
+< - Martin Kleppmann
+
+If your domain allows for it, you can partition commands topic, even send every command type (called `action` in the demo) to a different partition. <!-- , or potentially create a separate topic for every command. -->
+A good example would be e.g. telemetry data coming from independent sensors.
+
+If you cannot do that, the second option is to set an arbitrary number of partitions (you can always re-partition the topic later on) and distribute the commands uniformly in a round-robin way.
+Naturally you cannot guarantee at this point that the consumers subscribing to these topic partition lists will receive them in the same order as they were sent, which may or may not be a problem, depending on the domain you are working with.
+
+You might be tempted to use the timestamps that are included with the Kafka messages, either as part of the schema or in the meta-data and sort the commands in-memory.
+Don't do this :)
+
+< (...) in a stream process, timestamps are not enough: if you get an event with a certain timestamp, you don’t know whether you still need to wait for some previous event with a lower timestamp, or if all previous events have arrived and you’re ready to process the event.
+<  - Martin Kleppmann
+
+What options does it leave you with?
+Well you can simply ignore relations in your data, and store it "as-is", if we are talking about relational database as a storage this would be akin to not using foreign keys.
+Naturally, that would mean that you do not care, or that you only care *eventually* about the consistency.
+Consider a social network example - can you afford to process a `UserMessageSend` commands before `UserAccountCreate`?
+
+To sum up, if your domain call for a relational consistency of the data, or you cannot afford it to be eventually consistent that this pattern might not be a good fit for your domain.
