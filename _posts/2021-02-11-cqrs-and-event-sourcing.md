@@ -251,6 +251,6 @@ If we are talking about using relational database as a storage, this would be ak
 Naturally, that would mean that you do not care, or that you only care *eventually* about the relational consistency of your data.
 Consider a social network example - can you afford to process a `UserMessageSend` commands before `UserAccountCreate`?
 What if your processor rejects or throws when processing the latter but not the former? 
-You end up with a corrupted view of your data.
+You end up with a corrupted view of your data, but perhaps it is not a deal-breaker, and the fact that you can replay the history at will is enough of a pro that the cons do not deter you.
 
 To sum up, if your domain calls for a relational consistency of the data, or you cannot afford it to be *eventually* consistent than this pattern might not be a good fit for your domain.
