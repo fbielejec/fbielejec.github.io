@@ -16,7 +16,7 @@ It is inspired by a [StrangeLoop talk by Bobby Calderwood](https://www.youtube.c
 **TLDR**
 
 - *CQRS* involves splitting an application into two parts internally: the *command* side ordering the system to update state and the *query* side that gets the information without changing state.
-- by decoupling the write and read paths, you can decouple the teams responsible for the business logic of the write and read paths.
+- by decoupling the write and read paths, you can decouple the teams responsible for the implementation of the write and read logic.
 
 Here is a summary of the *Event Sourcing* architecture:
 - Commands represent user intentions
@@ -64,7 +64,7 @@ Therefore we could be talking of systems utilizing *just* the CQRS pattern, but 
 # <a name="implementation"/> Implementation
 
 For some people, and I definitely subscribe to that camp, it is easier to be learning something by practicing it.
-Therefore after reading and researching some the vast literature on the topic (including but not limited to talks and write-ups [Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html), [Greg Young](http://codebetter.com/gregyoung/2010/02/16/cqrs-task-based-uis-event-sourcing-agh/), [Martin Kleppmann](https://www.youtube.com/watch?v=avi-TZI9t2I)) I decided to create a toy example (not built to scale nor painted) which implements some of these concepts.
+Therefore after reading and researching some the vast literature on the topic (including but not limited to talks and write-ups by [Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html), [Greg Young](http://codebetter.com/gregyoung/2010/02/16/cqrs-task-based-uis-event-sourcing-agh/), [Martin Kleppmann](https://www.youtube.com/watch?v=avi-TZI9t2I)) I decided to create a toy example (not built to scale nor painted) which implements some of these concepts.
 
 Our domain will be a distributed calculator of sorts, fairly easy to reason about as well as assert the correctness of.
 
