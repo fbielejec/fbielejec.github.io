@@ -51,7 +51,7 @@ As already mentioned CQRS makes for a good fit with event-based architectures.
 The read/write model separation, which is the defining pillar of CQRS, allows to combine it with the other hero of this blogs entry title: the [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) pattern.
 
 The fundamental idea behind this pattern is that every state-altering action in your system is recorded and stored, forever, in a time-ordered event log, rather than as an aggregate of all the changes as they were happening over time in a single database.
-Intersting enough databses **are** build on top of event logs, stored on disk therefore this concept has been touted as [turning the database inside out](https://martin.kleppmann.com/2015/11/05/database-inside-out-at-oredev.html) by some of the greats.
+Interesting enough databases **are** build on top of event logs, stored on disk therefore this concept has been touted as [turning the database inside out](https://martin.kleppmann.com/2015/11/05/database-inside-out-at-oredev.html) by some of the greats.
 
 The advantages of this approach are many-fold:
 - There is now an audit log of everything that happened in the system at any given point in time.
@@ -118,7 +118,7 @@ The said **commands** topic is consumed by the *Command Processor*, a central co
 
 The emitted events are consumed by what the diagram collectively refers to as the `events consumers`.
 These micro-services are generating read optimized aggregate views of the data.
-They are free to share the same database or each keep it's own, they can subscribe to re-partitioned events or vanilla topic, write to and communicate using additional topics etc.
+They are free to share the same database or each keep its own, they can subscribe to re-partitioned events or vanilla topic, write to and communicate using additional topics etc.
 Main point being there is now an infinite number of ways to materialize a view of your data stored as events.
 
 There is also a subscriptions component, where clients can listen to for the status of their commands.
@@ -206,7 +206,7 @@ curl -H "Content-Type: application/json" -X GET http://localhost:3030/values/d35
 To demonstrate the replay-ability all state is kept in-memory and the *Command Processor* is configured to read from offset 0 (from the beginning of the topic).
 Therefore you can kill the process in which the components run and start it again to get the same state.
 
-In practice, given that such a re-sync is single-threaded and potentially time consuming, one would rather let it persist it's offset and state, so that it can start where it left off in case of a crash.
+In practice, given that such a re-sync is single-threaded and potentially time consuming, one would rather let it persist its offset and state, so that it can start where it left off in case of a crash.
 
 Potentially a copy could be created in a separate process, allowed to rebuild the *Events* log topic in a background and the system could switch to it with no visible downtime, to use a new, updated "state of the world".
 
