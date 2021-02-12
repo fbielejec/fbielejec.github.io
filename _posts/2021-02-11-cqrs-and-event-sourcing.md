@@ -227,8 +227,8 @@ The unit of concurrency in Kafka is a partition, with multiple consumers able to
 
 But how do we partition the commands or the derived events topic, without loosing the ever-important time ordering?
 
-< The most important rule is that any events that need to stay in a fixed order must go in the same topic, and they must also use the same partitioning key
-< - Martin Kleppmann
+> The most important rule is that any events that need to stay in a fixed order must go in the same topic, and they must also use the same partitioning key
+> -- <cite>Martin Kleppmann</cite>
 
 If your domain allows for it, you can partition commands topic, even send every command type (called `action` in the demo) to a different partition. <!-- , or potentially create a separate topic for every command. -->
 A good example would be e.g. telemetry data coming from independent sensors.
@@ -239,12 +239,16 @@ Naturally you cannot guarantee at this point that the consumers subscribing to t
 You might be tempted to use the timestamps that are included with the Kafka messages, either as part of the schema or in the meta-data and sort the commands in-memory.
 Don't do this :)
 
-< (...) in a stream process, timestamps are not enough: if you get an event with a certain timestamp, you don’t know whether you still need to wait for some previous event with a lower timestamp, or if all previous events have arrived and you’re ready to process the event.
-<  - Martin Kleppmann
+> (...) in a stream process, timestamps are not enough: if you get an event with a certain timestamp, you don’t know whether you still need to wait for some previous event with a lower timestamp, or if all previous events have arrived and you’re ready to process the event.
+> -- <cite>Martin Kleppmann</cite>
 
 What options does it leave you with?
-Well you can simply ignore relations in your data, and store it "as-is", if we are talking about relational database as a storage this would be akin to not using foreign keys.
-Naturally, that would mean that you do not care, or that you only care *eventually* about the consistency.
-Consider a social network example - can you afford to process a `UserMessageSend` commands before `UserAccountCreate`?
+Well, you can simply ignore relations in your data, and store it "as-is", or rather "as-arrives". 
+If we are talking about using relational database as a storage, this would be akin to not using foreign keys.
 
-To sum up, if your domain call for a relational consistency of the data, or you cannot afford it to be eventually consistent that this pattern might not be a good fit for your domain.
+Naturally, that would mean that you do not care, or that you only care *eventually* about the relational consistency of your data.
+Consider a social network example - can you afford to process a `UserMessageSend` commands before `UserAccountCreate`?
+What if your processor rejects or throws when processing the latter but not the former? 
+You end up with a corrupted view of your data.
+
+To sum up, if your domain calls for a relational consistency of the data, or you cannot afford it to be *eventually* consistent than this pattern might not be a good fit for your domain.
