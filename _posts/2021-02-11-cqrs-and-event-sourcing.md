@@ -7,13 +7,14 @@ categories: [rust, kafka, cqrs, event sourcing, event streaming, messaging]
 summary: "Study in an event-driven architecture implementation in Rust"
 ---
 
-# <a name="tldr"/> TL;DR
+# <a name="intor"/> Introduction
 
 In this blog post I will go over an architectural pattern which is a part of a broader spectrum of event based architectures.
 It is inspired by a [StrangeLoop talk by Bobby Calderwood](https://www.youtube.com/watch?v=B1-gS0oEtYc).
 
 --
 **TLDR**
+
 - *CQRS* involves splitting an application into two parts internally: the *command* side ordering the system to update state and the *query* side that gets the information without changing state.
 - by decoupling the write and read paths, you can decouple the teams responsible for the business logic of the write and read paths.
 
@@ -214,6 +215,7 @@ Potentially a copy could be created in a separate process, allowed to rebuild th
 
 ---
 **NOTE**
+
 A word of caution:
 This is the most subjective and opinionated part of this article, based on **my** understanding of the topic (and I have been wrong in the past).
 It should therefore be taken with a grain of salt.
