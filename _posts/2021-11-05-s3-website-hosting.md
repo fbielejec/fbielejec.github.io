@@ -22,7 +22,7 @@ We start by creating two S3 buckets, one for the root (sub)domain `view.spreadvi
 Navigate to AWS console for the [S3 service](https://s3.console.aws.amazon.com/s3).
 Create two buckets:
  - One called `view.spreadviz.org`
- - One called `www<span></span>.view.spreadviz.org`
+ - One called `www&#58.view.spreadviz.org`
 
 --
 
