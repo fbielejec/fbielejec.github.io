@@ -7,7 +7,7 @@ categories: [rust, kafka, cqrs, event sourcing, event streaming, messaging]
 summary: "Study in an event-driven architecture implementation in Rust"
 ---
 
-# <a name="intor"/> Introduction
+# <a name="intro"/> Introduction
 
 In this blog post I will go over an architectural pattern which is a part of a broader spectrum of event based architectures.
 It is inspired by a [StrangeLoop talk by Bobby Calderwood](https://www.youtube.com/watch?v=B1-gS0oEtYc).
