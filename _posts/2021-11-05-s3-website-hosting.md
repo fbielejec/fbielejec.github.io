@@ -22,7 +22,7 @@ We start by creating two S3 buckets, one for the root (sub)domain `view.spreadvi
 Navigate to AWS console for the [S3 service](https://s3.console.aws.amazon.com/s3).
 Create two buckets:
  - One called `view.spreadviz.org`
- - One called `www&#58.view.spreadviz.org`
+ - One called `www. view.spreadviz.org`
 
 --
 
@@ -43,9 +43,9 @@ Specify "index.html" as both the *index* and the *error* document - reason being
 
 ![_config.yml]({{ site.baseurl }}/images/2021-11-05-s3-website-hosting/screenshot1.jpg)
 
-Click on save changed.
+ <!-- on save change. -->
 
-Now for the second bucket called `www.view.spreadviz.org` set the access control to *BucketOwnerFullControl* or alternatively (if you intend on logging access to *LogDeliveryWrite*).
+Now for the second bucket called `www. view.spreadviz.org` set it's access control to *BucketOwnerFullControl* or alternatively (if you intend on logging access to *LogDeliveryWrite*).
 
 ![_config.yml]({{ site.baseurl }}/images/2021-11-05-s3-website-hosting/screenshot3.jpg)
 
@@ -62,10 +62,10 @@ Navigate to the AWS console for the [CloudFront](https://console.aws.amazon.com/
 Set *http://view.spreadviz.org.s3-website.us-east-2.amazonaws.com* (the S3 bucket website endpoint) as the **Origin Domain Name**, (do NOT use the autocomplete to select it!).
 In the **Viewer protocol policy** select *Redirect HTTP to HTTPS*.
 Under **Alternate domain name (CNAME)** put two names:
-- view.spreadviz.org
-- www.view.spreadviz.org
+- `view.spreadviz.org`
+- `www. view.spreadviz.org`
 
-As a *Custom SSL certificate* you need to select an ACM certificate created in the us-east-1 region and which is issued for all the domain names you have put there (so both `view.spreadviz.org` and `www.view.spreadviz.org`).
+As a *Custom SSL certificate* you need to select an ACM certificate created in the us-east-1 region and which is issued for all the domain names you have put there (so both `view.spreadviz.org` and `www. view.spreadviz.org`).
 If you don't have a certificate you can request it here.
 
 --
@@ -90,15 +90,15 @@ This can be done from the Error pages tab, by setting the Response Page Path to 
 Perfect, now we can finally set up DNS in [route53](https://console.aws.amazon.com/route53).
 We will create two records there, both pointing to the CF distribution we just created
 
-- view.spreadviz.org that is an A alias to a CF distributions domain name.
-- www.view.spreadviz.org, which does the same
+- `view.spreadviz.org`, an A alias to the CF distribution's domain name.
+- `www. view.spreadviz.org`, which does the same.
 
 ![_config.yml]({{ site.baseurl }}/images/2021-11-05-s3-website-hosting/screenshot6.jpg)
 
 # <a name="upload"/> Uploading your content to S3
 
 We haven't actually created any content to serve from the bucket.
-Assuming the entire compiled output is in *analysis-viewer/* directory you can use aws CLI tool to upload or sync it:
+Assuming the entire compiled output is in *analysis-viewer/* directory you can use the AWS CLI tool to upload or sync it:
 
 ```bash
 aws s3 sync analysis-viewer/ s3://view.spreadviz.org --acl public-read
