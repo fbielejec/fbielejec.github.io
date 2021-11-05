@@ -59,7 +59,7 @@ Great, now we will create a CloudFront distribution for the content.
 
 Navigate to the AWS console for the [CloudFront](https://console.aws.amazon.com/cloudfront/v3/home) service.
 
-Set `http://view.spreadviz.org.s3-website.us-east-2.amazonaws.com` (the S3 bucket website endpoint) as the **Origin Domain Name**, (do NOT use the autocomplete to select it!).
+Set `view.spreadviz.org.s3-website.us-east-2.amazonaws.com` (the S3 bucket website endpoint) as the **Origin Domain Name**, (do NOT use the autocomplete to select it!).
 In the **Viewer protocol policy** select *Redirect HTTP to HTTPS*.
 Under **Alternate domain name (CNAME)** put two names:
 - `view.spreadviz.org`
