@@ -10,14 +10,14 @@ summary: "Hosting static content on S3, complete with SSL and caching"
 # <a name="intro"/> Introduction
 
 For the purposes of this blog post we will assume that we want to serve some static content from `view.spreadviz.org`.
-It will come in the form of a so-called Single Page Application (SPA), written in one of the the frameworks such as React or Reagent, and compiled to JS digestible by browsers.
+It will come in the form of a so-called Single Page Application (SPA), written in a frameworks such as React or Reagent, and compiled to JS digestible by browsers.
 
-We will host it on S3, set it up with SLL and caching using AWS edge servers (CloudFront).
+We will host it on S3, set it up with SLL and use caching powered by the AWS edge servers (CloudFront).
 Finally I will show you how to deploy new versions of the page, while invalidating the cache.
 
 # <a name="buckets"/> Create S3 buckets
 
-We start by creating two S3 buckets, one for the root (sub)domain `view.spreadviz.org` abnd one for the `www` subdomain. 
+We start by creating two S3 buckets, one for the root (sub)domain `view.spreadviz.org` and one for the `www` subdomain. 
 
 Navigate to AWS console for the [S3 service](https://s3.console.aws.amazon.com/s3).
 Create two buckets:
@@ -45,11 +45,11 @@ Specify "index.html" as both the *index* and the *error* document - reason being
 
  <!-- on save change. -->
 
-Now for the second bucket called `www. view.spreadviz.org` set it's access control to *BucketOwnerFullControl* or alternatively (if you intend on logging access to *LogDeliveryWrite*).
+Now for the second bucket called `www. view.spreadviz.org` set it's access control to *BucketOwnerFullControl* or alternatively (if you intend on logging access set it to *LogDeliveryWrite*).
 
 ![_config.yml]({{ site.baseurl }}/images/2021-11-05-s3-website-hosting/screenshot3.jpg)
 
-In the Properties tab also set up website hosting, but this time set it to redirect to the root domain `view.spreadviz.org`.
+In the Properties tab of the second bucket also set up website hosting, but this time set it to redirect to the root domain `view.spreadviz.org`.
 
 ![_config.yml]({{ site.baseurl }}/images/2021-11-05-s3-website-hosting/screenshot4.jpg)
 
@@ -77,11 +77,11 @@ You can use an asterisk to cover all subdomain names in your SSL certificate : `
 --
 
 There is one more thing we need to tweak.
-Our bucket is configured to always serve *index.html*, even in case of an error.
-However when it cannot find a given route, e.g. when someone navigated to a route of your SPA, it will serve it with an error code of 404 - confusing for browser and crawlers.
+Our bucket is configured to always serve *index.html*, even in the case of an error.
+However, when it cannot find a given route, e.g. when someone navigates to a route of your SPA, it will serve it with an error code of 404 - confusing for browser and crawlers.
 
-To prevent that we need to set up a custom rule, that changes the response to a 200 in such cases.
-This can be done from the Error pages tab, by setting the Response Page Path to */index.html* with a Response Code of 200.
+To prevent that from happening we need to set up a custom rule, that changes the response to a 200 (OK) in such cases.
+This can be done from the *Error* pages tab, by setting the Response Page Path to */index.html* with a Response Code of 200.
 
 ![_config.yml]({{ site.baseurl }}/images/2021-11-05-s3-website-hosting/screenshot5.jpg)
 

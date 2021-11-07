@@ -92,4 +92,5 @@ exclude:
   - CNAME
 
 # theme: jekyll-theme-tactile
-remote_theme: pmarsceill/just-the-docs
+# remote_theme: pmarsceill/just-the-docs
+theme: just-the-docs
