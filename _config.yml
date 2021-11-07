@@ -91,4 +91,5 @@ exclude:
   - README.md
   - CNAME
 
-theme: jekyll-theme-tactile
+# theme: jekyll-theme-tactile
+remote_theme: pmarsceill/just-the-docs
