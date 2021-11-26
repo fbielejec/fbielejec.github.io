@@ -7,8 +7,6 @@ categories: [spread, viruses, phylogeography, data vizualization]
 summary: "Quick progress update on where the project is right now"
 ---
 
-# <a name="update"/> Update
-
 <video width="640" height="480" controls="controls" poster="{{ site.baseurl }}/images/2021-11-26-spread-progress-update/usa.png">
   <source src="{{ site.baseurl }}/images/2021-11-26-spread-progress-update/usa.mp4" type="video/mp4">
     Your browser does not support the video tag.
