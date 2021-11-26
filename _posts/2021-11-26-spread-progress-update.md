@@ -26,6 +26,7 @@ As a next step we will release an early version for testing by the members of th
 
 # <a name="milestones"/> Milestones achieved
 
+All the development is done out in the open and can be tracked [on GitHub](https://github.com/fbielejec/spread).
 Here is a rough overview of the major milestones achieved:
 
 - I have refactored the old parsers code (written in Java) as a [libspread](https://github.com/fbielejec/spread/blob/master/pom.xml) library.
