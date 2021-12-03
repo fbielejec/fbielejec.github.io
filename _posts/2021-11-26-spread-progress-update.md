@@ -12,7 +12,7 @@ summary: "Quick progress update on where the project is right now"
     Your browser does not support the video tag.
 </video>
 
-In [December last year](https://www.blog.nodrama.io/spread/) I announced I will be working on a next version of the popular [Spread](https://rega.kuleuven.be/cev/ecv/software/SpreaD3) package, for vizualizing how viruses and other pathogens are spreading in time and space.
+In [December last year](https://www.blog.nodrama.io/spread/) I announced I will be working on a next version of the popular [Spread](https://rega.kuleuven.be/cev/ecv/software/SpreaD3) package, for visualizing how viruses and other pathogens are spreading in time and space.
 First two releases were written as part of my PhD research, however it remained in use ever since, and at least weekly I would get emails with some questions about it that I shamelessly forwarded to my ex-colleagues (sorry guys!).
 Eventually the bit-rot made the legacy versions very cumbersome to use, and in the in the midst of the ongoing COVID pandemic I was approached by the head of my old lab to write a new release.
 
@@ -43,17 +43,17 @@ There are at least three major other features we would like to add.
 
 Firstly I realize that relying on Google for OAuth2 can be quite limiting.
 Some countries are actively blocking Google services, and we would not want this to be an obstacle for using the service.
-We still want to keep it passwordess and not store any user-related data beyond the analysis.
+We still want to keep it passwordless and not store any user-related data beyond the analysis.
 Therefore one of the big features in the roadmap is the implementation of another authorization flow, that uses *any* email as the identity provider, and delivers one-time JWT tokens, swapped for our long-lived spread tokens - the so-called "magic links" mechanism.
 
 The way we see the service being used is that it will remain under a relatively low load for most of the time, with occasional spikes of activity.
-It needs to be able to readily handel those spikes, as well as keep the resource utilization, and subsequently the costs, down in between them.
+It needs to be able to readily handle those spikes, as well as keep the resource utilization, and subsequently the costs, down in between them.
 
 Therefore another big goal is an implementation of a set of scaling rules, that provision additional resources in response to those spikes in load.
 There are some metrics we can use to guide these rules, such as number of un-acked messages in worker queues, network requests to the API etc.
 
 Another goal is not a technical one, albeit an equally important one
-We want the service to remain open and free to use for everyone in the phylogenetics, data vizualization, statistics, epidemiology and other interested communities.
+We want the service to remain open and free to use for everyone in the phylogenetics, data visualization, statistics, epidemiology and other interested communities.
 However the upkeep is a non-negligible one, various AWS services it comprises off generate costs on monthly basis.
 For the moment we are able to cover those costs thanks to a grant received by the ECR laboratory, however eventually a more long-term solution is needed.
-With that in mind I would like to set up a Github sponsorship with the goal of funding the server and upkeep costs - if you are a researcher, you have used and found the software usefull please consider donating.
+With that in mind I would like to set up a GitHub sponsorship with the goal of funding the server and upkeep costs - if you are a researcher, you have used and found the software useful please consider donating.
