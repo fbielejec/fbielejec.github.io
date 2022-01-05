@@ -6,7 +6,7 @@ permalink: /about/
 
 ### About me
 
-I am Filip Bielejec, a freelance software developer.
+Hi! This is nodrama, a blog run by a freelance software developer.
 
 I studied Applied Mathematics before working as a developer in various roles and industries.
 
@@ -19,6 +19,6 @@ I feel comfortable working with various platforms and languages, from the server
 
 Whenever possible in like to do all the work I can using the functional paradigm and Clojure / Clojurescript.
 
-### Contact me
+<!-- ### Contact me -->
 
-[fbielejec@gmail.com](mailto:fbielejec@gmail.com)
+<!-- [fbielejec@gmail.com](mailto:fbielejec@gmail.com) -->

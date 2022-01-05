@@ -3,7 +3,7 @@
 #
 
 # Name of your site (displayed in the header)
-name: Filip Bielejec
+name: NoDrama
 
 # Short bio or description (displayed in the header)
 description: Clojure | Clojurescript | DevOps | Rust | Blockchain
@@ -18,15 +18,15 @@ avatar: https://raw.githubusercontent.com/fbielejec/fbielejec.github.io/master/i
 # Includes an icon in the footer for each username you enter
 footer-links:
   dribbble:
-  email: fbielejec@gmail.com
+  email: #fbielejec@gmail.com
   facebook:
   flickr:
-  github: fbielejec
+  github: #fbielejec
   instagram:
   linkedin:
   pinterest:
   rss: # just type anything here for a working RSS icon
-  twitter: fbielejec
+  twitter: #fbielejec
   stackoverflow: # your stackoverflow profile, e.g. "users/50476/bart-kiers"
   youtube: # channel/<your_long_string> or user/<user-name>
   googleplus: # anything in your profile username that comes after plus.google.com/
@@ -41,7 +41,7 @@ google_analytics: UA-112315545-1
 
 # Your website URL (e.g. http://barryclark.github.io or http://www.barryclark.co)
 # Used for Sitemap.xml and your RSS feed
-url: https://fbielejec.github.io
+url: https://www.blog.nodrama.io/
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
