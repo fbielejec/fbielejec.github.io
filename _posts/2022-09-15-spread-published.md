@@ -1,4 +1,4 @@
-----
+---
 layout: post
 title: Spread is published
 author: Filip Bielejec
