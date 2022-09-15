@@ -8,7 +8,7 @@ summary: "Spread is ready to use and availiable at https://spreadviz.org"
 ---
 
 <video width="640" height="480" controls="controls" poster="{{ site.baseurl }}/images/2022-09-15-spread-published/screenshot.png">
-  <source src="{{ site.baseurl }}/images/2022-09-15-spread-published/screenshot.mp4" type="video/mp4">
+  <source src="{{ site.baseurl }}/images/2022-09-15-spread-published/screenshot.mkv" type="video/mp4">
     Your browser does not support the video tag.
 </video>
 
