@@ -1,18 +1,18 @@
 ---
 layout: post
-title: Controlling sensitive actions on your smart contracts written in ink!
+title: Implementing access control for smart contracts written in ink!
 author: Filip Bielejec
 comments: true
 categories: [rust, ink!, smart-contracts, substrate]
-summary: "In this post we go discuss an implementation of the access-control contract, that provides rights for usage of specific smart contract functions to selected addresses. We describe different solutions and finally preent a complete implementation with open-ended semantics that can be re-used for virtually every possible distributed application."
+summary: "In this post we discuss an implementation of the access-control smart contract, that provides execution rights to smart contract functions for selected addresses. We describe different solutions and finally preent a complete implementation with open-ended semantics that can be re-used for virtually every possible distributed application."
 ---
 
 # <a name="prerequisites"/> Prerequisites
 
 This post assumes a basic understanding of smart contracts development.
-Specifically one should be aware of what a smart contract (SC) is, what are the limitations and a how does a general model of SC execution looks like.
+Specifically one should be aware of what a smart contract (SC) is, what are the limitations and a how does a general model of SC execution look like.
 
-Since [Ethereum Virtual Machine](https://ethereum.github.io/yellowpaper/paper.pdf) is likely the most ubiquitous smart contracts virtual machine (VM), with Solidity being a de-facto standard programming language for SC development, many of the lessons learned there will apply directly.
+Since [Ethereum Virtual Machine](https://ethereum.github.io/yellowpaper/paper.pdf) is likely the most ubiquitous smart contracts virtual machine (VM), with Solidity being a de-facto standard programming language for SC development, many of the lessons learned there will apply to [ink!](https://docs.substrate.io/tutorials/smart-contracts/) directly.
 If you have ever written even a few lines of Solidity code you will feel right at home, or perhaps even better, with ink!.
 
 However emerging platforms for SC development improve upon Solidity and EVM in many places.
@@ -22,19 +22,18 @@ In this blog post we will highlight any differences and explain why and how thes
 
 ---
 
-*TLDR*
+**TLDR**
 
-This post is part of a series of more technical-oriented blog posts in which we highlight some of the challenges that we encountered and that have driven our design choices.
-
-In this part we talk about implementing access-control - a fine grained mechanism for controlling who and under what circumstances can perform particular actions that alter the state of your contracts.
+*This post is part of a series of more technical-oriented blog posts in which we highlight some of the challenges that we encountered and that have driven our design choices.*
+*Here we discuss implementing access-control - a fine grained mechanism for controlling who and under what circumstances can perform particular actions that alter the state of your contracts.
 
 ---
 
 WebAssembly (WASM) is a binary instruction format, that was designed in order to bring high-performance capabilities to the web clients (such as the browsers).
 It is an open standard that is already supported by a great many programming languages.
 
-Despite it's initial design goals, WASM makes no assumptions about the execution environment, meaning there is nothing web or even operating-system specific about it
-WASM is *just* a binary instruction format for a stack-based virtual machine.
+Despite it's initial design goals, WASM makes no assumptions about the execution environment, meaning there is nothing web or even operating-system specific about it.
+WASM is /just/ a binary instruction format for a stack-based virtual machine.
 
 What this means is it's utility goes way beyond the web.
 
@@ -42,20 +41,20 @@ One of the applications where WASM quickly made it's way into is the smart contr
 There are several advantages over languages like Solidity:
 - They can execute much faster, which in environments such as the distributed ledger leads to a lower gas fees.
 - They can be written in almost any language that has WASM as a compilation target, and in principle deployed to any chain with support for the WASM execution.
-- They can enjoy access to a vast collection of libraries that do not necessarily have to come from the community of smart contract developers .
+- They can enjoy access to a vast collection of libraries, as well as reuse existing tooling, that does not necessarily have to come from the community of smart contract developers.
 - Other goodies: 64 bit integer support, deterministic execution guarantees, LLVM compatible intermediate representation
 
 # <a name="substrate"/> Substrate
 
 Now in the light of all the [points mentioned above](#intro) one might wonder why do we even bother writing smart contracts in Solidity.
 Well, it's not that simple.
-First of all there is a large, valuable EVM ecosystem created over the years, with contracts processing billions of dollars.
+First of all there is a large, valuable EVM ecosystem created over the years, with contracts processing hundreds if not billions of dollars daily.
 There is immense tooling, libraries. frameworks and know-how along with battled developers that have been creating EVM contracts for many years now.
 
 ![_config.yml]({{ site.baseurl }}/images/2023-02-27-access-control-in-ink-smart-contracts/meme1.jpg)
 
 Finally, like in the meme, one cannot simply deploy a WASM contract to an EVM chain such as Ethereum that does not support WASM execution.
-I will say more, even the platforms that do support WASM are not neccessarily fully compatible, in the sense that taking a smart contract written for say [Solana](https://solana.com/) and deploying it to say [NEAR](https://near.org/) is not going to work out-of-the-box - we might get there someday though!
+I will say more, even the platforms that do support WASM are not necessarily fully compatible, in the sense that taking a smart contract written for say [Solana](https://solana.com/) and deploying it to for example [NEAR](https://near.org/) is not going to work out-of-the-box - we might get there someday though.
 
 Instead even WASM compatible chains usually employ some sort of a domain-specific language (DSL) for smart contracts that is eventually compiled to a WASM binary.
 That is because smart contract code needs to be instrumented, often needs to call into a specific logic or runtime of the chain it will be deployed on or interact with it in some other proprietary way.
@@ -64,17 +63,18 @@ One such DSL is the [ink!](https://github.com/paritytech/ink), a Rust-based lang
 
 # <a name="problem"/> Problem statement
 
-On-chain storage is expensive, and Substrate-based chains are no exception here.
-When it comes to smart contracts there are certain mechanism that incentivize reducing occupied storage space.
+<!-- When it comes to smart contracts there are certain mechanism that incentivize reducing the occupied storage space. -->
+
+On-chain storage is expensive, and the Substrate-based chains are no exception.
+That is why Substrate's SC pallet has a separation between the SC code and it's instance.
 
 Think of Ethereum and just how many instances of a basic ERC20 contract are there - thousands if not tens of thousands.
 Huge waste of a valuable on-chain real estate!
 
-That is why substrate's SC pallet has created a separation between the SC code and it's instance.
-In this model there can be multiple instances of a given contract created from the code that is uploaded just once - think of a variable and having reference's to it's value.
-You are incentivized, by getting your storage deposits back, to be eventually removing both - with the caveat that only if the reference counter goes to 0 can you remove the actual SC code.
+In the Substrate model there can be multiple instances of a given contract created from the code that is uploaded to the chain just once - think of a variable and having multiple reference's to it's value.
+You are incentivized, by getting your storage deposits back, to eventually be removing both if they ar enot needed - with the caveat that only if the reference counter goes to 0 can you remove the actual SC code from the chains storage.
 
-Now let's take a look at the following code snippet of an actual ink! code:
+Now let's take a look at the following code snippet of an ink! code:
 
 ```rust
 #[ink(message)]
@@ -84,16 +84,16 @@ pub fn terminate(&mut self) -> Result<()> {
 }
 ```
 
-This function is a callable message that can be called by a human or by another contract.
+This function is a callable message that can be invoked by a human or by another contract.
 Third line gets the callers address and fourth passes it to the `terminate_contract` that removes that contract's instance along with it's occupied storage and returns the deposit to the caller.
 
 What is the problem here?
-Well, anyone can call into this function, meaning anyone can wipe our precious contract and get back the deposit.
+Well, anyone can call into this function, meaning anyone can wipe our precious contract and claim the deposit.
 Not good, we need a way of controlling who can call `terminate`.
 
 ## <a name="ugly"/> The ugly solution
 
-One possible solution is to simply hard-code an address that can call the method and check against it during execution.
+One possible solution is to simply hard-code an address that can call the method and check against it during the execution.
 Here is the body of the method where we check whether the caller is `Alice` and revert if she is not:
 
 ```rust
@@ -108,13 +108,14 @@ if !caller.eq(&AccountId::from([
 self.env().terminate_contract(caller)
 ```
 
-Not great but it will work.
+If the caller's address is different from the whitelisted addres the transaction will fail.
+This solution is not great but it will get the job done.
 
 ## <a name="instantiate"/> Controlling who can instantiate the contract
 
-When stating the original [problem](#problem) we mentioned how the storage deposit for the contract code (remember how in Substrate multiple instances can be created from one on-chain storage of the contract code) can be redeemed only when the reference counter goes to zero.
+When stating the original [problem](#problem) we mentioned how the storage deposit for the contract code (remember how in Substrate multiple instances can be created from one on-chain storage of the contract code) can be redeemed only when the reference counter f contract's created as it's instances goes to zero.
 
-In our current contract anyone can create an instance, pass his own sudo and it will might never be able to redeem the deposit.
+Anyone can create an instance, and unless he is so kind to terminate it you might never be able to redeem the deposit.
 
 We need a way of limiting who can create instances of the contract uploaded by us.
 
@@ -135,12 +136,12 @@ pub fn new(sudo: [u8; 32]) -> Self {
 ```
 
 But if you allow for passing a controller account in the constructor this is no better than allowing anyone to create their own instance from your code in the first place.
-So we need a different approach.
+We need a different approach.
 
 ## <a name="hard"/> The hard solution
 
 If you control the underlying chain you can add a [chain extension](https://use.ink/macros-attributes/chain-extension) that will return the owner of a particular code hash stored on-chain, make it available to your contract and check if the caller is indeed the owner.
-You won't always have that luxury, not to mention that creating, testing and pushing chain updates is, even in Substrate, a very delicate and time-consuming operation.
+You won't always have that luxury, not to mention that creating, testing and pushing chain updates is a very delicate and time-consuming operation.
 
 Therefore we won't discuss this approach here, instead we will focus on what can be implemented with a smart contract based solution.
 
@@ -149,7 +150,7 @@ Therefore we won't discuss this approach here, instead we will focus on what can
 What if we go back to our first [ugly](#ugly) solution and just re-use it here?
 This might just work!
 
-Let's start by storing the 32 bits of the controlling account address:
+Let's start by storing the 32 bits of the controlling account address as a constant:
 
 ```rust
 const SUDO: [u8; 32] = [
@@ -171,7 +172,8 @@ pub fn new() -> Self {
 }
 ```
 
-So now only we can create and terminate instances of our contract, which is nice.
+So now we control creating and terminating instances of our contract, which is nice.
+
 But what if during the contract's lifetime:
 - You want to change the controlling account?
 - You want to have multiple controlling accounts.
@@ -182,10 +184,10 @@ But what if during the contract's lifetime:
 ## <a name="complete"/> The complete solution
 
 At this point it is becoming clear that to address all these points we need a more general solution, especially if you intend to re-use to across different distributed applications (dapps).
-[This repository](https://github.com/Cardinal-Cryptography/access-control) contains an example of how you might approach this, so let's walk though the code, starting with the [Flipper](https://github.com/Cardinal-Cryptography/access-control/blob/master/access_control/lib.rs#L0) contract.
+[This repository](https://github.com/Cardinal-Cryptography/access-control) contains an example of how you might approach this, so let's walk though the code, starting with the [Flipper](https://github.com/Cardinal-Cryptography/access-control/blob/master/access_control/lib.rs#L0) contract, which is a /hello-world/ of smart contract development.
 
-Storage struct looks as could be expected, with a Boolean field for flipping a bit in contract's storage.
-It contains one extra field with an address that will point to a contract that holds information about access privileges of other accounts:
+The storage struct looks as could be expected, with a Boolean field for flipping a bit in contract's storage.
+It contains just one extra field with an address that will point to a contract holding information about the access privileges:
 
 ```rust
 #[ink(storage)]
@@ -197,7 +199,7 @@ pub struct Flipper {
 }
 ```
 
-Let's now take a look at the constructor of this contract:
+Let's now take a look at the body of this contracts constructor:
 
 ```rust
 let caller = Self::env().caller();
@@ -219,18 +221,24 @@ match Self::check_role(access_control, caller, required_role) {
 ```
 
 What is going on here?
+
 First we obtain the caller's on-chain address.
-Then we read the hash of the contract' code - if you remember how we [talked about](#problem) how contract instances are created multiple times from just one code - this hash is the address in the storage where the contract code resides.
-In the next couple of lines we call the Access Control (AC) contract and ask whether the caller has the `Initializer` role assigned to him for this particular code hash.
+Then we read the hash of the contract's code - if you remember how we [talked about](#problem) how contract instances are created multiple times from just one code - this hash is exactly the address in the storage where the contract code resides.
+
+In the next couple of lines we call the Access Control (AC) contract and ask whether the caller has the `Initializer` role assigned to him, for this particular code hash.
 If not the constructor will panic and the whole transaction reverts.
 
 There are two other callable methods on this contract: `terminate` and `flip`.
-Similarly to the constructor `terminate` will check whether the caller's account is and Admin of this contract's instance - note that at this point the contract is already created, therefore we talk about an instance and instances have addresses - therefore the *Admin* `Role` is an enum over `AccountId`.
-The `flip` method checks a `Custom` `Role` - as there can be myriad of options they can be encoded in an application specific way using an enum variant with 4 bytes, giving you plenty of options to encode some access semantics that work for your application.
-Here the hex number *0x666C6970* simply encodes the word /flip/ in ASCII code,
 
-Fantastic, let's now take a look at the actual [Access Control](https://github.com/Cardinal-Cryptography/access-control/blob/master/access_control/lib.rs#L0) contract.
-There are some constant it defines - one is a placeholder for the address of the AccessControl contract itself.
+Similarly to the constructor `terminate` will check whether the caller's account is and Admin of this contract's instance - note that at this point the contract is already created, therefore we talk about an instance and instances have addresses - therefore the *Admin* `Role` is an enum over `AccountId`.
+
+The `flip` method checks a `Custom` `Role` - as there can be myriad of options they can be encoded in an application specific way using an enum variant with 4 bytes, giving you plenty of options to encode some access semantics that work for your application.
+Here the hex number *0x666C6970* simply encodes the word *flip* in ASCII.
+
+Let's now take a look at the actual [Access Control](https://github.com/Cardinal-Cryptography/access-control/blob/master/access_control/lib.rs#L0) contract.
+
+There are some top level constant it defines.
+First one is the placeholder for the address of the AccessControl contract itself.
 It is not used in the contract, but it's exported to be used as a dependency.
 Contract that use AC can replace this address in their bytecode once the AC on-chain address is known.
 Consult the [deployment script](https://github.com/Cardinal-Cryptography/access-control/blob/master/deploy.sh#L15) to see how this happens in practice.
@@ -268,7 +276,7 @@ It has three variants:
 - `Admin` of an instance, typically a superuser with some potentially destructive privileges, like halting SC actions, or even terminating it.
 - Finally a `Custom` role is meant as an open-ended means to create your own roles, with their own semantics that make sense in the context of whatever dapp you are creating.
 
-There's really not much more to it.
+There's really not much more to it, but it already gives you a flexible and convenient way of managing access.
 
 # <a name="summary"/> Summary
 
