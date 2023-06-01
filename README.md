@@ -1,6 +1,6 @@
 ## Personal blog
 
-[![Build Status](https://travis-ci.org/fbielejec/fbielejec.github.io.svg?branch=master)](https://travis-ci.org/fbielejec/fbielejec.github.io)
+![Build Status](https://github.com/fbielejec/fbielejec.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)
 
 ### Basics: Blog uses Jekyll and github pages for hosting
 
