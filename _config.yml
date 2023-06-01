@@ -78,10 +78,11 @@ sass:
 #   - jekyll-feed # Create an Atom feed using the official Jekyll feed gem
 
 plugins:
-   - jekyll-sitemap # Create a sitemap using the official Jekyll sitemap gem
-   - jekyll-feed # Create an Atom feed using the official Jekyll feed gem
-   - jemoji # use emojis
-   - jekyll-seo-tag # optimize your site for search engines and social media networks
+   - jekyll-sitemap      # Create a sitemap using the official Jekyll sitemap gem
+   - jekyll-feed         # Create an Atom feed using the official Jekyll feed gem
+   - jemoji              # use emojis
+   - jekyll-seo-tag      # optimize your site for search engines and social media networks
+   - jekyll-remote-theme # use remote themes
 
 # Exclude these files from your production _site
 exclude:
@@ -91,6 +92,5 @@ exclude:
   - README.md
   - CNAME
 
-theme: jekyll-theme-tactile
-# remote_theme: pmarsceill/just-the-docs
-# theme: just-the-docs
+# theme: jekyll-theme-tactile
+remote_theme: jekyll/minima
