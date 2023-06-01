@@ -4,7 +4,15 @@ title: Implementing access control for smart contracts written in ink!
 author: Filip Bielejec
 comments: true
 categories: [rust, ink!, smart-contracts, substrate]
-summary: "In this post we discuss an implementation of the access-control smart contract, that provides execution rights to smart contract functions for selected addresses. We describe different solutions and finally preent a complete implementation with open-ended semantics that can be re-used for virtually every possible distributed application."
+summary: "We discuss implementing access-control - a fine grained mechanism for controlling who and under what circumstances can perform particular actions that alter the state of your contracts."
+---
+
+---
+
+**TLDR**
+
+*Here we discuss implementing access-control - a fine grained mechanism for controlling who and under what circumstances can perform particular actions that alter the state of your contracts.*
+
 ---
 
 # <a name="prerequisites"/> Prerequisites
@@ -19,15 +27,6 @@ However emerging platforms for SC development improve upon Solidity and EVM in m
 In this blog post we will highlight any differences and explain why and how these drive the design choices that we made.
 
 # <a name="intro"/> Introduction
-
----
-
-**TLDR**
-
-*This post is part of a series of more technical-oriented blog posts in which we highlight some of the challenges that we encountered and that have driven our design choices.*
-*Here we discuss implementing access-control - a fine grained mechanism for controlling who and under what circumstances can perform particular actions that alter the state of your contracts.
-
----
 
 WebAssembly (WASM) is a binary instruction format, that was designed in order to bring high-performance capabilities to the web clients (such as the browsers).
 It is an open standard that is already supported by a great many programming languages.
