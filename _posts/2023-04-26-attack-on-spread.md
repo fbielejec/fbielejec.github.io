@@ -36,7 +36,7 @@ My concern was that a potential leak of our API key could result in an unauthori
 
 # <a name="steps"/> Steps taken
 
-To investigate the situation, we reviewed the logs and noticed a significant increase in email login attempts. 
+To investigate the situation, we reviewed the logs and noticed a significant increase in email login attempts.
 While this was not ideal, it indicated an attempt to overload the endpoint responsible for sending login emails, rather than a compromise of user credentials or a sophisticated attack.
 
 To mitigate the issue, I took the following steps:
@@ -45,7 +45,7 @@ To mitigate the issue, I took the following steps:
 * Temporarily disabled the "magic link" login/sign-on functionality until the API token was rotated.
 * Developed a solution to handle similar attacks by implementing an IP-based "jailer" decorator that limits the number of login attempts within a specific timeframe.
 * Collaborated with [Juan](https://github.com/jpmonettas?tab=repositories) to improve the decorator implementation, resulting in a more efficient and testable state machine-based approach.
-* The solution can be found in the following code snippet :[server.cljs#L33-L78](https://github.com/phylogeography/spread/blob/5964d016665270d960e94a193b44f5dff75578b1/src/clj/api/server.clj#L33-L78)
+* The solution can be found in the following [code](https://github.com/phylogeography/spread/blob/5964d016665270d960e94a193b44f5dff75578b1/src/clj/api/server.clj#L33-L78):
 
 ---
 <a name="footnote1">1</a>: sadly academia is notoriously under-financed.
