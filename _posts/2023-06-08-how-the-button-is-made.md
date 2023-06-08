@@ -1,13 +1,11 @@
 ---
 layout: post
-title: TheButton: A Smart Contracts-Based Game on Aleph Zero Blockchain
+title: TheButton: A Smart Contracts-Based Game on AlephZero Blockchain
 author: Filip Bielejec
 comments: true
 categories: [rust, ink!, smart-contracts, substrate]
-summary: "In this bog post we descibe TheButton, a smart-contract based game deployed on the Aleph Zero blockchain."
+summary: "In this bog post we describe TheButton, a smart-contract based game deployed on the Aleph Zero blockchain."
 ---
-
-
 
 # <a name="intro"/> Introduction
 
@@ -31,6 +29,12 @@ Aleph Zero's rapid block finality, with blocks produced and finalized every seco
 
 In the following sections, we will describe the key components that comprise TheButton.
 This introductory overview serves as a starting point for our series of technical deep-dives, where we will delve into each component
+
+# <a name="hld"/> TheButton Game: high level diagram
+
+Following diagram summarizes communication and interaction between the core components of TheButton game.
+
+![_config.yml]({{ site.baseurl }}/images/2023-06-06-how-was-the-button-made/diagram.svg)
 
 # <a name="button"/> The Button Contract: Governing Gameplay, Tracking Rewards, and Minting Tokens
 
