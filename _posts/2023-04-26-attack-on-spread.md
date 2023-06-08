@@ -8,7 +8,7 @@ summary: "In this blog post I describe a minor security incident"
 ---
 
 ---
-*TL;DR*
+**TL;DR**
 
 [Spread](https://spreadviz.org/) recently experienced a minor security incident related to increased email login attempts.
 However, no user data was compromised during the incident.
@@ -18,12 +18,12 @@ However, no user data was compromised during the incident.
 # <a name="intro"/> Introduction
 
 In this blog post, I'll discuss a recent security incident at Spread and the steps taken to address it.
-I'll provide an overview of our authentication approach, explain the incident details, outline the actions we took, and discuss future directions.
+I'll provide an overview of our authentication approach, explain the incident details, outline the actions I took, and discuss the future directions.
 
 # <a name="auth"/> Authentication Approach
 
 When [designing Spread](https://www.blog.nodrama.io/spread/), I adopted a passwordless approach for user authorization and authentication.
-Spread doesn't store any  credentials or passwords.
+Spread doesn't store any credentials or passwords.
 Instead, users can choose to authenticate using OAuth 2.0 with Google or any other email.
 In the latter case, Spread sends an email containing a "magic link" with a short-lived token.
 Upon clicking the link, the token is validated, and a longer-lived JWT access token is issued, signed with Spread's RSA key.
@@ -36,8 +36,8 @@ My concern was that a potential leak of our API key could result in an unauthori
 
 # <a name="steps"/> Steps taken
 
-To investigate the situation, we reviewed the logs and noticed a significant increase in email login attempts.
-While this was not ideal, it indicated an attempt to overload the endpoint responsible for sending login emails, rather than a compromise of user credentials or a sophisticated attack.
+To investigate the situation, I reviewed the logs and noticed a significant increase in email login attempts.
+While this was not ideal, it indicated an attempt to overload the endpoint responsible for sending login emails, rather than credentials leak or a sophisticated attack.
 
 To mitigate the issue, I took the following steps:
 
@@ -48,4 +48,4 @@ To mitigate the issue, I took the following steps:
 * The solution can be found in the following [code](https://github.com/phylogeography/spread/blob/5964d016665270d960e94a193b44f5dff75578b1/src/clj/api/server.clj#L33-L78).
 
 ---
-<a name="footnote1">1</a>: sadly academia is notoriously under-financed.
+<a name="footnote1">1</a>: sadly the academia is notoriously underfunded.
