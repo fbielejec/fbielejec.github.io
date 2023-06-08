@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Spread: security incident
+title: Spread security incident
 author: Filip Bielejec
 comments: true
 categories: [Clojure, spread, authorization, authentication, security]
