@@ -1,25 +1,25 @@
 ---
 layout: post
-title: TheButton: A Smart Contracts-Based Game on AlephZero Blockchain
+title: TheButton: A Smart Contracts-Based Game on the AlephZero Blockchain
 author: Filip Bielejec
 comments: true
-categories: [rust, ink!, smart-contracts, substrate]
+categories: [rust, ink!, smart-contracts, substrate, pokadot, alephzero, wasm, psp22, dex, defi]
 summary: "In this bog post we describe TheButton, a smart-contract based game deployed on the Aleph Zero blockchain."
 ---
 
 # <a name="intro"/> Introduction
 
-March 2023 has brought an important milestone the AlephZero: the long-awaited launch of smart contracts capabilites.
+March 2023 has brought an important milestone to the [AlephZero](https://alephzero.org/): the long-awaited launch of smart contracts capabilites.
 
-In this bog post we welcome you to TheButton, a smart-contract based game deployed on the Aleph Zero blockchain.
-Inspired by the famous [Reddit game and social experiment](https://en.wikipedia.org/wiki/The_Button_(Reddit)), TheButton utilizes ink! smart contracts and the lightning-fast finality of Aleph Zero to deliver a captivating gaming experience.
+In this bog post we welcome you to [TheButton](https://the-button.azero.dev/), a smart-contract based game deployed on the Aleph Zero blockchain.
+Inspired by the famous [Reddit game and social experiment](https://en.wikipedia.org/wiki/The_Button_(Reddit)), TheButton utilizes [ink!](https://use.ink/) smart contracts and the lightning-fast finality of Aleph Zero to deliver a captivating gaming experience.
 
 At its core, TheButton features a timer countdown that decreases with each finalized block on the Aleph Zero blockchain.
 Players' clicks on the button reset the timer, ensuring its survival for 9,000 blocks (around 25 hours).
 
 With three unique buttons, each governed by different rules, players strategically time their engagement to reap the greatest rewards.
 
-Players utilize ticket tokens (PSP22 standard) to enter TheButton's games and earn reward tokens.
+Players utilize ticket tokens ([PSP22 standard](https://medium.com/supercolony/psp22-the-first-smart-contract-standard-on-the-polkadot-ecosystem-fef3f6c27d88)) to enter TheButton's games and earn reward tokens.
 These tokens open the doors to TheButton's Marketplace, where players can partake in a Dutch auction for ticket sales, taking advantage of fluctuating prices.
 
 Additionally, the game introduces the SimpleDex, a Decentralized Exchange that enables seamless swapping between reward tokens and the wAzero token - a PSP22-wrapped native token of Aleph Zero, ensuring liquidity and flexibility.
@@ -108,7 +108,7 @@ Liquidity for wAzero is periodically topped up by the Foundation itself, while l
 The pricing mechanism employed by the SimpleDex holds a strategic value within the game.
 Players can leverage this mechanism to devise strategies that optimize their token swaps, providing them with a competitive edge in navigating TheButton's gameplay dynamics.
 
-# <a name="outro"/> **Conclusion: Unveiling TheButton's Core Components**
+# <a name="outro"/> Conclusion
 
 With this, we conclude our exploration of the core components that drive TheButton, a captivating smart contract-based game deployed on the Aleph Zero blockchain.
 We have delved into the Button contract, which governs gameplay and rewards, the Marketplace contract that facilitates ticket sales, and the SimpleDex contract, empowering decentralized token swaps.
@@ -117,3 +117,8 @@ But our journey is far from over: in the upcoming series of blog posts, we will 
 We will discuss design choices we made, and unveil some innovative features, diving into a more technical intricacies.
 
 Stay tuned!
+
+# <a name="outro"/> Keep reading
+
+* Next in the series: [implementing Access Control](https://www.blog.nodrama.io/access-control-in-ink-smart-contracts/)
+* [Source code](https://github.com/Cardinal-Cryptography/aleph-node/tree/59ac2dd8c106bb5e44bdbb14ccc58bc4476d2f32/contracts)
