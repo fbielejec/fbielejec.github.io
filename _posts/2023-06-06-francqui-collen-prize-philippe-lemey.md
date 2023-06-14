@@ -9,7 +9,7 @@ summary: "Spread has been featured in the Belgian news broadcast VRT NWS"
 
 ---
 
-If you're a geek like I am, you must remember that [scene in The Matrix Reloaded](https://www.youtube.com/watch?v=0PxTAn4g20U) when Trinity fires up nmap on 10.2.2.2 and finds a vulnerability in SSH to exploit.
+If you're a geek like I am, you must remember that [scene in The Matrix Reloaded](https://www.youtube.com/watch?v=0PxTAn4g20U) when Trinity fires up [nmap](https://nmap.org/) on 10.2.2.2 and finds a vulnerability in SSH to exploit.
 
 Its [author](https://github.com/fyodor) was apparently dancing in the aisles of the cinema when he saw his creation in the movie. Well, [Spread](https://spreadviz.org/) sorta-kinda had its first moment of fame too!
 
