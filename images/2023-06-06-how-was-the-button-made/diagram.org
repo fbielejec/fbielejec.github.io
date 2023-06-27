@@ -1,0 +1,68 @@
+#+CAPTION: High level diagram
+#+LABEL: fig:diagran
+#+ATTR_LATEX: :placement [th]
+#+begin_src plantuml :file diagram.png
+
+@startuml
+class Player {
+    + address: AccountId
+}
+
+class ButtonGame {
+    + address: AccountId
+    + pressCount: u128
+    + lastPressTime: BlockNumber
+    + pressiah: Player
+    + totalRewardsPaid: Balance
+    + ticketToken: PSP22
+    + rewardToken: PSP22
+    + marketplaceContract: Marketplace
+    --
+    + press(): void
+    + reset(): void
+}
+
+class Marketplace {
+    + address: AccountId
+    + ticketToken: PSP22
+    + averagePrice: Balance
+    --
+    + buy(player: Player): void
+}
+
+class SimpleDex {
+    + address: AccountId
+    + tokenPool: PSP22[]
+    --
+    + swap(in: PSP22, out: PSP22, amountIn: Balance, minAmountOut: Balance): void
+}
+
+class TicketToken {
+    + address: AccountId
+    --
+    + balanceOf(account: string): Balance
+    + transfer(from: AccountId, to: AccountId, amount: Balance): void
+}
+
+class RewardToken {
+    + address: AccountId
+    --
+    + balanceOf(account: AccountId): Balance
+    + transfer(from: AccountId, to: AccountId, amount: uint256): void
+    + mint(to: AccountId, amount: Balance): void
+    + burn(to: AccountId, amount: Balance): void
+}
+
+Player --> ButtonGame : press
+ButtonGame --> TicketToken : transfer
+ButtonGame --> RewardToken : mint
+
+
+Player -> SimpleDex : swap
+
+Player --> Marketplace : buy
+Marketplace -> RewardToken : burn
+
+@enduml
+#+RESULTS: fig:diagram
+[[file:diagram.png][file:diagram.png]]
