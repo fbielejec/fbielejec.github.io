@@ -27,7 +27,7 @@ So once again, a huge congratulations to him!
 
 On this occasion, VRT, the national public broadcaster for the Dutch-speaking part of Belgium, has aired a segment about Professor Lemey and the work of him and his lab.
 
-![_config.yml]({{ site.baseurl }}/images/2023-06-06-2023-06-06-francqui-collen-prize/spread_on_news.jpg)
+![_config.yml]({{ site.baseurl }}/images/2023-06-06-francqui-collen-prize/spread_on_news.jpg)
 
 It was really cool to see the material include a clear shot of Spread in use 😄.
 The entire segment can be found [here](https://www.vrt.be/vrtnws/nl/2023/06/06/francqui-collen-prijzen/), and at 58 seconds into the second video, there is a close-up of the tool being used.
