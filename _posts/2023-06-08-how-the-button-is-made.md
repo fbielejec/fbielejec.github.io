@@ -9,9 +9,9 @@ summary: "In this bog post we describe TheButton, a smart-contract based game de
 
 # <a name="intro"/> Introduction
 
-March 2023 has brought an important milestone to the [AlephZero](https://alephzero.org/): the long-awaited launch of smart contracts capabilites.
+March 2023 has brought an important milestone to the [Aleph Zero](https://alephzero.org/): the long-awaited launch of smart contracts capabilities.
 
-In this bog post we welcome you to [TheButton](https://the-button.azero.dev/), a smart-contract based game deployed on the Aleph Zero blockchain.
+In this blog post we welcome you to [TheButton](https://the-button.azero.dev/), a smart-contract based game deployed on the Aleph Zero blockchain.
 Inspired by the famous [Reddit game and social experiment](https://en.wikipedia.org/wiki/The_Button_(Reddit)), TheButton utilizes [ink!](https://use.ink/) smart contracts and the lightning-fast finality of Aleph Zero to deliver a captivating gaming experience.
 
 At its core, TheButton features a timer countdown that decreases with each finalized block on the Aleph Zero blockchain.
