@@ -92,7 +92,7 @@ I enjoy rapid prototyping, and in the recent years I have specialized in privacy
 
 | Year | Project | Description |
 |------|---------|-------------|
-| 2026 | [**backoff**](https://github.com/ihrwein/backoff) | Contributed to popular Rust exponential backoff crate -- replacing unmaintained dependency ([PR](https://github.com/ihrwein/backoff/pull/76)) |
+| 2026 | [**backoff**](https://github.com/ihrwein/backoff) | Contributed to popular Rust exponential backoff crate ([PR](https://github.com/ihrwein/backoff/pull/76)) |
 | 2025 | [**datadog-tracing**](https://github.com/will-bank/datadog-tracing) | Upgraded Rust OpenTelemetry + Datadog integration to OpenTelemetry v0.31.x ([PR](https://github.com/will-bank/datadog-tracing/pull/7)) |
 | 2024 - 2025 | [**MoonMath Manual**](https://github.com/LeastAuthority/moonmath-manual) | Contributed fixes to open educational resource for understanding zk-SNARKs |
 | 2023 - 2024 | [**Polkadot Blockchain Academy**](https://polkadot.network/development/academy/) | Authored ink! smart contract lecture materials and hands-on exercises ([content](https://github.com/Polkadot-Blockchain-Academy/pba-content), [exercises](https://github.com/Polkadot-Blockchain-Academy/Ink_hands-on)) |
