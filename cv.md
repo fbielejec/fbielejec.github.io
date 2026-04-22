@@ -95,15 +95,31 @@ I enjoy rapid prototyping, and in the recent years I have specialized in privacy
 
 ### Open Source Contributions
 
-- **February 2023** -- Contributed to **Poseidon377**, making the Poseidon hash function [WASM compatible](https://github.com/penumbra-zone/poseidon377/commit/50699746c031a915d5434088a1240f4b568d9ee8) for broader usability in zero-knowledge systems
+- **2026** -- Contributed to [**backoff**](https://github.com/ihrwein/backoff), a popular Rust crate for exponential backoff and retry
 
-- **2019** -- Developed a **ClojureScript client library for [Firebase](https://firebase.google.com/)** ([GitHub](https://github.com/fbielejec/cljs-firebase-client), [blog post](https://www.blog.nodrama.io/clojurescript-firebase-library/))
+- **2025** -- Contributed to [**datadog-tracing**](https://github.com/will-bank/datadog-tracing), upgrading the Rust OpenTelemetry + Datadog integration to OpenTelemetry v0.31.x ([PR](https://github.com/will-bank/datadog-tracing/pull/7))
 
-- **2017 - 2019** -- Developed an **IPFS client library for ClojureScript**, enabling decentralized storage access directly in the browser ([GitHub](https://github.com/district0x/cljs-ipfs-http-client))
+- **2024 - 2025** -- Contributed to the [**MoonMath Manual**](https://github.com/LeastAuthority/moonmath-manual), an open educational resource for understanding zk-SNARKs, with documentation fixes and corrections
 
-- **June 2020** -- Built an **OrbitDB client library for ClojureScript**, bringing distributed peer-to-peer databases to web applications ([GitHub](https://github.com/district0x/cljs-orbitdb))
+- **2023 - 2024** -- Instructor at the [**Polkadot Blockchain Academy**](https://polkadot.network/development/academy/): authored ink! smart contract lecture materials and hands-on exercises ([course content](https://github.com/Polkadot-Blockchain-Academy/pba-content), [exercises](https://github.com/Polkadot-Blockchain-Academy/Ink_hands-on))
 
-- **2018 - 2019** -- Developed [lein-solc](https://github.com/fbielejec/lein-solc), a Leiningen plugin for compiling Solidity smart contracts, with a macro-preprocessor ([GitHub](https://github.com/fbielejec/lein-solc/commit/43aa24d87a47021810b99249a1a9db3987e13477))
+- **February 2023** -- Contributed to [**Poseidon377**](https://github.com/penumbra-zone/poseidon377) (Penumbra), making the Poseidon hash function [WASM compatible](https://github.com/penumbra-zone/poseidon377/commit/50699746c031a915d5434088a1240f4b568d9ee8) for broader usability in zero-knowledge systems ([PR](https://github.com/penumbra-zone/poseidon377/pull/35))
+
+- **2022** -- Contributed a [refactoring PR](https://github.com/use-ink/cargo-contract/pull/597) to [**cargo-contract**](https://github.com/use-ink/cargo-contract), the official setup and deployment tool for ink! WASM smart contracts
+
+- **2021** -- Built [**load-test**](https://github.com/fbielejec/load-test), a high-throughput Rust tool for API load testing
+
+- **2020** -- Built [**rust-opencv**](https://github.com/fbielejec/rust-opencv), OpenCV bindings and examples in Rust (14 stars)
+
+- **2020** -- Built [**rust-tensorflow**](https://github.com/fbielejec/rust-tensorflow), running TensorFlow models from Rust for the recommendation engine [talk](https://www.youtube.com/watch?v=RG4g0Wd_elo)
+
+- **2019** -- Developed a **ClojureScript client library for [Firebase](https://firebase.google.com/)** ([GitHub](https://github.com/fbielejec/cljs-firebase-client), [blog post](https://www.blog.nodrama.io/clojurescript-firebase-library/)) -- 22 stars
+
+- **2017 - 2020** -- **Contributed to [district0x](https://github.com/district0x)** ecosystem: IPFS client ([GitHub](https://github.com/district0x/cljs-ipfs-http-client)), OrbitDB client ([GitHub](https://github.com/district0x/cljs-orbitdb)), Ethlance, MemeFactory, and core libraries
+
+- **2018 - 2019** -- Developed [**lein-solc**](https://github.com/fbielejec/lein-solc), a Leiningen plugin for compiling Solidity smart contracts, with a macro-preprocessor
+
+- **2011 - 2016** -- **Contributed to [BEAST](https://github.com/beast-dev/beast-mcmc)**, a widely-used Bayesian evolutionary analysis framework; co-developed the [Beagle](https://github.com/beagle-dev/beagle-lib) high-performance computing library
 
 ---
 
