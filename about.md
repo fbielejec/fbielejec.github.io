@@ -6,19 +6,12 @@ permalink: /about/
 
 ### About me
 
-Hi! This is nodrama, a blog run by a freelance software developer.
+Hi! I'm Filip, a software engineer with over 10 years of professional experience, based in Poland.
 
-I studied Applied Mathematics before working as a developer in various roles and industries.
+I studied Applied Mathematics and hold a PhD in Bioinformatics from KU Leuven, where I co-developed GPU-accelerated computing libraries ([BEAGLE](https://github.com/beagle-dev/beagle-lib)) and spatiotemporal visualization tools ([SpreaD3](https://github.com/phylogeography/SpreaD3)) still widely used in research.
 
-I have been building and writing computer systems and programs in various applications.
-I have authored OpenSource software for geo-awareness in epidemiology, co-developed high-performance library for highly-parallel processors and worked on systems for navigation and map-data solutions as well as healthcare and insurance.
+In the recent years I have specialized in blockchain infrastructure and privacy-preserving zero-knowledge cryptography, working primarily in Rust. I have hands-on experience across multiple blockchain ecosystems -- Substrate, Ethereum, and EVM-compatible chains -- building cross-chain bridges, on-chain applications, and ZK circuits in production.
 
-Recently I became interested in decentralized applications and the use of blockchain technologies like Ethereum and IPFS.
+I enjoy rapid prototyping, functional programming, and writing about computing topics on this blog. When I'm not coding you can find me climbing, mountain biking, or skiing.
 
-I feel comfortable working with various platforms and languages, from the server to the browser and mobile, I also have a substantial experience in DevOps and various cloud technologies.
-
-Whenever possible in like to do all the work I can using the functional paradigm and Clojure / Clojurescript.
-
-<!-- ### Contact me -->
-
-<!-- [fbielejec@gmail.com](mailto:fbielejec@gmail.com) -->
+Check out my [CV](/cv) for the full picture, or find me on [GitHub](https://github.com/fbielejec).
