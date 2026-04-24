@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "GEM strategy in a Bear Market: model comparison"
+title: "Winning in the Bear Market: GEM strategies comparison"
 author: Filip Bielejec
 comments: true
 categories: [python, trading, quantitative-finance, GEM, momentum, regression, bear-market]
@@ -67,7 +67,7 @@ No doubt the bear is already here.
 
 **Models and their parameter configs**:
 
-We use the so called "bear" and a "ranging" specialist model, GEM models with their parameters selected towards capital preservation and cautious exploration of the token universe, respectively:
+We use the so called "bear" and a "ranging" specialist models, GEM models with their parameters selected towards capital preservation and cautious exploration of the token universe, respectively:
 
 | | Bear | Ranging |
 |---|---|---|

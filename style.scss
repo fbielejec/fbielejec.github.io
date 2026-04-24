@@ -110,6 +110,28 @@ img {
   max-width: 100%;
 }
 
+table {
+  width: 100%;
+  margin: 15px 0;
+  border: 1px solid $lightGray;
+  font-size: 14px;
+
+  th, td {
+    padding: 8px 12px;
+    border: 1px solid $lightGray;
+    text-align: left;
+  }
+
+  th {
+    background-color: lighten($lightGray, 5%);
+    font-weight: bold;
+  }
+
+  tr:nth-child(even) {
+    background-color: lighten($lightGray, 8%);
+  }
+}
+
 // Fixes images in popup boxes from Google Translate
 .gmnoprint img {
   max-width: none;
