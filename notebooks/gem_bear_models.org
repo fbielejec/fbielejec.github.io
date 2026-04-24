@@ -653,6 +653,150 @@ print_metrics("Exponential GEM - Ranging params", exp_ranging)
     Final value:       $   9599.15
 #+end_example
 
+* Run: Linear GEM on Bear Portfolio
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+print(f"Running linear GEM on {len(candles_by_token)} tokens")
+print(f"Params: bear (top_n=1, r2=0.5, cooldown=10)")
+
+lin_bear = gem_backtest(BEAR_PARAMS, candles_by_token, fit_token_linear)
+print_metrics("Linear GEM - Bear params", lin_bear)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  Running linear GEM on 4 tokens
+  Params: bear (top_n=1, r2=0.5, cooldown=10)
+
+  ==================================================
+    Linear GEM - Bear params
+  ==================================================
+    Total return:          0.00%
+    Annualized return:     0.00%
+    Max drawdown:         -0.00%
+    Sharpe ratio:         0.000
+    Sortino ratio:        0.000
+    Calmar ratio:         0.000
+    Rebalance count:          8
+    Win rate (monthly):     0.0%
+    Final value:       $  10000.00
+#+end_example
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+print(f"Params: ranging (top_n=8, r2=0.3, cooldown=5)")
+
+lin_ranging = gem_backtest(RANGING_PARAMS, candles_by_token, fit_token_linear)
+print_metrics("Linear GEM - Ranging params", lin_ranging)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  Params: ranging (top_n=8, r2=0.3, cooldown=5)
+
+  ==================================================
+    Linear GEM - Ranging params
+  ==================================================
+    Total return:         -4.01%
+    Annualized return:    -5.91%
+    Max drawdown:         -4.21%
+    Sharpe ratio:        -1.908
+    Sortino ratio:       -2.075
+    Calmar ratio:        -1.405
+    Rebalance count:         15
+    Win rate (monthly):     0.0%
+    Final value:       $   9599.15
+#+end_example
+
+* Diagnostics: What do the models see?
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+# Sample a few dates and inspect fit results for each token
+sample_dates = ["2022-06-15", "2022-08-01", "2022-10-15", "2022-12-01"]
+
+for date_str in sample_dates:
+    ts = int(pd.Timestamp(date_str).timestamp() * 1000)
+    print(f"\n{'='*70}")
+    print(f"  {date_str}")
+    print(f"{'='*70}")
+    print(f"  {'token':<12} {'model':<6} {'a1/equiv':>10} {'r2':>8} {'momentum':>10} {'atr':>8} {'pass_growth':>12} {'pass_r2_0.3':>12} {'pass_r2_0.5':>12}")
+    print(f"  {'-'*12} {'-'*6} {'-'*10} {'-'*8} {'-'*10} {'-'*8} {'-'*12} {'-'*12} {'-'*12}")
+
+    for token, candles in candles_by_token.items():
+        up_to = candles[candles["timestamp"] <= ts]
+        if len(up_to) < 2:
+            continue
+
+        for model_name, fit_fn in [("exp", fit_token_exponential), ("lin", fit_token_linear)]:
+            pos = fit_fn(up_to, atr_window=15, r2_exponent=1.0)
+            if pos is None:
+                print(f"  {token:<12} {model_name:<6} {'FAILED':>10}")
+                continue
+            pass_growth = "Y" if pos.a1 > 1.0 else "N"
+            pass_r2_03 = "Y" if pos.r2 > 0.3 else "N"
+            pass_r2_05 = "Y" if pos.r2 > 0.5 else "N"
+            print(f"  {token:<12} {model_name:<6} {pos.a1:>10.6f} {pos.r2:>8.4f} {pos.momentum:>10.4f} {pos.atr:>8.4f} {pass_growth:>12} {pass_r2_03:>12} {pass_r2_05:>12}")
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+  ======================================================================
+    2022-06-15
+  ======================================================================
+    token        model    a1/equiv       r2   momentum      atr  pass_growth  pass_r2_0.3  pass_r2_0.5
+    ------------ ------ ---------- -------- ---------- -------- ------------ ------------ ------------
+    EURUSDT      exp      1.000246   0.0902     0.0022   0.0084            Y            N            N
+    EURUSDT      lin      1.000247   0.0906     0.0022   0.0084            Y            N            N
+    PAXGUSDT     exp      0.999814   0.0422    -0.0008   0.0160            N            N            N
+    PAXGUSDT     lin      0.999815   0.0420    -0.0008   0.0160            N            N            N
+    TUSDUSDT     exp      1.000007   0.0157     0.0000   0.0006            Y            N            N
+    TUSDUSDT     lin      1.000007   0.0157     0.0000   0.0006            Y            N            N
+    USDCUSDT     exp      1.000006   0.0085     0.0000   0.0006            Y            N            N
+    USDCUSDT     lin      1.000006   0.0085     0.0000   0.0006            Y            N            N
+
+  ======================================================================
+    2022-08-01
+  ======================================================================
+    token        model    a1/equiv       r2   momentum      atr  pass_growth  pass_r2_0.3  pass_r2_0.5
+    ------------ ------ ---------- -------- ---------- -------- ------------ ------------ ------------
+    EURUSDT      exp      0.999470   0.5230    -0.0277   0.0082            N            Y            Y
+    EURUSDT      lin      0.999466   0.5267    -0.0281   0.0082            N            Y            Y
+    PAXGUSDT     exp      0.999026   0.6829    -0.0665   0.0120            N            Y            Y
+    PAXGUSDT     lin      0.999018   0.6878    -0.0675   0.0120            N            Y            Y
+    TUSDUSDT     exp      0.999989   0.1654    -0.0002   0.0002            N            N            N
+    TUSDUSDT     lin      0.999989   0.1654    -0.0002   0.0002            N            N            N
+    USDCUSDT     exp      0.999988   0.1519    -0.0002   0.0004            N            N            N
+    USDCUSDT     lin      0.999988   0.1519    -0.0002   0.0004            N            N            N
+
+  ======================================================================
+    2022-10-15
+  ======================================================================
+    token        model    a1/equiv       r2   momentum      atr  pass_growth  pass_r2_0.3  pass_r2_0.5
+    ------------ ------ ---------- -------- ---------- -------- ------------ ------------ ------------
+    EURUSDT      exp      0.999431   0.8392    -0.0478   0.0084            N            Y            Y
+    EURUSDT      lin      0.999429   0.8413    -0.0480   0.0084            N            Y            Y
+    PAXGUSDT     exp      0.999213   0.8210    -0.0646   0.0122            N            Y            Y
+    PAXGUSDT     lin      0.999212   0.8213    -0.0647   0.0122            N            Y            Y
+    TUSDUSDT     exp      0.999989   0.4378    -0.0005   0.0003            N            Y            N
+    TUSDUSDT     lin      0.999989   0.4378    -0.0005   0.0003            N            Y            N
+    USDCUSDT     exp      0.999989   0.3945    -0.0004   0.0003            N            Y            N
+    USDCUSDT     lin      0.999989   0.3945    -0.0004   0.0003            N            Y            N
+
+  ======================================================================
+    2022-12-01
+  ======================================================================
+    token        model    a1/equiv       r2   momentum      atr  pass_growth  pass_r2_0.3  pass_r2_0.5
+    ------------ ------ ---------- -------- ---------- -------- ------------ ------------ ------------
+    EURUSDT      exp      0.999686   0.4359    -0.0137   0.0081            N            Y            N
+    EURUSDT      lin      0.999690   0.4306    -0.0133   0.0081            N            Y            N
+    PAXGUSDT     exp      0.999448   0.6161    -0.0340   0.0106            N            Y            Y
+    PAXGUSDT     lin      0.999455   0.6079    -0.0331   0.0106            N            Y            Y
+    TUSDUSDT     exp      0.999989   0.4378    -0.0005   0.0003            N            Y            N
+    TUSDUSDT     lin      0.999989   0.4378    -0.0005   0.0003            N            Y            N
+    USDCUSDT     exp      0.999989   0.3945    -0.0004   0.0003            N            Y            N
+    USDCUSDT     lin      0.999989   0.3945    -0.0004   0.0003            N            Y            N
+#+end_example
+
 * Buy & Hold Benchmark
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
@@ -700,3 +844,20 @@ def buy_and_hold(candles_by_token: dict[str, pd.DataFrame], initial_capital: flo
 bh = buy_and_hold(candles_by_token)
 print_metrics("Buy & Hold - Bear Portfolio (equal weight)", bh)
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+  ==================================================
+    Buy & Hold - Bear Portfolio (equal weight)
+  ==================================================
+    Total return:         -0.65%
+    Annualized return:    -0.97%
+    Max drawdown:         -6.01%
+    Sharpe ratio:        -0.117
+    Sortino ratio:       -0.171
+    Calmar ratio:        -0.161
+    Rebalance count:          0
+    Win rate (monthly):    44.4%
+    Final value:       $   9905.15
+#+end_example
