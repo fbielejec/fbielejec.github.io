@@ -12,6 +12,13 @@ description: Engineer | Rust & Python | Distributed Systems | Data Pipelines | M
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: https://raw.githubusercontent.com/fbielejec/fbielejec.github.io/master/images/logo.png
 
+author:
+  name: Filip Bielejec
+  title: Engineer-Scientist
+  bio: "Bridging software engineering, applied cryptography, and computational research. PhD in Bioinformatics from KU Leuven."
+  location: Poland
+  scholar: https://scholar.google.com/citations?user=5xTmvcYAAAAJ
+
 #
 # Flags below are optional
 #

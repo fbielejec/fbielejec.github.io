@@ -40,3 +40,9 @@ $georgia: $font-display;
     @content;
   }
 }
+
+@mixin tablet {
+  @media screen and (max-width: 860px) {
+    @content;
+  }
+}

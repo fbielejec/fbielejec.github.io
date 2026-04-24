@@ -1,0 +1,32 @@
+- name: Spread
+  description: "Open-source platform for visualizing viral spread across time and geography, actively used worldwide in epidemiological research. Featured on Belgian national TV."
+  url: https://spreadviz.org
+  repo: https://github.com/phylogeography/spread
+  tags: [Clojure, GraphQL, Visualization, Bioinformatics]
+
+- name: Shielder
+  description: "Privacy protocol with zk-SNARK-based confidential transactions and partial de-anonymization for governance accountability. In-SNARK ElGamal encryption and Poseidon hashing."
+  url: https://app.common.fi/
+  repo: https://github.com/Cardinal-Cryptography/zkOS-circuits
+  tags: [Rust, Halo2, ZK-SNARKs, Privacy]
+
+- name: MOST Bridge
+  description: "Cross-chain bridge relayer for Substrate-Ethereum communication, handling deterministic vs. probabilistic finality and deep reorgs with circuit-breaker failsafes."
+  url: https://mo.st/
+  repo: https://github.com/Cardinal-Cryptography/most
+  tags: [Rust, Substrate, Ethereum, Cross-chain]
+
+- name: TheButton
+  description: "Smart contracts game on Aleph Zero demonstrating sub-second finality, with an AMM-based DEX and Dutch auction marketplace."
+  url: https://alephzero.org/the-button
+  tags: [Rust, ink!, Substrate, DeFi]
+
+- name: BEAGLE
+  description: "High-performance library for massively parallel GPU-accelerated phylogenetic likelihood computations using NVIDIA CUDA."
+  repo: https://github.com/beagle-dev/beagle-lib
+  tags: [C++, CUDA, OpenCL, GPU Computing]
+
+- name: SpreaD3
+  description: "Spatiotemporal data visualization platform for pathogen phylogeography. Widely cited and still used in research worldwide."
+  repo: https://github.com/phylogeography/SpreaD3
+  tags: [Java, Visualization, Phylogeography]

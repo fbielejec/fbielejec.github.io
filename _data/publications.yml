@@ -1,0 +1,23 @@
+- title: "SPREAD 4: online visualisation of pathogen phylogeographic reconstructions"
+  authors: "F Bielejec et al."
+  venue: "Virus Evolution"
+  year: 2022
+  volume: "8(2)"
+  url: https://academic.oup.com/ve/article/8/2/veac088/6717755
+  doi: 10.1093/ve/veac088
+
+- title: "piBUSS: a parallel BEAST/BEAGLE utility for sequence simulation"
+  authors: "F Bielejec et al."
+  venue: "BMC Bioinformatics"
+  year: 2014
+  volume: "15:133"
+  url: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-133
+  doi: 10.1186/1471-2105-15-133
+
+- title: "Inferring large-scale heterogeneous evolutionary processes through time"
+  authors: "F Bielejec et al."
+  venue: "Systematic Biology"
+  year: 2014
+  volume: "63(4)"
+  url: https://academic.oup.com/sysbio/article/63/4/493/2848077
+  doi: 10.1093/sysbio/syu016

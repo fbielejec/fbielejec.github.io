@@ -25,11 +25,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.container {
+.container-wide {
+  max-width: 1100px;
   margin: 0 auto;
-  max-width: 780px;
-  padding: 0 24px;
+  padding: 0 32px;
   width: 100%;
+
+  @include mobile { padding: 0 20px; }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -98,13 +100,8 @@ table {
     font-weight: 600;
   }
 
-  tr:last-child td {
-    border-bottom: none;
-  }
-
-  tr:nth-child(even) {
-    background: $border-light;
-  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: $border-light; }
 }
 
 .gmnoprint img { max-width: none; }
@@ -141,49 +138,177 @@ table {
 }
 
 /*********************/
+/* SITE LAYOUT       */
+/*********************/
+
+.site-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 48px;
+  padding-top: 40px;
+  padding-bottom: 48px;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding-top: 0;
+  }
+}
+
+.site-content {
+  min-width: 0;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/*********************/
+/* SIDEBAR           */
+/*********************/
+
+.sidebar {
+  @media screen and (min-width: 861px) {
+    position: sticky;
+    top: 32px;
+    align-self: start;
+  }
+
+  @include tablet {
+    border-bottom: 1px solid $border;
+    background: $white;
+    padding: 24px 0;
+  }
+}
+
+.sidebar-profile {
+  @include tablet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.sidebar-avatar {
+  margin-bottom: 16px;
+
+  img {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    transition: transform 0.2s ease;
+    &:hover { transform: scale(1.03); }
+  }
+
+  @include tablet {
+    margin-bottom: 0;
+    img { width: 64px; height: 64px; border-radius: 10px; }
+  }
+}
+
+.sidebar-identity {
+  @include tablet {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+.sidebar-name {
+  font-family: $font-display;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: $navy;
+  margin: 0 0 2px;
+  line-height: 1.3;
+}
+
+.sidebar-title {
+  font-size: 0.82rem;
+  color: $text-light;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.sidebar-bio {
+  font-size: 0.85rem;
+  color: $text-light;
+  line-height: 1.55;
+  margin: 16px 0;
+
+  @include tablet {
+    display: none;
+  }
+}
+
+.sidebar-location {
+  font-size: 0.8rem;
+  color: $text-light;
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  svg { opacity: 0.6; }
+
+  @include tablet {
+    display: none;
+  }
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  @include tablet {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+
+    span { display: none; }
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: $text-light;
+    padding: 4px 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $navy;
+    }
+
+    svg { flex-shrink: 0; opacity: 0.6; }
+    &:hover svg { opacity: 1; }
+
+    @include tablet {
+      padding: 6px;
+      svg { width: 20px; height: 20px; }
+    }
+  }
+}
+
+/*********************/
 /* MASTHEAD          */
 /*********************/
 
 .wrapper-masthead {
-  margin-bottom: 0;
   background: $white;
   border-bottom: 1px solid $border;
 }
 
 .masthead {
-  padding: 20px 0;
+  padding: 16px 0;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   @include mobile {
     flex-direction: column;
-    text-align: center;
-    gap: 12px;
+    gap: 10px;
   }
-}
-
-.site-avatar {
-  width: 52px;
-  height: 52px;
-  margin-right: 16px;
-  flex-shrink: 0;
-
-  @include mobile {
-    margin: 0;
-  }
-
-  img {
-    border-radius: 10px;
-    width: 52px;
-    height: 52px;
-    transition: transform 0.2s ease;
-    &:hover { transform: scale(1.05); }
-  }
-}
-
-.site-info {
-  flex: 1;
-  @include mobile { flex: none; }
 }
 
 .site-name {
@@ -191,23 +316,17 @@ table {
   color: $navy;
   font-family: $font-display;
   font-weight: 400;
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   letter-spacing: 0.5px;
 
   a { color: inherit; &:hover { color: inherit; } }
-}
-
-.site-description {
-  margin: 2px 0 0;
-  color: $text-light;
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
 }
 
 nav {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-wrap: wrap;
 
   @include mobile {
     justify-content: center;
@@ -215,9 +334,9 @@ nav {
 
   a {
     color: $text;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 6px;
     transition: all 0.2s ease;
     letter-spacing: 0.02em;
@@ -235,11 +354,13 @@ nav {
 
 .featured-section {
   background: $navy;
-  padding: 48px 0;
-  animation: fadeInUp 0.5s ease-out;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
 
   @include mobile {
-    padding: 32px 0;
+    padding: 24px 20px;
+    border-radius: 12px;
   }
 }
 
@@ -250,7 +371,7 @@ nav {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: $accent;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -266,33 +387,32 @@ nav {
 .featured-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
 
   @include mobile {
     grid-template-columns: 1fr;
-    gap: 16px;
   }
 }
 
 .featured-card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 28px;
+  border-radius: 10px;
+  padding: 24px;
   transition: transform 0.25s ease, background 0.25s ease;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     background: rgba(255, 255, 255, 0.08);
   }
 
   &:first-child {
     grid-column: 1 / -1;
-    .featured-card-title { font-size: 1.5rem; }
+    .featured-card-title { font-size: 1.35rem; }
 
     @include mobile {
       grid-column: 1;
-      .featured-card-title { font-size: 1.25rem; }
+      .featured-card-title { font-size: 1.15rem; }
     }
   }
 
@@ -300,30 +420,30 @@ nav {
 }
 
 .featured-card-date {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .featured-card-title {
   font-family: $font-display;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 400;
   color: $white;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   line-height: 1.35;
 
   a { color: inherit; &:hover { color: $accent-light; } }
 }
 
 .featured-card-summary {
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.55;
-  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  margin: 0 0 12px;
 }
 
 .featured-card-tags {
@@ -349,10 +469,9 @@ nav {
 /*********************/
 
 .posts-section {
-  padding: 48px 0;
-  animation: fadeInUp 0.5s ease-out 0.1s both;
+  padding: 8px 0 0;
 
-  @include mobile { padding: 32px 0; }
+  @include mobile { padding: 0; }
 }
 
 .posts-label {
@@ -376,19 +495,17 @@ nav {
 }
 
 .posts > .post {
-  padding: 24px 0;
+  padding: 20px 0;
   border-bottom: 1px solid $border;
 }
 
-.posts > .post:last-child {
-  border-bottom: none;
-}
+.posts > .post:last-child { border-bottom: none; }
 
 .post-meta {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   flex-wrap: wrap;
 }
 
@@ -408,8 +525,8 @@ nav {
 
 .post {
   h1 {
-    font-size: 1.35rem;
-    margin: 0 0 6px;
+    font-size: 1.25rem;
+    margin: 0 0 4px;
     line-height: 1.35;
 
     a {
@@ -421,15 +538,15 @@ nav {
 
   .entry {
     color: $text-light;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     line-height: 1.6;
-    margin: 0 0 10px;
+    margin: 0 0 8px;
 
     p { margin: 0; }
   }
 
   .read-more {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: $accent;
     text-transform: uppercase;
@@ -465,12 +582,12 @@ nav {
 }
 
 .post-header h1 {
-  font-size: 2rem;
+  font-size: 1.85rem;
   margin: 0 0 12px;
   line-height: 1.25;
   color: $navy;
 
-  @include mobile { font-size: 1.6rem; }
+  @include mobile { font-size: 1.5rem; }
 }
 
 .post-header-meta {
@@ -516,14 +633,147 @@ nav {
 
 .page {
   h1 {
-    font-size: 2rem;
+    font-size: 1.85rem;
     color: $navy;
     margin-bottom: 24px;
 
-    @include mobile { font-size: 1.6rem; }
+    @include mobile { font-size: 1.5rem; }
   }
 
   .entry { line-height: 1.7; }
+}
+
+/*********************/
+/* PROJECTS          */
+/*********************/
+
+.project-card {
+  padding: 24px;
+  margin-bottom: 16px;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: darken($border, 8%);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.project-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.project-card-title {
+  font-family: $font-display;
+  font-size: 1.15rem;
+  font-weight: 400;
+  margin: 0;
+  color: $navy;
+
+  a {
+    color: inherit;
+    &:hover { color: $accent; }
+  }
+}
+
+.project-repo-link {
+  color: $text-light;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover { color: $navy; }
+}
+
+.project-card-desc {
+  font-size: 0.88rem;
+  color: $text-light;
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+
+.project-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  .tag {
+    background: $border-light;
+    color: $text-light;
+  }
+}
+
+/*********************/
+/* PUBLICATIONS      */
+/*********************/
+
+.publication-item {
+  display: flex;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid $border;
+
+  &:last-of-type { border-bottom: none; }
+
+  @include mobile {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.publication-year {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $text-light;
+  min-width: 48px;
+  padding-top: 3px;
+}
+
+.publication-body {
+  flex: 1;
+}
+
+.publication-title {
+  font-family: $font-display;
+  font-size: 1.05rem;
+  font-weight: 400;
+  margin: 0 0 4px;
+  line-height: 1.35;
+  color: $navy;
+
+  a {
+    color: inherit;
+    &:hover { color: $accent; }
+  }
+}
+
+.publication-authors {
+  font-size: 0.85rem;
+  color: $text-light;
+  margin: 0 0 2px;
+}
+
+.publication-venue {
+  font-size: 0.85rem;
+  color: $text-light;
+  margin: 0;
+}
+
+.publication-doi {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.publications-more {
+  margin-top: 24px;
+  font-size: 0.9rem;
+  color: $text-light;
 }
 
 /*********************/
@@ -532,29 +782,14 @@ nav {
 
 .wrapper-footer {
   margin-top: 0;
-  border-top: none;
+  border-top: 1px solid $border;
   border-bottom: none;
   background: $navy;
 }
 
 footer {
-  padding: 32px 0;
+  padding: 24px 0;
   text-align: center;
-}
-
-.footer-social {
-  margin-bottom: 16px;
-
-  .svg-icon {
-    filter: brightness(0) invert(1);
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-  }
-
-  a {
-    margin: 0 6px;
-    &:hover .svg-icon { opacity: 1; }
-  }
 }
 
 .footer-copy {
@@ -563,12 +798,12 @@ footer {
   letter-spacing: 0.02em;
 }
 
-@import "highlights";
-@import "svg-icons";
-
 /*********************/
 /* CODE              */
 /*********************/
+
+@import "highlights";
+@import "svg-icons";
 
 code {
   font-family: $font-mono;
