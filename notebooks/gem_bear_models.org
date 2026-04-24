@@ -835,6 +835,86 @@ for window in fit_windows:
     Final value:       $   9847.97
 #+end_example
 
+* Plot: R-squared as a "dead cat bounce" filter
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+
+paxg = candles_by_token["PAXGUSDT"]
+paxg_dates = pd.to_datetime(paxg["timestamp"], unit="ms")
+
+# Find a dead cat bounce: PAXG drops hard in May-June, brief bounce mid-June, then continues down
+# Window 1: "dead cat bounce" — pick 30 days around the June bounce
+bounce_start = "2022-06-01"
+bounce_end = "2022-07-01"
+mask_bounce = (paxg_dates >= bounce_start) & (paxg_dates < bounce_end)
+bounce = paxg[mask_bounce].reset_index(drop=True)
+
+# Window 2: genuine rally — PAXG Nov rally (matches our winner's entry period)
+rally_start = "2022-11-03"
+rally_end = "2022-12-03"
+mask_rally = (paxg_dates >= rally_start) & (paxg_dates < rally_end)
+rally = paxg[mask_rally].reset_index(drop=True)
+
+print(f"Bounce window: {bounce_start} to {bounce_end}, {len(bounce)} candles")
+print(f"Rally window:  {rally_start} to {rally_end}, {len(rally)} candles")
+#+END_SRC
+
+#+RESULTS:
+: Bounce window: 2022-06-01 to 2022-07-01, 30 candles
+: Rally window:  2022-11-03 to 2022-12-03, 30 candles
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both :file images/r2_bounce_filter.png
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+for ax, data, title_prefix in [
+    (ax1, bounce, "Dead cat bounce"),
+    (ax2, rally, "Genuine rally"),
+]:
+    dates = pd.to_datetime(data["timestamp"], unit="ms")
+    closes = data["close"].values
+    x = np.arange(len(closes), dtype=float)
+
+    # Fit linear model
+    b0, b1 = fit_linear_pricespace(x, closes)
+    y_hat = b0 + b1 * x
+    r2 = r_squared(closes, y_hat)
+    mean_price = np.mean(closes)
+    norm_slope = b1 / mean_price
+
+    # Fit exponential model
+    b0_log, b1_log = fit_linear_logspace(x, closes)
+    a0, a1 = fit_exponential(x, closes, (np.exp(b0_log), np.exp(b1_log)))
+    y_hat_exp = exponential_model(x, a0, a1)
+    r2_exp = r_squared(closes, y_hat_exp)
+
+    ax.plot(dates, closes, 'k-', linewidth=1.5, label='PAXG price')
+    ax.plot(dates, y_hat, 'b--', linewidth=2, label=f'Linear (R²={r2:.3f})')
+    ax.plot(dates, y_hat_exp, 'r:', linewidth=2, label=f'Exponential (R²={r2_exp:.3f})')
+
+    slope_sign = "+" if b1 > 0 else ""
+    growth = "PASS" if (1.0 + norm_slope) > 1.0 else "FAIL"
+    r2_pass = "PASS" if r2 > 0.5 else "FAIL"
+
+    ax.set_title(f"{title_prefix}\nslope: {slope_sign}{norm_slope*100:.3f}%/day  |  growth: {growth}  |  R² filter: {r2_pass}",
+                 fontsize=10)
+    ax.legend(fontsize=8, loc='best')
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+    ax.tick_params(axis='x', rotation=45)
+    ax.set_ylabel('Price (USDT)')
+    ax.grid(True, alpha=0.3)
+
+fig.suptitle("PAXGUSDT: different 30-day windows", fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.savefig("../images/2026-04-24-gem-bear-market-models/r2_bounce_filter.png", dpi=150, bbox_inches='tight')
+plt.show()
+print("Saved to images/2026-04-24-gem-bear-market-models/r2_bounce_filter.png")
+#+END_SRC
+
+#+RESULTS:
+: Saved to images/2026-04-24-gem-bear-market-models/r2_bounce_filter.png
+
 * Diagnostics: What do the models see with rolling windows?
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
