@@ -212,7 +212,7 @@ def fit_token_linear(candles: pd.DataFrame, atr_window: int = 15, r2_exponent: f
     normalized_slope = b1 / mean_close
     momentum = (r2 ** r2_exponent) * normalized_slope * 100.0
 
-    # Growth filter equivalent: a1 field stores normalized_slope
+    # Growth filter (catches trend): a1 stores normalized_slope
     # build_portfolio filters on a1 > 1, so we store 1 + normalized_slope
     # positive slope -> a1 > 1, negative slope -> a1 < 1
     a1_equiv = 1.0 + normalized_slope
@@ -235,9 +235,9 @@ def fit_token_linear(candles: pd.DataFrame, atr_window: int = 15, r2_exponent: f
         a1=a1_equiv,
         atr=atr,
     )
-
-print("fit_token_linear defined.")
 #+END_SRC
+
+#+RESULTS:
 
 ** Portfolio Construction
 
@@ -253,11 +253,14 @@ class GemParams:
     fee_rate: float = 0.003
     rebalance_cooldown: int = 7
 
+# params taken from previous experiments
+# portfolio geared towards capital preservayion
 BEAR_PARAMS = GemParams(
     top_n=1, r2_threshold=0.5, rebalance_cooldown=10,
     momentum_cap=0.14, r2_exponent=2.0,
 )
 
+# params taken from previous experiments (ranging specialist)
 RANGING_PARAMS = GemParams(
     top_n=8, r2_threshold=0.3, rebalance_cooldown=5,
     momentum_cap=0.20, r2_exponent=1.5,
@@ -290,9 +293,9 @@ def build_portfolio(candidates: list[Position], params: GemParams) -> list[Posit
         p.weight = iv / total_inv_vol
 
     return filtered
-
-print("Portfolio construction defined.")
 #+END_SRC
+
+#+RESULTS:
 
 ** Portfolio State
 
@@ -357,9 +360,9 @@ class PortfolioState:
             for token, pos in self.positions.items()
         }
         self.history.append(DaySnapshot(total_value=total, positions=pos_values))
-
-print("PortfolioState defined.")
 #+END_SRC
+
+#+RESULTS:
 
 ** Rebalancing
 
@@ -422,9 +425,9 @@ def rebalance_to_targets(
             buy_amount = min(buy_amount, state.cash)
             if buy_amount > 0:
                 state.buy(token, price, buy_amount, fee_rate)
-
-print("Rebalancing functions defined.")
 #+END_SRC
+
+#+RESULTS:
 
 * GEM Backtest (Exponential)
 
@@ -463,7 +466,7 @@ def gem_backtest(params: GemParams, candles_by_token: dict[str, pd.DataFrame], f
             if timestamp in ts_map
         }
 
-        # Fit tokens using candles up to current timestamp
+        # Fit tokens using candles up to the current timestamp [T | 0,..,T-1]
         fit_results = {}
         for token, candles in eligible.items():
             up_to = candles[candles["timestamp"] <= timestamp]
@@ -494,9 +497,9 @@ def gem_backtest(params: GemParams, candles_by_token: dict[str, pd.DataFrame], f
         state.record_snapshot(prices)
 
     return _compute_metrics(state, rebalance_count, all_timestamps)
-
-print("gem_backtest defined.")
 #+END_SRC
+
+#+RESULTS:
 
 * Metrics Computation
 
@@ -506,6 +509,7 @@ def _empty_metrics():
         "total_return_pct": 0.0, "annualized_return_pct": 0.0,
         "max_drawdown_pct": 0.0, "sharpe_ratio": 0.0, "sortino_ratio": 0.0,
         "calmar_ratio": 0.0, "rebalance_count": 0, "win_rate_pct": 0.0,
+        # time series of portfolio value over time, stored for plotting
         "equity_curve": [],
     }
 
@@ -587,9 +591,9 @@ def print_metrics(label: str, m: dict):
     print(f"  Rebalance count:   {m['rebalance_count']:>8d}")
     print(f"  Win rate (monthly):{m['win_rate_pct']:>8.1f}%")
     print(f"  Final value:       ${m.get('final_value', 0):>10.2f}")
-
-print("Metrics computation defined.")
 #+END_SRC
+
+#+RESULTS:
 
 * Run: Exponential GEM on Bear Portfolio
 
@@ -605,12 +609,49 @@ exp_bear = gem_backtest(BEAR_PARAMS, candles_by_token, fit_token_exponential)
 print_metrics("Exponential GEM - Bear params", exp_bear)
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+  Running exponential GEM on 4 tokens
+  Params: bear (top_n=1, r2=0.5, cooldown=10)
+
+  ==================================================
+    Exponential GEM - Bear params
+  ==================================================
+    Total return:          0.00%
+    Annualized return:     0.00%
+    Max drawdown:         -0.00%
+    Sharpe ratio:         0.000
+    Sortino ratio:        0.000
+    Calmar ratio:         0.000
+    Rebalance count:          8
+    Win rate (monthly):     0.0%
+    Final value:       $  10000.00
+#+end_example
+
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
 print(f"Params: ranging (top_n=8, r2=0.3, cooldown=5)")
 
 exp_ranging = gem_backtest(RANGING_PARAMS, candles_by_token, fit_token_exponential)
 print_metrics("Exponential GEM - Ranging params", exp_ranging)
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+  Params: ranging (top_n=8, r2=0.3, cooldown=5)
+
+  ==================================================
+    Exponential GEM - Ranging params
+  ==================================================
+    Total return:         -4.01%
+    Annualized return:    -5.91%
+    Max drawdown:         -4.21%
+    Sharpe ratio:        -1.908
+    Sortino ratio:       -2.075
+    Calmar ratio:        -1.405
+    Rebalance count:         15
+    Win rate (monthly):     0.0%
+    Final value:       $   9599.15
+#+end_example
 
 * Buy & Hold Benchmark
 
