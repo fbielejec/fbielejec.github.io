@@ -5,14 +5,14 @@
   <div class="sidebar-identity">
     <h2 class="sidebar-name">{{ site.author.name }}</h2>
     <p class="sidebar-title">{{ site.author.title }}</p>
+    {% if site.author.location %}
+    <p class="sidebar-location">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      {{ site.author.location }}
+    </p>
+    {% endif %}
   </div>
   <p class="sidebar-bio">{{ site.author.bio }}</p>
-  {% if site.author.location %}
-  <p class="sidebar-location">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-    {{ site.author.location }}
-  </p>
-  {% endif %}
   <nav class="sidebar-links">
     {% if site.footer-links.github %}
     <a href="https://github.com/{{ site.footer-links.github }}">
