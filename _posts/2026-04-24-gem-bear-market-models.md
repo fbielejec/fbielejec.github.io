@@ -129,7 +129,7 @@ R-squared plays a dual role in this setup:
 - A genuine rally over a 30-day window produces a clean uptrend and high R-squared
 - A "dead cat bounce" is noisy and V-shaped -- the linear fit is poor, R-squared is low, and the position gets filtered out
 
-![R-squared as a dead cat bounce filter]({{ site.baseurl }}/images/2026-04-24-gem-bear-market-models/r2_bounce_filter.png)
+<img src="{{ site.baseurl }}/images/2026-04-24-gem-bear-market-models/r2_bounce_filter.png" alt="R-squared as a dead cat bounce filter" style="width: 130%;" />
 
 I tested three window sizes -- 15, 30, and 60 days -- across both models and both parameter configs:
 
