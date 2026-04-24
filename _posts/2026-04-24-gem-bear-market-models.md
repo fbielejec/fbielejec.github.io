@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Winning in the Bear Market: GEM strategies comparison"
+title: "Winning with the Bear: GEM strategies comparison"
 author: Filip Bielejec
 comments: true
 categories: [python, trading, quantitative-finance, GEM, momentum, regression, bear-market]
