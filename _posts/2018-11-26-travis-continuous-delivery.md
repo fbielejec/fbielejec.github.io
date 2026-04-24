@@ -15,6 +15,7 @@ categories:
 - git
 - Github
 - Leiningen
+description: "Setting up a complete Continuous Delivery pipeline with Travis CI, GitHub and Leiningen for Clojars deployment"
 ---
 
 # <a name="intro">Intro</a>

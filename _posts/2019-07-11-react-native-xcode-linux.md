@@ -5,7 +5,7 @@ comments: true
 author: Filip Bielejec
 categories: [clojurescript, cljs, shadow-cljs, react-native, iOS, mobile, linux, xcode, virtualbox ]
 tags: [clojurescript, react-native, iOS, linux]
-summary: "Using shadow-cljs to compile react-native code and running it on an iOS simulator under GNU/Linux"
+description: "Using shadow-cljs to compile react-native code and running it on an iOS simulator under GNU/Linux"
 ---
 
 # <a name="intro">Intro</a>

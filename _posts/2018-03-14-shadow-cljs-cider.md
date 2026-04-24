@@ -7,6 +7,7 @@ categories:
 - clojurescript
 - tooling
 - shadow-cljs
+description: "Integrating shadow-cljs ClojureScript compiler with Emacs and CIDER for a smooth development workflow"
 ---
 
 # <a name="into"/>Intro

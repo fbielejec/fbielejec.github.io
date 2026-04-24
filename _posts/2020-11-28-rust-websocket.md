@@ -5,7 +5,7 @@ author: Filip Bielejec
 comments: true
 featured: true
 categories: [rust, websockets, API, gateway, performance, testing, histograms]
-summary: "ws-load-test is a high-throughput tool written in Rust for testing websocket APIs"
+description: "ws-load-test is a high-throughput tool written in Rust for testing websocket APIs"
 ---
 
 # <a name="repo"/> TL;DR Project repository

@@ -5,7 +5,7 @@ author: Filip Bielejec
 comments: true
 featured: true
 categories: [spread, viruses, phylogeography, data vizualization]
-summary: "Spread is ready to use and availiable at https://spreadviz.org"
+description: "Spread is ready to use and availiable at https://spreadviz.org"
 ---
 
 <video width="640" height="480" controls="controls" poster="{{ site.baseurl }}/images/2022-09-15-spread-published/screenshot.png">

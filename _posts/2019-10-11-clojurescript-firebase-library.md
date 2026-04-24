@@ -5,7 +5,7 @@ author: Filip Bielejec
 comments: true
 categories: [clojurescript, firebase]
 tags: [clojurescript, shadow-cljs, firebase, library]
-summary: "How to develop mobile iOS applications on Linux"
+description: "How to develop mobile iOS applications on Linux"
 ---
 
 # <a name="intro"/> Intro

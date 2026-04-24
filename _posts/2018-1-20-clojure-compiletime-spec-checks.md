@@ -7,6 +7,7 @@ categories:
 - Clojure
 - spec
 - macros
+description: "Using clojure.spec for compile-time type checking and validation in a dynamic language"
 ---
 
 # Intro

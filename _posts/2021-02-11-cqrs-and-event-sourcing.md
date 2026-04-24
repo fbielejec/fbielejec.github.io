@@ -5,7 +5,7 @@ author: Filip Bielejec
 comments: true
 featured: true
 categories: [rust, kafka, cqrs, event sourcing, event streaming, messaging]
-summary: "Study in an event-driven architecture implementation in Rust"
+description: "Study in an event-driven architecture implementation in Rust"
 ---
 
 # <a name="intro"/> Introduction

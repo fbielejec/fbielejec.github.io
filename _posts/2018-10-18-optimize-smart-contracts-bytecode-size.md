@@ -14,6 +14,7 @@ categories:
 - deploying
 - smart contracts
 - size
+description: "Techniques for reducing Solidity smart contract bytecode size to fit within block gas limits"
 ---
 
 # <a name="intro"/> Intro

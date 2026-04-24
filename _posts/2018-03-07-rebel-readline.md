@@ -8,6 +8,7 @@ categories:
 - tooling
 - rebel-readline
 - terminal
+description: "Installing and configuring rebel-readline for a better Clojure REPL experience"
 ---
 
 # <a name="into">Intro</a>

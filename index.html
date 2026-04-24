@@ -13,8 +13,8 @@ layout: default
       <h2 class="featured-card-title">
         <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
       </h2>
-      {% if post.summary %}
-      <p class="featured-card-summary">{{ post.summary }}</p>
+      {% if post.description %}
+      <p class="featured-card-summary">{{ post.description }}</p>
       {% endif %}
       {% if post.categories.size > 0 %}
       <div class="featured-card-tags">
@@ -45,9 +45,9 @@ layout: default
         {% endif %}
       </div>
       <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
-      {% if post.summary %}
+      {% if post.description %}
       <div class="entry">
-        <p>{{ post.summary }}</p>
+        <p>{{ post.description }}</p>
       </div>
       {% endif %}
       <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>

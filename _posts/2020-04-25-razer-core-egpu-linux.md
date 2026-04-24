@@ -4,7 +4,7 @@ title: How to setup Razer Core external GPU on GNU/Linux
 author: Filip Bielejec
 comments: true
 categories: [GPU, Linux, Nvidia]
-summary: "With this setup I should be able to enjoy the crisp graphics provided by the GPU"
+description: "With this setup I should be able to enjoy the crisp graphics provided by the GPU"
 ---
 
 # <a name="plugging"/> Plugging in the card

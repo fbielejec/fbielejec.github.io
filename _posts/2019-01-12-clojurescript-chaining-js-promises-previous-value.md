@@ -13,6 +13,7 @@ categories:
 - chaining
 - previous value
 - callback
+description: "A macro for chaining JavaScript Promises in ClojureScript while accessing previous values in the chain"
 ---
 
 # <a name="intro"> Intro </a>

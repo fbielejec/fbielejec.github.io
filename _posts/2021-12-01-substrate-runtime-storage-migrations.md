@@ -4,7 +4,7 @@ title: Writing Substrate runtime migrations
 author: Filip Bielejec
 comments: true
 categories: [Rust, Substrate, runtime, migrations, blockchain, polkadot, dot]
-summary: "writing storage migrations for substrate based chains"
+description: "writing storage migrations for substrate based chains"
 ---
 
 # <a name="intro"/> Introduction

@@ -9,6 +9,7 @@ categories:
 - parity
 - geth
 - metamask
+description: "How to import raw Ethereum private keys into Parity wallet from MetaMask or Geth"
 ---
 
 # <a name="intro"> Intro </a>

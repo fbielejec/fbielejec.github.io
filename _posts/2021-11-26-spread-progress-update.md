@@ -4,7 +4,7 @@ title: Progress update on Spread
 author: Filip Bielejec
 comments: true
 categories: [spread, viruses, phylogeography, data vizualization]
-summary: "Quick progress update on where the project is right now"
+description: "Quick progress update on where the project is right now"
 ---
 
 <video width="640" height="480" controls="controls" poster="{{ site.baseurl }}/images/2021-11-26-spread-progress-update/usa.png">

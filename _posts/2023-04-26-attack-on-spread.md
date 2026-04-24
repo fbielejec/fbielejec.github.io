@@ -4,7 +4,7 @@ title: Spread security incident
 author: Filip Bielejec
 comments: true
 categories: [Clojure, spread, authorization, authentication, security]
-summary: "In this blog post I describe a minor security incident"
+description: "In this blog post I describe a minor security incident"
 ---
 
 ---

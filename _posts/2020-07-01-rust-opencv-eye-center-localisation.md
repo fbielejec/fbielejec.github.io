@@ -5,7 +5,7 @@ author: Filip Bielejec
 comments: true
 featured: true
 categories: [rust, opencv, eye tracking, iris tracking, gaze tracking, facial recognition, computer vision, viola-jones, timm barth]
-summary: "Implementing Timm-Barth algorithm for accurately tracking iris location with Rust and OpenCV"
+description: "Implementing Timm-Barth algorithm for accurately tracking iris location with Rust and OpenCV"
 ---
 
 # <a name="intro"/> Intro

@@ -4,7 +4,7 @@ title: Spread on TV
 author: Filip Bielejec
 comments: true
 categories: [spread, viruses, phylogeography, FrancquiCollenPrize, PhilippeLemey, vrt, news]
-summary: "Spread has been featured in the Belgian news broadcast VRT NWS"
+description: "Spread has been featured in the Belgian news broadcast VRT NWS"
 ---
 
 ---

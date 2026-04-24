@@ -3,6 +3,7 @@ layout: post
 title: Patching your AWS EC2 instance for the Meltdown/Spectre vulnerabilities
 author: Filip Bielejec
 comments: true
+description: "Applying KPTI kernel patches to your AWS EC2 instance to mitigate the Meltdown vulnerability"
 ---
 
 # Intro

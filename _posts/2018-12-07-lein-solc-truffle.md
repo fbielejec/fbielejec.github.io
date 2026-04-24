@@ -12,6 +12,7 @@ categories:
 - compilation
 - lein-solc
 - workflow
+description: "Integrating the lein-solc Solidity compiler plugin with the Truffle smart contract framework"
 ---
 
 # <a name="intro">Intro</a>

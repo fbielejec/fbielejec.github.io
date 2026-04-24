@@ -4,7 +4,7 @@ title: Hosting Your Website on AWS S3
 author: Filip Bielejec
 comments: true
 categories: [AWS, S3, CloudFront, hosting, website, S3, SPA]
-summary: "Hosting static content on S3, complete with SSL and caching"
+description: "Hosting static content on S3, complete with SSL and caching"
 ---
 
 # <a name="intro"/> Introduction

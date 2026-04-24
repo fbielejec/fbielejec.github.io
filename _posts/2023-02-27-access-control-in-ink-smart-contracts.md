@@ -4,7 +4,7 @@ title: Implementing access control for smart contracts written in ink!
 author: Filip Bielejec
 comments: true
 categories: [rust, ink!, smart-contracts, substrate]
-summary: "We discuss implementing access-control - a fine grained mechanism for controlling who and under what circumstances can perform particular actions that alter the state of your contracts."
+description: "We discuss implementing access-control - a fine grained mechanism for controlling who and under what circumstances can perform particular actions that alter the state of your contracts."
 ---
 
 ---

@@ -10,6 +10,7 @@ categories:
 - DMARC
 - SPF
 - DKIM
+description: "Setting up DMARC, SPF and DKIM records on AWS Route 53 to protect your domains from email spoofing"
 ---
 
 # <a name="intro"> Intro </a>

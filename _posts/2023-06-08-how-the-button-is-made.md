@@ -4,7 +4,7 @@ title: TheButton - A Smart Contracts-Based Game on the Aleph Zero Blockchain
 author: Filip Bielejec
 comments: true
 categories: [rust, ink!, smart-contracts, substrate, pokadot, alephzero, wasm, psp22, dex, defi]
-summary: "In this bog post we describe TheButton, a smart-contract based game deployed on the Aleph Zero blockchain."
+description: "In this bog post we describe TheButton, a smart-contract based game deployed on the Aleph Zero blockchain."
 ---
 
 # <a name="intro"/> Introduction

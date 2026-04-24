@@ -5,7 +5,7 @@ comments: true
 author: Filip Bielejec
 categories: [DevOps, ContinuousDeployment, automation, CI, CD, CI/CD, git]
 tags: [docker, travis, watchtower, github]
-summary: "In this entry I will describe how to setup a pipeline for a Continuous Deliver of an entire project"
+description: "In this entry I will describe how to setup a pipeline for a Continuous Deliver of an entire project"
 ---
 
 # <a name="intro">Intro</a>
