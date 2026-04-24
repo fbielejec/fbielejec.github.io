@@ -42,7 +42,7 @@ for token, g in df.groupby("token"):
 #+RESULTS:
 : Loaded 788 candles for 4 tokens
 : Date range: 2022-05-01 to 2022-12-31
-: 
+:
 :   EURUSDT: 245 candles, 2022-05-01 to 2022-12-31
 :   PAXGUSDT: 245 candles, 2022-05-01 to 2022-12-31
 :   TUSDUSDT: 149 candles, 2022-05-01 to 2022-09-26
@@ -130,7 +130,7 @@ class Position:
     atr: float = 0.0
 
 def fit_token_exponential(candles: pd.DataFrame, atr_window: int = 15, r2_exponent: float = 1.0) -> Optional[Position]:
-    """Current GEM pipeline: log-linear initial -> LM exponential refinement."""
+    """Exponential GEM pipeline: log-linear initial -> LM exponential refinement."""
     if candles.empty:
         return None
 
@@ -154,7 +154,7 @@ def fit_token_exponential(candles: pd.DataFrame, atr_window: int = 15, r2_expone
     # Step 2: exponential refinement via LM
     a0, a1 = fit_exponential(x, closes, initial)
 
-    # R-squared in price-space
+    # R2 in price-space
     y_hat = exponential_model(x, a0, a1)
     r2 = r_squared(closes, y_hat)
 
@@ -180,9 +180,9 @@ def fit_token_exponential(candles: pd.DataFrame, atr_window: int = 15, r2_expone
         a1=a1,
         atr=atr,
     )
-
-print("fit_token_exponential defined.")
 #+END_SRC
+
+#+RESULTS:
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
 def fit_token_linear(candles: pd.DataFrame, atr_window: int = 15, r2_exponent: float = 1.0) -> Optional[Position]:
