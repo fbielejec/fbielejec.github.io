@@ -9,6 +9,7 @@ Token universe: bear portfolio (PAXGUSDT, EURUSDT, USDCUSDT, TUSDUSDT).
 * Setup
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+import os
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
@@ -17,9 +18,14 @@ from typing import Optional
 import warnings
 warnings.filterwarnings('ignore')
 
+NOTEBOOK_DIR = os.path.expanduser("~/CloudStation/DevOps/fbielejec.github.io/notebooks")
+os.chdir(NOTEBOOK_DIR)
+
 INITIAL_CAPITAL = 10_000.0
 FEE_RATE = 0.003
 #+END_SRC
+
+#+RESULTS:
 
 * Data Loading
 
@@ -32,6 +38,15 @@ print()
 for token, g in df.groupby("token"):
     print(f"  {token}: {len(g)} candles, {g['date'].min().date()} to {g['date'].max().date()}")
 #+END_SRC
+
+#+RESULTS:
+: Loaded 788 candles for 4 tokens
+: Date range: 2022-05-01 to 2022-12-31
+: 
+:   EURUSDT: 245 candles, 2022-05-01 to 2022-12-31
+:   PAXGUSDT: 245 candles, 2022-05-01 to 2022-12-31
+:   TUSDUSDT: 149 candles, 2022-05-01 to 2022-09-26
+:   USDCUSDT: 149 candles, 2022-05-01 to 2022-09-26
 
 * Core Functions
 
@@ -59,19 +74,26 @@ def average_true_range(close: np.ndarray, high: np.ndarray, low: np.ndarray) -> 
         )
         tr_sum += tr
     return tr_sum / (n - 1)
-
-print("Statistics functions defined.")
 #+END_SRC
+
+#+RESULTS:
 
 ** Regression Models
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+# initial estimates
 def fit_linear_logspace(x: np.ndarray, y: np.ndarray):
     """Fit ln(y) = b0 + b1*x via OLS. Returns (b0, b1)."""
     ln_y = np.log(y)
     X = np.column_stack([np.ones_like(x), x])
     beta, _, _, _ = np.linalg.lstsq(X, ln_y, rcond=None)
     return beta[0], beta[1]  # intercept, slope
+
+def fit_linear_pricespace(x: np.ndarray, y: np.ndarray):
+    """Fit y = b0 + b1*x via OLS in price-space. Returns (b0, b1)."""
+    X = np.column_stack([np.ones_like(x), x])
+    beta, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
+    return beta[0], beta[1]
 
 def exponential_model(x, a0, a1):
     return a0 * np.power(a1, x)
@@ -82,6 +104,7 @@ def fit_exponential(x: np.ndarray, y: np.ndarray, initial: tuple):
         popt, _ = curve_fit(
             exponential_model, x, y,
             p0=initial,
+            method='lm',
             maxfev=5000,
         )
         a0, a1 = popt
@@ -90,9 +113,9 @@ def fit_exponential(x: np.ndarray, y: np.ndarray, initial: tuple):
     except (RuntimeError, ValueError):
         pass
     return initial
-
-print("Regression functions defined.")
 #+END_SRC
+
+#+RESULTS:
 
 ** Token Fitting
 
@@ -159,6 +182,61 @@ def fit_token_exponential(candles: pd.DataFrame, atr_window: int = 15, r2_expone
     )
 
 print("fit_token_exponential defined.")
+#+END_SRC
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+def fit_token_linear(candles: pd.DataFrame, atr_window: int = 15, r2_exponent: float = 1.0) -> Optional[Position]:
+    """Linear GEM: fit y = b0 + b1*x in price-space."""
+    if candles.empty:
+        return None
+
+    token = candles.iloc[0]["token"]
+    x = np.arange(len(candles), dtype=float)
+    closes = candles["close"].values
+    highs = candles["high"].values
+    lows = candles["low"].values
+
+    try:
+        b0, b1 = fit_linear_pricespace(x, closes)
+    except Exception:
+        return None
+
+    # R-squared in price-space
+    y_hat = b0 + b1 * x
+    r2 = r_squared(closes, y_hat)
+
+    # Momentum: normalized slope (b1 / mean_price) as percentage daily trend
+    mean_close = np.mean(closes)
+    if mean_close <= 0:
+        return None
+    normalized_slope = b1 / mean_close
+    momentum = (r2 ** r2_exponent) * normalized_slope * 100.0
+
+    # Growth filter equivalent: a1 field stores normalized_slope
+    # build_portfolio filters on a1 > 1, so we store 1 + normalized_slope
+    # positive slope -> a1 > 1, negative slope -> a1 < 1
+    a1_equiv = 1.0 + normalized_slope
+
+    # Normalized ATR (trailing window)
+    lookback = min(len(candles), atr_window)
+    if lookback > 1 and mean_close > 0:
+        atr = average_true_range(
+            closes[-lookback:],
+            highs[-lookback:],
+            lows[-lookback:],
+        ) / mean_close
+    else:
+        atr = 0.0
+
+    return Position(
+        token=token,
+        momentum=momentum,
+        r2=r2,
+        a1=a1_equiv,
+        atr=atr,
+    )
+
+print("fit_token_linear defined.")
 #+END_SRC
 
 ** Portfolio Construction
