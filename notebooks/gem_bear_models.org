@@ -49,7 +49,6 @@ for token, g in df.groupby("token"):
 :   USDCUSDT: 149 candles, 2022-05-01 to 2022-09-26
 
 * Core Functions
-
 ** Statistics
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
@@ -624,6 +623,218 @@ for window in fit_windows:
             print_metrics(label, result)
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+
+  ==================================================
+    exp-bear-w15
+  ==================================================
+    Total return:         -6.27%
+    Annualized return:    -9.19%
+    Max drawdown:         -8.77%
+    Sharpe ratio:        -1.461
+    Sortino ratio:       -2.088
+    Calmar ratio:        -1.048
+    Rebalance count:         24
+    Win rate (monthly):    22.2%
+    Final value:       $   9373.20
+
+  ==================================================
+    lin-bear-w15
+  ==================================================
+    Total return:         -6.27%
+    Annualized return:    -9.19%
+    Max drawdown:         -8.77%
+    Sharpe ratio:        -1.461
+    Sortino ratio:       -2.088
+    Calmar ratio:        -1.048
+    Rebalance count:         24
+    Win rate (monthly):    22.2%
+    Final value:       $   9373.20
+
+  ==================================================
+    exp-ranging-w15
+  ==================================================
+    Total return:         -9.28%
+    Annualized return:   -13.51%
+    Max drawdown:        -10.42%
+    Sharpe ratio:        -1.944
+    Sortino ratio:       -2.514
+    Calmar ratio:        -1.297
+    Rebalance count:         45
+    Win rate (monthly):    22.2%
+    Final value:       $   9071.60
+
+  ==================================================
+    lin-ranging-w15
+  ==================================================
+    Total return:         -8.36%
+    Annualized return:   -12.20%
+    Max drawdown:         -9.84%
+    Sharpe ratio:        -1.316
+    Sortino ratio:       -1.797
+    Calmar ratio:        -1.239
+    Rebalance count:         46
+    Win rate (monthly):    11.1%
+    Final value:       $   9163.90
+
+  ==================================================
+    exp-bear-w30
+  ==================================================
+    Total return:          6.40%
+    Annualized return:     9.69%
+    Max drawdown:         -1.39%
+    Sharpe ratio:         1.593
+    Sortino ratio:        3.332
+    Calmar ratio:         6.982
+    Rebalance count:         21
+    Win rate (monthly):    33.3%
+    Final value:       $  10640.43
+
+  ==================================================
+    lin-bear-w30
+  ==================================================
+    Total return:          6.40%
+    Annualized return:     9.69%
+    Max drawdown:         -1.39%
+    Sharpe ratio:         1.593
+    Sortino ratio:        3.332
+    Calmar ratio:         6.982
+    Rebalance count:         21
+    Win rate (monthly):    33.3%
+    Final value:       $  10640.43
+
+  ==================================================
+    exp-ranging-w30
+  ==================================================
+    Total return:         -0.28%
+    Annualized return:    -0.42%
+    Max drawdown:         -9.42%
+    Sharpe ratio:        -0.020
+    Sortino ratio:       -0.031
+    Calmar ratio:        -0.044
+    Rebalance count:         29
+    Win rate (monthly):    33.3%
+    Final value:       $   9972.08
+
+  ==================================================
+    lin-ranging-w30
+  ==================================================
+    Total return:         -0.34%
+    Annualized return:    -0.50%
+    Max drawdown:         -7.88%
+    Sharpe ratio:        -0.039
+    Sortino ratio:       -0.058
+    Calmar ratio:        -0.064
+    Rebalance count:         30
+    Win rate (monthly):    33.3%
+    Final value:       $   9966.27
+
+  ==================================================
+    exp-bear-w60
+  ==================================================
+    Total return:          3.77%
+    Annualized return:     5.67%
+    Max drawdown:         -1.10%
+    Sharpe ratio:         1.132
+    Sortino ratio:        2.336
+    Calmar ratio:         5.144
+    Rebalance count:         19
+    Win rate (monthly):    33.3%
+    Final value:       $  10377.04
+
+  ==================================================
+    lin-bear-w60
+  ==================================================
+    Total return:          3.77%
+    Annualized return:     5.67%
+    Max drawdown:         -1.10%
+    Sharpe ratio:         1.132
+    Sortino ratio:        2.336
+    Calmar ratio:         5.144
+    Rebalance count:         19
+    Win rate (monthly):    33.3%
+    Final value:       $  10377.04
+
+  ==================================================
+    exp-ranging-w60
+  ==================================================
+    Total return:         -1.02%
+    Annualized return:    -1.51%
+    Max drawdown:         -5.30%
+    Sharpe ratio:        -0.273
+    Sortino ratio:       -0.396
+    Calmar ratio:        -0.285
+    Rebalance count:         37
+    Win rate (monthly):    22.2%
+    Final value:       $   9898.34
+
+  ==================================================
+    lin-ranging-w60
+  ==================================================
+    Total return:         -1.02%
+    Annualized return:    -1.51%
+    Max drawdown:         -5.30%
+    Sharpe ratio:        -0.273
+    Sortino ratio:       -0.396
+    Calmar ratio:        -0.285
+    Rebalance count:         37
+    Win rate (monthly):    22.2%
+    Final value:       $   9898.34
+
+  ==================================================
+    exp-bear-w90
+  ==================================================
+    Total return:          0.49%
+    Annualized return:     0.73%
+    Max drawdown:         -0.91%
+    Sharpe ratio:         0.465
+    Sortino ratio:        0.660
+    Calmar ratio:         0.799
+    Rebalance count:         13
+    Win rate (monthly):    11.1%
+    Final value:       $  10048.70
+
+  ==================================================
+    lin-bear-w90
+  ==================================================
+    Total return:          0.49%
+    Annualized return:     0.73%
+    Max drawdown:         -0.91%
+    Sharpe ratio:         0.465
+    Sortino ratio:        0.660
+    Calmar ratio:         0.799
+    Rebalance count:         13
+    Win rate (monthly):    11.1%
+    Final value:       $  10048.70
+
+  ==================================================
+    exp-ranging-w90
+  ==================================================
+    Total return:         -1.52%
+    Annualized return:    -2.26%
+    Max drawdown:         -4.30%
+    Sharpe ratio:        -0.494
+    Sortino ratio:       -0.671
+    Calmar ratio:        -0.525
+    Rebalance count:         20
+    Win rate (monthly):    22.2%
+    Final value:       $   9847.97
+
+  ==================================================
+    lin-ranging-w90
+  ==================================================
+    Total return:         -1.52%
+    Annualized return:    -2.26%
+    Max drawdown:         -4.30%
+    Sharpe ratio:        -0.494
+    Sortino ratio:       -0.671
+    Calmar ratio:        -0.525
+    Rebalance count:         20
+    Win rate (monthly):    22.2%
+    Final value:       $   9847.97
+#+end_example
+
 * Diagnostics: What do the models see with rolling windows?
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
@@ -655,6 +866,103 @@ for date_str in sample_dates:
                 wlabel = str(w) if w > 0 else "all"
                 print(f"  {token:<12} {model_name:<6} {wlabel:>4} {pos.a1:>10.6f} {pos.r2:>8.4f} {pos.momentum:>10.4f} {pass_all:>9}")
 #+END_SRC
+
+* Holdings Analysis: bear-w30 winner
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+from dataclasses import replace
+
+params = replace(BEAR_PARAMS, fit_window=30)
+eligible = candles_by_token
+
+all_timestamps = sorted(set(
+    ts for c in eligible.values() for ts in c["timestamp"].values
+))
+price_index = {
+    token: dict(zip(c["timestamp"].values, c["close"].values))
+    for token, c in eligible.items()
+}
+
+state = PortfolioState(params.initial_capital)
+last_rebalance_day = None
+fit_fn = fit_token_exponential
+
+print(f"{'day':>4} {'date':<12} {'action':<10} {'held':<12} {'momentum':>10} {'r2':>8} {'value':>10}")
+print(f"{'-'*4} {'-'*12} {'-'*10} {'-'*12} {'-'*10} {'-'*8} {'-'*10}")
+
+for day_idx, timestamp in enumerate(all_timestamps):
+    prices = {
+        token: ts_map[timestamp]
+        for token, ts_map in price_index.items()
+        if timestamp in ts_map
+    }
+
+    fit_results = {}
+    for token, candles in eligible.items():
+        up_to = candles[candles["timestamp"] <= timestamp]
+        if params.fit_window > 0 and len(up_to) > params.fit_window:
+            up_to = up_to.iloc[-params.fit_window:]
+        if len(up_to) >= 2:
+            pos = fit_fn(up_to, params.atr_window, params.r2_exponent)
+            if pos is not None:
+                fit_results[token] = pos
+
+    need_rebalance = False
+    if day_idx == 0:
+        need_rebalance = True
+    elif not is_in_cooldown(day_idx, last_rebalance_day, params.rebalance_cooldown):
+        momentums = {t: p.momentum for t, p in fit_results.items()}
+        holdings = {t: p.quantity for t, p in state.positions.items()}
+        need_rebalance = should_rebalance(holdings, momentums)
+
+    if need_rebalance:
+        candidates = list(fit_results.values())
+        portfolio = build_portfolio(candidates, params)
+        target_weights = {p.token: p.weight for p in portfolio}
+        rebalance_to_targets(state, target_weights, prices, params.fee_rate)
+        last_rebalance_day = day_idx
+
+        date_str = pd.Timestamp(timestamp, unit="ms").strftime("%Y-%m-%d")
+        held_tokens = list(state.positions.keys())
+        held_str = ",".join(held_tokens) if held_tokens else "CASH"
+        total_val = state.total_value(prices)
+
+        # Show the selected token's stats
+        if portfolio:
+            p = portfolio[0]
+            print(f"{day_idx:>4} {date_str:<12} {'REBAL':<10} {held_str:<12} {p.momentum:>10.4f} {p.r2:>8.4f} {total_val:>10.2f}")
+        else:
+            print(f"{day_idx:>4} {date_str:<12} {'TO CASH':<10} {'CASH':<12} {'':>10} {'':>8} {total_val:>10.2f}")
+
+    state.record_snapshot(prices)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+   day date         action     held           momentum       r2      value
+  ---- ------------ ---------- ------------ ---------- -------- ----------
+     0 2022-05-01   TO CASH    CASH                               10000.00
+    10 2022-05-11   TO CASH    CASH                               10000.00
+    20 2022-05-21   TO CASH    CASH                               10000.00
+    30 2022-05-31   TO CASH    CASH                               10000.00
+    40 2022-06-10   TO CASH    CASH                               10000.00
+    50 2022-06-20   TO CASH    CASH                               10000.00
+    60 2022-06-30   TO CASH    CASH                               10000.00
+    93 2022-08-02   TO CASH    CASH                               10000.00
+   103 2022-08-12   TO CASH    CASH                               10000.00
+   113 2022-08-22   TO CASH    CASH                               10000.00
+  123 2022-09-01   TO CASH    CASH                               10000.00
+  138 2022-09-16   TO CASH    CASH                               10000.00
+  162 2022-10-10   TO CASH    CASH                               10000.00
+  172 2022-10-20   TO CASH    CASH                               10000.00
+  182 2022-10-30   TO CASH    CASH                               10000.00
+  192 2022-11-09   REBAL      EURUSDT          0.0222   0.5021    9970.00
+  202 2022-11-19   REBAL      EURUSDT          0.0868   0.6758   10340.74
+  212 2022-11-29   REBAL      EURUSDT          0.1182   0.7516   10312.76
+  222 2022-12-09   REBAL      EURUSDT          0.0442   0.7052   10524.61
+  232 2022-12-19   REBAL      PAXGUSDT         0.0858   0.7897   10539.04
+  242 2022-12-29   REBAL      EURUSDT          0.0290   0.7041   10574.95
+#+end_example
 
 * Buy & Hold Benchmark
 
