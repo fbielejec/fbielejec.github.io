@@ -5,11 +5,10 @@
 
     {% include meta.html %}
 
-    <!--[if lt IE 9]>
-      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Young+Serif&display=swap" rel="stylesheet">
 
-    <!-- latex support -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       tex2jax: {
@@ -27,14 +26,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/images/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ site.baseurl }}/images/favicon/favicon-16x16.png">
     <link rel="manifest" href="{{ site.baseurl }}/images/favicon/site.webmanifest">
-    <link rel="mask-icon" color="#5bbad5" href="{{ site.baseurl }}/images/favicon/safari-pinned-tab.svg">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
-
-    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <link rel="mask-icon" color="#c45e3e" href="{{ site.baseurl }}/images/favicon/safari-pinned-tab.svg">
+    <meta name="msapplication-TileColor" content="#1a2332">
+    <meta name="theme-color" content="#1a2332">
   </head>
 
   <body>
+    <div class="top-accent"></div>
+
     <div class="wrapper-masthead">
       <div class="container">
         <header class="masthead clearfix">
@@ -54,14 +53,19 @@
       </div>
     </div>
 
-    <div id="main" role="main" class="container">
+    <div id="main" role="main">
       {{ content }}
     </div>
 
     <div class="wrapper-footer">
       <div class="container">
         <footer class="footer">
-          {% include svg-icons.html %}
+          <div class="footer-social">
+            {% include svg-icons.html %}
+          </div>
+          <div class="footer-copy">
+            &copy; {{ site.time | date: '%Y' }} {{ site.name }}
+          </div>
         </footer>
       </div>
     </div>

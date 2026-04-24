@@ -3,23 +3,38 @@
 // VARIABLES
 //
 
-// Colors
-$blue: #4183C4;
+// Brand colors
+$navy: #1a2332;
+$navy-light: #243447;
+$accent: #c45e3e;
+$accent-light: #d4765c;
 
-// Grays
+// Neutrals
+$bg: #faf9f7;
+$text: #2d2d2d;
+$text-light: #6b7280;
+$border: #e2ded8;
+$border-light: #f0ebe5;
+
+// Legacy compatibility
+$blue: $accent;
 $black: #000;
-$darkerGray: #222;
-$darkGray: #333;
-$gray: #666;
-$lightGray: #eee;
+$darkerGray: $text;
+$darkGray: $text;
+$gray: $text-light;
+$lightGray: $border-light;
 $white: #fff;
 
 // Font stacks
-$helvetica: Helvetica, Arial, sans-serif;
-$helveticaNeue: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$georgia: Georgia, serif;
+$font-display: "Young Serif", Georgia, serif;
+$font-body: "Figtree", -apple-system, BlinkMacSystemFont, sans-serif;
+$font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
 
-// Mobile breakpoints
+$helvetica: $font-body;
+$helveticaNeue: $font-body;
+$georgia: $font-display;
+
+// Breakpoints
 @mixin mobile {
   @media screen and (max-width: 640px) {
     @content;

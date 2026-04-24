@@ -3,6 +3,7 @@ layout: post
 title: Spread is published
 author: Filip Bielejec
 comments: true
+featured: true
 categories: [spread, viruses, phylogeography, data vizualization]
 summary: "Spread is ready to use and availiable at https://spreadviz.org"
 ---

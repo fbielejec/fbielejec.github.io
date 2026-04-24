@@ -3,6 +3,7 @@ layout: post
 title: "Winning with the Bear: GEM strategies comparison"
 author: Filip Bielejec
 comments: true
+featured: true
 categories: [python, trading, quantitative-finance, GEM, momentum, regression, bear-market]
 summary: "GEM based strategies for a safe-haven portfolio selection during the 2022 crypto bear market"
 ---

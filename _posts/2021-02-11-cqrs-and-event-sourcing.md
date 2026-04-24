@@ -3,6 +3,7 @@ layout: post
 title: CQRS and Event Sourcing
 author: Filip Bielejec
 comments: true
+featured: true
 categories: [rust, kafka, cqrs, event sourcing, event streaming, messaging]
 summary: "Study in an event-driven architecture implementation in Rust"
 ---
