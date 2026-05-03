@@ -34,19 +34,19 @@ For each token on each day:
 3. **Filter**: Keep tokens with positive trend, R-squared above a threshold, and the momentum below a cap (to exclude pump-and-dump spikes)
 4. **Weight**: Rank by momentum, take the top N, and assign inverse-volatility weights using Average True Range (ATR). This is the portfolio.
 
-The current production model uses a two-step exponential regression:
+The baseline model uses a two-step exponential regression:
 
 $$y = a_0 \cdot a_1^{x}$$
 
 First, a log-linear OLS fit ($\ln y = b_0 + b_1 x$) provides initial parameter estimates.
 These are refined via Levenberg-Marquardt optimization into the exponential form.
-Momentum is then $R^{2^{exp}} \cdot (a_1 - 1) \cdot 100$, where the R-squared exponent controls how much low-quality fits are penalized.
+Momentum is then $R^{2} \cdot (a_1 - 1) \cdot 100$, where the R-squared exponent controls how much low-quality fits are penalized.
 
 The experimental linear model fits directly in price-space:
 
 $$y = b_0 + b_1 \cdot x$$
 
-Momentum becomes $R^{2^{exp}} \cdot (b_1 / \bar{p}) \cdot 100$, where $b_1 / \bar{p}$ normalizes the slope by the mean price to produce a percentage daily trend, analogous to $a_1 - 1$ in the exponential case.
+Momentum becomes $R^{2} \cdot (b_1 / \bar{p}) \cdot 100$, where $b_1 / \bar{p}$ normalizes the slope by the mean price to produce a percentage daily trend, analogous to $a_1 - 1$ in the exponential case.
 
 The rest of the pipeline -- ATR computation, portfolio construction, differential rebalancing, and cooldown -- is identical between the two models.
 
