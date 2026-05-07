@@ -106,9 +106,7 @@ The loop changed two numbers:
 | `fee_rate` | 0.001 | 0.003 (10 bps exchange + 20 bps slippage) |
 | stress multiplier | 2.0× | 1.5× |
 
-That single calibration fix unblocked 160+ viable configs.
-Realistic fees with a realistic stress test let the strategy be measured at all.
-This is exactly the kind of finding a hand-driven sweep tends to miss because it doesn't change anything load-bearing -- it just unsticks the gate.
+That single calibration fix, a realistic fee with a realistic stress test, unblocked 160+ viable configs.
 
 ## Phase 1: HMM hyperparameters
 
