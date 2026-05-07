@@ -263,7 +263,7 @@ Replacements worth trying, ranked by implementation cost:
 ## More aggresive bear specialist model
 
 The bear specialist currently sits in cash when no token has a positive trend.
-With the use of perpetual funds (such as offered by [Kraken]() or [dy/dx]())
+With the use of perpetual funds (such as offered by [Kraken](https://www.kraken.com/features/futures) or [dYdX](https://www.dydx.xyz/))
 the defensive (long safe-haven) startegy could flip int an offensive one (short weak-momentum tokens).
 
 The same $R^2 \cdot (a_1 - 1)$ momentum signal becomes a short-entry signal when negated, and the inverse-volatility weighting carries over directly.
