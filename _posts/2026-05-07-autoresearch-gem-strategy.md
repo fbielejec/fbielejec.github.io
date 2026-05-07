@@ -13,16 +13,20 @@ description: "Applying the Karpathy-style autoresearch loop to an HMM + per-regi
 In the [previous post]({{ site.baseurl }}{% post_url 2026-04-24-gem-bear-market-models %}) I compared exponential vs. linear regression GEM models on a hand-curated 4-token bear portfolio.
 The headline finding from that post: the choice of regression model was almost irrelevant; the **fitting window** was the dominant knob.
 
-That experiment had two glaring limitations.
+That experiment had two limitations.
 First, the universe was tiny -- four safe-haven tokens picked by hand.
 Second, the parameter sweep was hand-driven: I picked window sizes, ran them, eyeballed the results, picked again.
-That's fine for a blog post but not how you actually search a multi-dimensional parameter space.
+<!-- That's fine for a blog post but not how you actually search a multi-dimensional parameter space. -->
 
 This post is about what happens when you replace the human-in-the-loop with an LLM agent following a written methodology contract.
 The agent picks hypotheses, edits the strategy code, runs the sweep, scores the result, keeps or reverts.
 Sleep, wake up, read the results.
 
-*TL;DR* On the full Binance + DefiLlama universe (437 tokens, 5 years), an LLM-driven autoresearch loop ran 215 configurations across 18 hours, lifted the ensemble score from `-inf` (every config failing under realistic fees) to **1175.2**, and beat a BTC+ETH buy-and-hold baseline by **142×**. Three structural findings emerged: two were genuinely new, one was a confirmation of an earlier 4-token result at scale. The one-at-a-time phased sweep cannot discover cross-block parameter interactions, which is the next problem worth solving.
+*TL;DR* On the full Binance + DefiLlama universe (437 tokens, 5 years), an LLM-driven autoresearch loop ran 215 configurations across 18 hours, lifted the ensemble score from `-inf` (every config failing under realistic fees) to **1175.2**, and beat a BTC+ETH buy-and-hold baseline by **142×**.
+
+Three structural findings emerged: two were genuinely new, one was a confirmation of an earlier 4-token result at scale.
+
+The one-at-a-time phased sweep cannot discover cross-block parameter interactions, which is the next problem worth solving.
 
 The scaled-down Python version at [trader-research](https://github.com/fbielejec/trader-research) shows the **methodology** -- the contract surface, the modifiable interior, the program.md spec the agent operates under -- on a 4-token, bear-specialist-only, 2022-only subset.
 It is not a full reproduction of the headline numbers.
@@ -39,10 +43,10 @@ The structure is two-file:
 A `program.md` contract tells the agent which file is which, what the score function is, and what the loop should do at each iteration.
 Then you start the agent and walk away.
 
-For a trading strategy the analog is direct.
-The "model" is a parameterized portfolio-construction pipeline.
-The "training loop" is a causal walk-forward backtest.
-The "metric" is a single scalar score computed from the backtest output.
+For a trading strategy the analog is direct:
+- The "model" is a parameterized portfolio-construction pipeline.
+- The "training loop" is a causal walk-forward backtest.
+- The "metric" is a single scalar score computed from the backtest output.
 
 # <a name="contract"/> The Contract Surface
 
@@ -52,7 +56,7 @@ If the agent can edit the metric, it can drive the score arbitrarily high withou
 **Untouchable:**
 - The data loader and the causal walk-forward split. No peeking past day `t-1` when deciding for day `t`.
 - The backtest skeleton -- the day-by-day loop, portfolio bookkeeping, fee accounting.
-- The scoring function. Single scalar, no rewriting.
+- The scoring function. Single scalar, untouchable.
 - External constants: the 30 bps round-trip fee (10 bps exchange + 20 bps slippage), the 1.5× stress multiplier, the starting capital. These are market facts, not strategy parameters.
 
 **Modifiable:**
@@ -60,7 +64,7 @@ If the agent can edit the metric, it can drive the score arbitrarily high withou
 - The model body -- the `fit` function, the portfolio-construction function, the regression primitives.
 - The sweep driver itself. The agent can rewrite the search strategy if it wants.
 
-In the scaled-down Python version this split is `harness.py` (untouchable) vs. `sweep.py` (modifiable), with `program.md` describing the loop the agent runs:
+In the scaled-down Python version this split is `harness.py` (untouchable) vs. `sweep.py` (fair game), with `program.md` describing the loop the agent runs:
 
 ```mermaid
 flowchart TD
@@ -107,9 +111,11 @@ $$\text{diversification\_bonus} = 1 + 0.1 \cdot (1 - \text{HHI})$$
 
 **The shape of the formula matters as much as the values it spits out.**
 Each term is multiplicative, which puts them in tension against each other.
+
 If you had only the drawdown dampener, the agent's optimal strategy is to sit in cash forever -- zero drawdown, zero return, zero score.
 If you had only the return term, the agent can chase any tail-risk strategy that produces a high headline number and accept any drawdown to do it.
 If you had only the diversification bonus, equal-weight buy-and-hold trivially wins.
+
 Multiplying the three forces the agent to earn return *and* keep drawdown bounded *and* maintain diversification -- drop any one and the score collapses.
 This is the design principle: a single scalar metric is dangerous unless its internal terms genuinely fight each other.
 
@@ -223,6 +229,27 @@ The buy-and-hold BTC+ETH baseline scored 8.3 (12.9% return).
 
 That is a 142× improvement over buy-and-hold by score, almost entirely from realized return rather than from any drawdown improvement.
 
+## Since Loop 3
+
+The Loop 3 numbers above are a historical snapshot.
+Subsequent work -- including the risk-off gates that Loop 3's shutdown report recommended as a Loop 4 priority -- has shifted the strategy to a different point on the risk-return frontier:
+
+| Metric | Loop 3 | Current baseline |
+|---|---|---|
+| Annualized return | 1830% | **314%** |
+| Max drawdown | -96.4% | **-77.2%** |
+| Calmar ratio | 19.0 | 4.07 |
+| Sharpe / Sortino | --- | 0.98 / 3.92 |
+| Avg HHI | 0.319 | 0.253 |
+| Tokens selected (of fitted) | --- | 21 of 419 |
+| Rebalances | --- | 1,386 |
+| Bluechip benchmark annualized | 12.9% | 6.33% |
+
+Lower headline return, much lower drawdown, better diversification.
+Calmar dropped because risk-off gates trade away tail-end upside for survivability.
+
+The findings below are still about Loop 3 specifically -- the loop ran, the loop produced these conclusions -- but the limitations section uses the current baseline as the foil.
+
 # <a name="findings"/> What the Loop Found
 
 Two new findings, plus one confirmation of an earlier result at scale. Ranked by how surprising they were:
@@ -275,26 +302,56 @@ The score will frequently come back as `-inf` because the 4-token bear basket is
 
 A few things the run does **not** prove:
 
-- **The 96% drawdown is real.** Every config from Phase 2 onward shows max drawdown of -93% to -96%. This is a property of the 2022 crash applied to the full token universe, not a strategy failure. The drawdown dampener penalizes it but does not reject it. No real portfolio survives this; the score is a **research metric**, not a deployable risk profile.
+- **The 96% drawdown was a local ceiling, not a structural one.** Every Loop 3 config from Phase 2 onward showed max drawdown of -93% to -96%, and the Loop 3 shutdown report attributed this to the 2022 crash plus the absence of risk-off gates. Subsequent work brought the baseline drawdown down to **-77%** (annualized return 314%, Calmar 4.07). That's still not a deployable risk profile -- no real portfolio survives a 77% drawdown either -- but it's a substantial improvement, and a reminder that the ceilings a one-at-a-time phased sweep finds are usually *local* ceilings, not structural ones. The score remains a **research metric**, not a tradable risk profile.
 - **One-at-a-time phased sweeping cannot find cross-block interactions.** If bull and bear specialists need *jointly* different parameters to reach a high score, this loop will not find that configuration.
-- **Survivorship bias.** The 437-token universe is what's listed *now*, not what was tradeable in 2021. The 1800% return likely reflects a meaningful chunk of survivorship.
+- **Survivorship bias.** The 437-token universe is what's listed *now*, not what was tradeable in 2021. Both Loop 3's headline 1830% and the current baseline's 314% annualized return likely reflect a meaningful chunk of survivorship -- the loop has no way to detect or correct for it.
 - **One regime cycle.** The 2021-2025 window covers exactly one bull-bear-recovery cycle. A different cycle could rank these configs differently.
 
 # <a name="next"/> Next Steps
 
-The phased-sweep limitation is the most interesting.
-A natural successor is to replace the loop with a **reinforcement-learning search policy**.
-State: the current parameter tensor plus a summary of past evaluations.
-Action: a parameter edit.
-Reward: `ensemble_score`.
-Environment: the same walk-forward backtest, exposed as a thin wrapper.
+The phased-sweep limitation is the most interesting one to attack.
+The current loop is a hand-coded one-parameter-at-a-time scan.
+The search heuristics -- "sweep `top_n` first, then $R^2$ threshold, then sweep again with the new defaults locked in" -- live in `program.md` as English instructions to the agent.
 
-The same setup is the natural place to test whether the historical "deletion wins" finding from earlier loops survives under joint-space search, or whether it was an artifact of the one-at-a-time methodology.
+That's a clever workaround for the high-dimensional parameter space, but the heuristics themselves are guesses.
+A different ordering, a different grid resolution, a different fallback when a sweep stalls -- any of these could move the headline number meaningfully, and a hand-driven `program.md` has no way to discover that.
+
+A natural successor is to replace the loop with a **reinforcement-learning search policy** that learns those heuristics from the score signal directly.
+A trained policy could reproduce useful patterns like "after finding a good $R^2$ threshold, explore `top_n`", but it could also discover patterns no human had thought to write down.
+
+Sketch of the setup:
+
+- **State**: the current `GemParams` tensor plus a fixed-size summary of past evaluations -- "where am I in the search space?" Some options: an embedding of the last K (params, score) pairs, per-axis quantile positions of already-tried values, or the (params, score) of the current best.
+- **Action**: a parameter edit. Discrete head for axis choice, continuous head for the new value (or a discrete head over a quantized range).
+- **Reward**: `ensemble_score` from `harness.py`, possibly shaped by the delta against the current best to give the policy a denser signal than raw score.
+- **Environment**: a thin wrapper around the same walk-forward causal backtest. The scoring contract stays fixed -- single scalar, hard-rejection gate, untouchable harness. Only the search policy changes.
+
+Three test cases worth running:
+
+1. **Joint-space search.** A one-at-a-time sweep cannot find a configuration where, say, bull and bear specialists need *jointly* different $R^2$ threshold settings to reach a high score. An RL agent acting in the joint space can. How much score lift this unlocks is the headline number to chase.
+2. **Does "deletion wins" survive?** The earlier autoresearch loops found that the largest gains came from deleting active components, not adding new ones. Was that a real architectural finding, or an artifact of the hand-coded one-at-a-time methodology that biases towards small local moves? Joint-space search is the way to find out.
+3. **Sample efficiency.** Each backtest is the dominant cost (~5 minutes per config in Loop 3). A naive RL setup needs thousands of episodes; the budget for this problem is more like hundreds. The practical hurdle is reward shaping plus a cheap surrogate (Bayesian or learned) so the policy can plan when to spend an expensive real evaluation vs. a cheap predicted one.
 
 A second, parallel direction is to relax the long-only constraint via dYdX perpetual futures.
 The bear specialist currently sits in cash when no token has a positive trend; with perps it could short the tokens it currently filters out.
 The same $R^2 \cdot (a_1 - 1)$ momentum signal becomes a short-entry signal when negated, and the inverse-volatility weighting carries over directly.
+
 The open questions are funding-rate cost vs. the current 30 bps fee budget, sizing under leverage, and whether the Calmar hard-rejection gate still makes sense once shorting is allowed.
 
-The autoresearch contract -- single scalar score, fixed harness, modifiable interior, program.md spec -- carries over to both directions unchanged.
+A third direction is the regime detector itself.
+The current HMM uses Gaussian emissions, which is a known poor fit for crypto returns -- the empirical distributions are fat-tailed and asymmetric, with the kind of tail events the loop's hard-rejection gate exists to defend against.
+A single 30%-down day can fool a Gaussian-emission HMM into a regime call that doesn't reflect the underlying dynamics.
+
+Finding #1 -- soft blending dominating hard switching -- is consistent with this: the HMM's regime calls aren't confident not because the regimes don't exist, but because the emission model is too simple to assign them confidently.
+
+Replacements worth trying, ranked by implementation cost:
+
+- **Student's $t$ emissions.** Minimal change to the existing HMM, just heavier tails. Cheap to implement, immediate test of whether soft-blend dominance survives a fatter-tailed emission model.
+- **Hidden semi-Markov models** with explicit state-duration distributions, capturing the empirical fact that regimes don't switch every day.
+- **Mixture-of-Gaussians or GARCH-style emissions** to model volatility clustering inside a regime rather than across them.
+- **Neural sequence models** (LSTM / Transformer) that learn regime structure end-to-end without the Markov assumption -- higher capacity, harder to interpret, and the most aggressive departure from the current contract surface.
+
+Any of these slots into the regime-detector hole in the contract surface; the autoresearch loop runs unchanged on the new detector and re-evaluates whether the same parameter winners hold.
+
+The autoresearch contract -- single scalar score, fixed harness, modifiable interior, program.md spec -- carries over to all three directions unchanged.
 That's the part of the methodology worth keeping.
