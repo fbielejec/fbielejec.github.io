@@ -11,21 +11,20 @@ description: "Applying the Karpathy-style autoresearch loop to an HMM + per-regi
 # <a name="intro"/> Introduction
 
 In the [previous post]({{ site.baseurl }}{% post_url 2026-04-24-gem-bear-market-models %}) I compared exponential vs. linear regression GEM models on a hand-curated 4-token bear portfolio.
-The headline finding from that post: the choice of regression model was almost irrelevant; the **fitting window** was the dominant knob.
+The main finding from that experiment: the choice of regression model was almost irrelevant; the **fitting window** dominated the returns.
 
 That experiment had two limitations:
 - The universe was tiny -- four hand-picked safe-haven tokens.
 - The manual parameter sweep -- I picked window sizes, ran the sweep code, verified the results, iterated again.
-<!-- That's fine for a blog post but not how you actually search a multi-dimensional parameter space. -->
 
 This post is about replacing the human-in-the-loop with an LLM agent following a written experimental research recipe.
-The agentiterates on: picks a hypotheses, edits the allowed part of the codebase, run the experiment, score the results, keep or revert.
+The agent iterates on: pick a hypotheses, edit the allowed parts of the codebase, run the experiment, score the results, keep or revert. Repeat.
 Human goes to sleep and wakes up to read the overnight results.
 
 ---
 
 *TL;DR*
-On the full Binance + DefiLlama universe (437 tokens, 5 years), an LLM-driven autoresearch loop ran 215 configurations across 18 hours, lifted the ensemble score from `-inf` (every config failing under realistic fees) to **1175.2**, and beat a BTC+ETH buy-and-hold baseline by **142×**.
+On the full Binance + DefiLlama universe (437 tokens, 5 years), an LLM-driven autoresearch loop ran 215 configurations across 18 hours, lifted the ensemble score from `-inf` (every config failing under realistic fees) to **1175.2**, and beat a BTC+ETH buy-and-hold baseline by a factor of **142**.
 
 ---
 
@@ -33,98 +32,41 @@ Three structural findings emerged: two were genuinely new, one was a confirmatio
 
 The one-at-a-time phased sweep cannot discover cross-block parameter interactions, which is the next problem worth solving.
 
-The scaled-down Python version at [trader-research](https://github.com/fbielejec/trader-research) shows the **methodology** -- the contract surface, the modifiable interior, the program.md spec the agent operates under -- on a 4-token, bear-specialist-only, 2022-only subset.
-It is not a full reproduction of the headline numbers.
-It is the smallest runnable artifact that exhibits the same scoring shape and the same loop structure -- something you can clone and run on a laptop in minutes.
+The scaled-down Python version at [trader-research](https://github.com/fbielejec/trader-research) shows the methodology used -- the contract surface, the modifiable interior, the program.md spec the agent operates under -- on a 4-token, bear-specialist-only, 2022-only subset.
+It is a small runnable example with the same scoring and loop structure -- perfect to clone and run on a laptop in minutes.
 
 # <a name="autoresearch"/> The Autoresearch Loop
 
-The pattern is borrowed from Andrej Karpathy's [nanochat](https://github.com/karpathy/nanochat) repo and its companion [autoresearch](https://github.com/karpathy/autoresearch) experiment.
-The structure is two-file:
+The pattern is borrowed from Andrej Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) experiment.
+The structure is a two-file one:
 
-- A **read-only file** (`prepare.py` in nanochat, `harness.py` in our repo) -- data loader, evaluation metric, and any constants the agent is not allowed to game.
-- A **modifiable file** (`train.py` in nanochat, `sweep.py` in our repo) -- the actual model and training loop, free to be rewritten any way the agent wants.
+- A **read-only file** `harness.py` -- data loader, evaluation metric, and any constants the agent is not allowed to touch.
+- A **modifiable** `sweep.py` file -- the actual model and the training loop, fair-game for the agent to rewrite.
 
-A `program.md` contract tells the agent which file is which, what the score function is, and what the loop should do at each iteration.
-Then you start the agent and walk away.
+A `program.md` tells the agent what is the metric (the scoring function computed from the backtest output) to iterate and improve on, which files it can touch and which are off-limits.
+Human starts the agent and walks away.
 
-For a trading strategy the analog is direct:
-- The "model" is a parameterized portfolio-construction pipeline.
-- The "training loop" is a causal walk-forward backtest.
-- The "metric" is a single scalar score computed from the backtest output.
+# <a name="score"/> Keeping The Loop Honest
 
-# <a name="contract"/> The Contract Surface
+The experiments metric is a single scalar:
 
-The role boundary is what keeps the loop honest.
-If the agent can edit the metric, it can drive the score arbitrarily high without producing a better strategy.
+$$\text{score} = \text{annualized_return} \cdot \text{drawdown_dampener} \cdot \text{diversification_bonus}$$
 
-**Untouchable:**
-- The data loader and the causal walk-forward split. No peeking past day `t-1` when deciding for day `t`.
-- The backtest skeleton -- the day-by-day loop, portfolio bookkeeping, fee accounting.
-- The scoring function. Single scalar, untouchable.
-- External constants: the 30 bps round-trip fee (10 bps exchange + 20 bps slippage), the 1.5× stress multiplier, the starting capital. These are market facts, not strategy parameters.
+where:
 
-**Modifiable:**
-- The strategy parameter struct (`GemParams` and friends) and its defaults.
-- The model body -- the `fit` function, the portfolio-construction function, the regression primitives.
-- The sweep driver itself. The agent can rewrite the search strategy if it wants.
+- $$\text{drawdown_dampener} = \frac{1}{(1 + \max(0, \text{dd} - 0.15))^{2}}$$ (15% drawdown free zone, then quadratic decay)
 
-In the scaled-down Python version this split is `harness.py` (untouchable) vs. `sweep.py` (fair game), with `program.md` describing the loop the agent runs:
+and
 
-```mermaid
-flowchart TD
-    csv[("data/bear_portfolio_candles.csv")]
-    load["harness.load_candles"]
-    eval["harness.evaluate(params, candles, fit_fn, portfolio_fn)"]
-    fit["sweep.fit_token_exponential"]
-    port["sweep.build_portfolio"]
-    bt["harness.gem_backtest<br/>(base + 1.5x fee stress)"]
-    metrics["base + stress metrics"]
-    score["harness.ensemble_score"]
-    sweep["sweep_one_parameter"]
-    tsv[("results/bear_sweep_results.tsv")]
+$$\text{diversification_bonus} = 1 + 0.1 \cdot (1 - \text{HHI})$$ (up to +10% bonus for a non-concentrated portfolio, where HHI is the Herfindahl-Hirschman index of position weights).
 
-    csv --> load
-    load -->|candles_by_token| eval
-    fit -. injected as fit_fn .-> eval
-    port -. injected as portfolio_fn .-> eval
-    eval --> bt
-    bt --> metrics
-    metrics --> score
-    score -->|scalar| sweep
-    sweep -->|append row| tsv
-```
+The terms are multiplied, which puts them in tension against each other and doesn't allow the agent to game the metric.
 
-The harness calls back into the modifiable side via injected `fit_fn` and `portfolio_fn` callables.
-That way the backtest skeleton stays fixed while the model body stays free.
-
-# <a name="score"/> The Score
-
-The agent's only currency is a single scalar:
-
-$$\text{score} = \text{annualized\_return} \cdot \text{drawdown\_dampener} \cdot \text{diversification\_bonus}$$
-
-where
-
-$$\text{drawdown\_dampener} = \frac{1}{(1 + \max(0, \text{dd} - 0.15))^{2}}$$
-
-(15% drawdown free zone, then quadratic decay), and
-
-$$\text{diversification\_bonus} = 1 + 0.1 \cdot (1 - \text{HHI})$$
-
-(up to +10% bonus for a non-concentrated portfolio, where HHI is the Herfindahl-Hirschman index of position weights).
-
-**The shape of the formula matters as much as the values it spits out.**
-Each term is multiplicative, which puts them in tension against each other.
-
-If you had only the drawdown dampener, the agent's optimal strategy is to sit in cash forever -- zero drawdown, zero return, zero score.
-If you had only the return term, the agent can chase any tail-risk strategy that produces a high headline number and accept any drawdown to do it.
+If you had only the drawdown dampener, the optimal strategy is to sit in cash forever -- zero drawdown.
+If you had only the returns term, the agent can chase any tail-risk strategy that produces a high headline number and accept any drawdown it comes with.
 If you had only the diversification bonus, equal-weight buy-and-hold trivially wins.
 
-Multiplying the three forces the agent to earn return *and* keep drawdown bounded *and* maintain diversification -- drop any one and the score collapses.
-This is the design principle: a single scalar metric is dangerous unless its internal terms genuinely fight each other.
-
-Hard rejection (`-inf`) on either of:
+One more loop rule is a hard rejection (`-inf`) on either one of:
 
 - Annualized return below -50%.
 - Stress-test Calmar ratio (1.5× fees) is negative.
@@ -134,7 +76,7 @@ Both conditions have to hold: positive expected return at the base 30 bps round-
 
 # <a name="phases"/> Phased Sweeping
 
-The full ensemble has three GEM specialists (bull / bear / ranging) gated by a 3-state HMM regime detector, plus a meta-allocator that blends specialist portfolios when the HMM is uncertain.
+The full ensemble has three GEM specialists (bull / bear / ranging) gated by a 3-state HMM regime detector, plus a meta-allocator model that blends specialist portfolios when the HMM outcome is uncertain (< 90%).
 That is roughly 15 sweepable parameters.
 
 A grid over all 15 is combinatorially hopeless.
@@ -142,20 +84,13 @@ The autoresearch loop instead sweeps in phases:
 
 1. **Phase 1 -- HMM hyperparameters** (refit interval, hard-switch threshold, min observations). Specialists held at defaults.
 2. **Phase 2 -- per-specialist GemParams** (`top_n`, $R^2$ threshold, rebalance cooldown). One specialist at a time, the other two at the Phase 1 winner.
-3. **Verification -- combined grid** with the new defaults locked in, varying one specialist at a time off the new baseline to spot interactions.
-
-This is structurally limited.
-A one-at-a-time sweep cannot find a configuration where bull and bear specialists need *jointly* different `r2_threshold` settings to reach a high score.
-Acknowledging that limitation is half the motivation for the next-step ideas at the end.
+3. **Verification -- combined grid** with the new defaults locked in, varying one specialist at a time off the new baseline to try and spot interactions.
 
 # <a name="loop3"/> Loop 3: 437 Tokens, 18 Hours, 215 Configs
 
-This is the run that matters.
-Branch `master`, two-day session, 215 configurations evaluated end-to-end.
-
 **Universe:** 431 Binance OHLC tokens (2020-01-01 through 2026-04-18) plus 6 DefiLlama price feeds for tokens not on Binance (AERO, DRIFT, FLUID, GRAIL, HYPE, MNDE) -- 437 tokens total, ~508K daily candles.
 
-**Evaluation window:** 2021-01-01 to 2025-12-31 with a 250-day warmup buffer. Causal walk-forward.
+**Evaluation window:** 2021-01-01 to 2025-12-31 with a 250-day warmup buffer. Causal walk-forward (No peeking past day `t-1` when deciding for day `t`).
 
 **Baseline:** the existing ensemble defaults under the old fee regime, score `-inf` (every config rejected).
 
@@ -189,9 +124,9 @@ The threshold finding is the interesting one.
 At `hard_switch_threshold=0.90` the ensemble almost never hard-switches to a single regime; instead it soft-blends the three specialist portfolios most of the time.
 That scored 305.7 vs 244.8 at the previous default of 0.80 -- a 25% lift from doing **less** of what the architecture was designed to do.
 
-The HMM's regime classification is informative but not confident enough for binary regime calls.
+The HMM's regime classification is informative but not confident enough for a binary regime decision.
 Soft blending hedges against misclassification.
-That's a real architectural finding, not a parameter tweak.
+<!-- That's a real architectural finding, not a parameter tweak. -->
 
 ## Phase 2: per-specialist GemParams
 
@@ -199,60 +134,63 @@ Three sweeps, 36 configs each, for `top_n × r2_threshold × rebalance_cooldown`
 
 **Bull (best 5 of 36):**
 
-| Config | Score | Return |
-|---|---|---|
-| `top_n=15 r2=0.2 cd=5` | **156.9** | 229.8% |
-| `top_n=10 r2=0.2 cd=5` | 133.8 | 183.9% |
-| `top_n=25 r2=0.2 cd=3` | 126.9 | 161.2% |
-| `top_n=25 r2=0.2 cd=5` | 124.9 | 170.9% |
-| `top_n=20 r2=0.2 cd=5` | 123.0 | 175.1% |
+| Config | Score |
+|---|---|
+| `top_n=15 r2=0.2 cd=5` | **156.9** |
+| `top_n=10 r2=0.2 cd=5` | 133.8 |
+| `top_n=25 r2=0.2 cd=3` | 126.9 |
+| `top_n=25 r2=0.2 cd=5` | 124.9 |
+| `top_n=20 r2=0.2 cd=5` | 123.0 |
 
 **Bear (best 5 of 36):**
 
-| Config | Score | Return |
-|---|---|---|
-| `top_n=1 r2=0.5 cd=10` | **440.6** | 687.1% |
-| `top_n=3 r2=0.5 cd=10` | 420.5 | 653.9% |
-| `top_n=5 r2=0.5 cd=10` | 419.8 | 652.6% |
-| `top_n=8 r2=0.5 cd=10` | 416.7 | 647.6% |
-| `top_n=3 r2=0.5 cd=14` | 269.7 | 418.7% |
+| Config | Score |
+|---|---|
+| `top_n=1 r2=0.5 cd=10` | **440.6** |
+| `top_n=3 r2=0.5 cd=10` | 420.5 |
+| `top_n=5 r2=0.5 cd=10` | 419.8 |
+| `top_n=8 r2=0.5 cd=10` | 416.7 |
+| `top_n=3 r2=0.5 cd=14` | 269.7 |
 
 **Ranging (best 5 of 36):**
 
-| Config | Score | Return |
-|---|---|---|
-| `top_n=8 r2=0.3 cd=5` | **1174.5** | 1828.8% |
-| `top_n=12 r2=0.3 cd=5` | 1023.6 | 1592.9% |
-| `top_n=15 r2=0.3 cd=5` | 990.0 | 1540.5% |
-| `top_n=12 r2=0.5 cd=5` | 631.2 | 984.3% |
-| `top_n=15 r2=0.5 cd=5` | 625.3 | 974.9% |
+| Config | Score |
+|---|---|
+| `top_n=8 r2=0.3 cd=5` | **1174.5** |
+| `top_n=12 r2=0.3 cd=5` | 1023.6 |
+| `top_n=15 r2=0.3 cd=5` | 990.0 |
+| `top_n=12 r2=0.5 cd=5` | 631.2 |
+| `top_n=15 r2=0.5 cd=5` | 625.3 |
 
 ## Verification: the combined defaults
 
-With each specialist's winners locked in, the verification grid hit **score 1175.2** on the combined defaults (1829.9% annualized return, HHI 0.319).
-The buy-and-hold BTC+ETH baseline scored 8.3 (12.9% return).
+With each specialist's winners locked in, the verification grid hit **score 1175.2** on the combined defaults.
+<!-- (1829.9% annualized return, HHI 0.319). -->
+The buy-and-hold BTC+ETH baseline scored 8.3.
+<!-- (12.9% return). -->
 
-That is a 142× improvement over buy-and-hold by score, almost entirely from realized return.
+That is a 142× improvement over the buy-and-hold.
+<!-- by score, almost entirely from the realized returns. -->
 
-## Since Loop 3
+<!-- ## Since Loop 3 -->
 
-The Loop 3 numbers above are a historical snapshot.
-Subsequent work -- including the risk-off gates that Loop 3's shutdown report recommended as a Loop 4 priority -- has shifted the strategy to a different point on the risk-return frontier:
+<!-- The Loop 3 numbers above are a historical snapshot. -->
+<!-- Subsequent work -- including the risk-off gates that Loop 3's shutdown report recommended as a Loop 4 priority -- has shifted the strategy to a different point on the risk-return frontier: -->
 
-| Metric | Loop 3 | Current baseline |
-|---|---|---|
-| Annualized return | 1830% | **314%** |
-| Calmar ratio | 19.0 | 4.07 |
-| Sharpe / Sortino | --- | 0.98 / 3.92 |
-| Avg HHI | 0.319 | 0.253 |
-| Tokens selected (of fitted) | --- | 21 of 419 |
-| Rebalances | --- | 1,386 |
-| Bluechip benchmark annualized | 12.9% | 6.33% |
+<!-- | Metric | Loop 3 | Current baseline | -->
+<!-- |---|---|---| -->
+<!-- | Annualized return | 1830% | **314%** | -->
+<!-- | Calmar ratio | 19.0 | 4.07 | -->
+<!-- | Sharpe / Sortino | --- | 0.98 / 3.92 | -->
+<!-- | Avg HHI | 0.319 | 0.253 | -->
+<!-- | Tokens selected (of fitted) | --- | 21 of 419 | -->
+<!-- | Rebalances | --- | 1,386 | -->
+<!-- | Bluechip benchmark annualized | 12.9% | 6.33% | -->
 
-Lower headline return, better diversification.
-Calmar dropped because risk-off gates trade away tail-end upside for survivability.
+<!-- Lower headline return, better diversification. -->
+<!-- Calmar dropped because risk-off gates trade away tail-end upside for survivability. -->
 
-The findings below are still about Loop 3 specifically -- the loop ran, the loop produced these conclusions -- but the limitations section uses the current baseline as the foil.
+<!-- The findings below are still about Loop 3 specifically -- the loop ran, the loop produced these conclusions -- but the limitations section uses the current baseline as the foil. -->
 
 # <a name="findings"/> What the Loop Found
 
@@ -277,49 +215,47 @@ This isn't a new discovery, but it's a non-trivial confirmation -- the loop arri
 The first finding -- soft-blend dominance -- is the kind of result that's worth more than any specific parameter value.
 It tells you the ensemble's architecture is over-relying on a part of the system (binary regime calls) that the data doesn't support.
 
-# <a name="reproduce"/> The Public Reproduction
+<!-- # <a name="reproduce"/> The Public Reproduction -->
 
-The full Loop 3 run was executed against a Rust implementation of the trading stack over a much larger token universe -- not something you can clone and run on a laptop without the Rust codebase and ~18 hours of compute.
-The artifact at [trader-research](https://github.com/fbielejec/trader-research) is the scaled-down Python version of the same idea, intentionally narrower:
+<!-- The full Loop 3 run was executed against a Rust implementation of the trading stack over a much larger token universe -- not something you can clone and run on a laptop without the Rust codebase and ~18 hours of compute. -->
+<!-- The artifact at [trader-research](https://github.com/fbielejec/trader-research) is the scaled-down Python version of the same idea, intentionally narrower: -->
 
-| Dimension | Loop 3 (Rust, full universe) | trader-research (Python, scaled-down) |
-|---|---|---|
-| Universe | 437 tokens (Binance + DefiLlama) | 4 safe-haven tokens (PAXG, EUR, USDC, TUSD) |
-| Window | 2021-01-01 to 2025-12-31 | May 1 to Dec 31, 2022 |
-| Specialists | bull + bear + ranging + HMM + meta-allocator | bear specialist only |
-| Driver | LLM-driven over 18 hours | LLM-driven over a single sweep |
+<!-- | Dimension | Loop 3 (Rust, full universe) | trader-research (Python, scaled-down) | -->
+<!-- |---|---|---| -->
+<!-- | Universe | 437 tokens (Binance + DefiLlama) | 4 safe-haven tokens (PAXG, EUR, USDC, TUSD) | -->
+<!-- | Window | 2021-01-01 to 2025-12-31 | May 1 to Dec 31, 2022 | -->
+<!-- | Specialists | bull + bear + ranging + HMM + meta-allocator | bear specialist only | -->
+<!-- | Driver | LLM-driven over 18 hours | LLM-driven over a single sweep | -->
 
-This is the same scoring shape, the same file split, the same `program.md` contract.
-What's not reproduced is the headline number -- 4 tokens over 8 months in a single regime cannot scale to 437 tokens over 5 years across multiple regimes, and shouldn't pretend to.
+<!-- This is the same scoring shape, the same file split, the same `program.md` contract. -->
+<!-- What's not reproduced is the headline number -- 4 tokens over 8 months in a single regime cannot scale to 437 tokens over 5 years across multiple regimes, and shouldn't pretend to. -->
 
-What **is** reproduced:
+<!-- What **is** reproduced: -->
 
-- The contract surface (`harness.py`).
-- The modifiable interior (`sweep.py`).
-- The single-scalar score with the same hard-rejection gate.
-- The `program.md` the agent follows.
+<!-- - The contract surface (`harness.py`). -->
+<!-- - The modifiable interior (`sweep.py`). -->
+<!-- - The single-scalar score with the same hard-rejection gate. -->
+<!-- - The `program.md` the agent follows. -->
 
-You can clone it, install three Python packages, and watch the autoresearch agent do exactly one parameter sweep against the bear portfolio.
-The score will frequently come back as `-inf` because the 4-token bear basket is genuinely a hostile universe under realistic fees -- which is itself a faithful reproduction of the kind of failure mode the full loop has to navigate.
+<!-- You can clone it, install three Python packages, and watch the autoresearch agent do exactly one parameter sweep against the bear portfolio. -->
+<!-- The score will frequently come back as `-inf` because the 4-token bear basket is genuinely a hostile universe under realistic fees -- which is itself a faithful reproduction of the kind of failure mode the full loop has to navigate. -->
 
-# <a name="limits"/> Limitations
+# <a name="limits"/> Limitation
 
-A few things the run does **not** prove:
-
-- **One-at-a-time phased sweeping cannot find cross-block interactions.** If bull and bear specialists need *jointly* different parameters to reach a high score, this loop will not find that configuration.
-- **Survivorship bias.** The 437-token universe is what's listed *now*, not what was tradeable in 2021. Both Loop 3's headline 1830% and the current baseline's 314% annualized return likely reflect a meaningful chunk of survivorship -- the loop has no way to detect or correct for it.
-- **One regime cycle.** The 2021-2025 window covers exactly one bull-bear-recovery cycle. A different cycle could rank these configs differently.
+This optimization approach has one strong limitation: **One-at-a-time phased sweeping cannot find between-parameter interactions.**.
+For example: If the bull and bear specialists models need *jointly* different parameter values in order to reach a high score, this loop will not find that configuration.
+This is a structural limitation, one that drives the motivation for the [next-phase ideas]({{ site.baseurl }}{% post_url 2026-05-07-autoresearch-gem-strategy %}#next).
 
 # <a name="next"/> Next Steps
 
-The phased-sweep limitation is the most interesting one to attack.
-The current loop is a hand-coded one-parameter-at-a-time scan.
-The search heuristics -- "sweep `top_n` first, then $R^2$ threshold, then sweep again with the new defaults locked in" -- live in `program.md` as English instructions to the agent.
+## Lifting the phased-sweep limitation
 
-That's a clever workaround for the high-dimensional parameter space, but the heuristics themselves are guesses.
-A different ordering, a different grid resolution, a different fallback when a sweep stalls -- any of these could move the headline number meaningfully, and a hand-driven `program.md` has no way to discover that.
+The current loop is a one-parameter-at-a-time scan.
+The search heuristics -- "sweep `top_n` first, then $R^2$ threshold, then sweep again with the new defaults locked in" -- lives in `program.md` as natural language instructions for the agent.
 
-A natural successor is to replace the loop with a **reinforcement-learning search policy** that learns those heuristics from the score signal directly.
+That's a workaround for the high-dimensional parameter space, yet a different ordering, a different grid resolution, a different fallback when a sweep stalls -- any of these could move the metric meaningfully, and currently there is no no way to discover that.
+
+A natural successor is to replace the loop with a **reinforcement-learning search policy** that learns from the score signal directly.
 A trained policy could reproduce useful patterns like "after finding a good $R^2$ threshold, explore `top_n`", but it could also discover patterns no human had thought to write down.
 
 Sketch of the setup:
@@ -332,17 +268,12 @@ Sketch of the setup:
 Three test cases worth running:
 
 1. **Joint-space search.** A one-at-a-time sweep cannot find a configuration where, say, bull and bear specialists need *jointly* different $R^2$ threshold settings to reach a high score. An RL agent acting in the joint space can. How much score lift this unlocks is the headline number to chase.
-2. **Does "deletion wins" survive?** The earlier autoresearch loops found that the largest gains came from deleting active components, not adding new ones. Was that a real architectural finding, or an artifact of the hand-coded one-at-a-time methodology that biases towards small local moves? Joint-space search is the way to find out.
-3. **Sample efficiency.** Each backtest is the dominant cost (~5 minutes per config in Loop 3). A naive RL setup needs thousands of episodes; the budget for this problem is more like hundreds. The practical hurdle is reward shaping plus a cheap surrogate (Bayesian or learned) so the policy can plan when to spend an expensive real evaluation vs. a cheap predicted one.
+2. **Does "deletion wins" survive?** The earlier autoresearch loops found that the largest gains came from deleting active components, not adding new ones. Was that a real architectural finding, or an artifact of the hand-coded one-at-a-time methodology that biases towards small local moves?
+3. **Sample efficiency.** Each backtest is the dominant cost (~5 minutes per config in Loop 3). A naive RL setup needs thousands of episodes; the budget for this problem is more like hundreds. The practical hurdle is reward shaping plus a cheap surrogate (Bayesian or learned), such that the policy can plan when to spend an expensive real evaluation vs. a cheap predicted one.
 
-A second, parallel direction is to relax the long-only constraint via perpetual futures.
-The bear specialist currently sits in cash when no token has a positive trend; with perps it could short the tokens it currently filters out.
-The same $R^2 \cdot (a_1 - 1)$ momentum signal becomes a short-entry signal when negated, and the inverse-volatility weighting carries over directly.
+## Improving the regime detector
 
-The open questions are funding-rate cost vs. the current 30 bps fee budget, sizing under leverage, and whether the Calmar hard-rejection gate still makes sense once shorting is allowed.
-
-A third direction is the regime detector itself.
-The current HMM uses Gaussian emissions, which is a known poor fit for crypto returns -- the empirical distributions are fat-tailed and asymmetric, with the kind of tail events the loop's hard-rejection gate exists to defend against.
+The current HMM uses Gaussian emissions, which is a known poor fit for stocks (or crypto) data  -- the empirical distributions are fat-tailed and asymmetric, with the kind of tail events the loop's hard-rejection gate exists to defend against.
 A single 30%-down day can fool a Gaussian-emission HMM into a regime call that doesn't reflect the underlying dynamics.
 
 Finding #1 -- soft blending dominating hard switching -- is consistent with this: the HMM's regime calls aren't confident not because the regimes don't exist, but because the emission model is too simple to assign them confidently.
@@ -354,7 +285,14 @@ Replacements worth trying, ranked by implementation cost:
 - **Mixture-of-Gaussians or GARCH-style emissions** to model volatility clustering inside a regime rather than across them.
 - **Neural sequence models** (LSTM / Transformer) that learn regime structure end-to-end without the Markov assumption -- higher capacity, harder to interpret, and the most aggressive departure from the current contract surface.
 
-Any of these slots into the regime-detector hole in the contract surface; the autoresearch loop runs unchanged on the new detector and re-evaluates whether the same parameter winners hold.
+## More aggresive bear specialist model
 
-The autoresearch contract -- single scalar score, fixed harness, modifiable interior, program.md spec -- carries over to all three directions unchanged.
-That's the part of the methodology worth keeping.
+The bear specialist currently sits in cash when no token has a positive trend.
+With the use of perpetual funds (such as offered by [Kraken]() or [dy/dx]())
+the defensive (long safe-haven) startegy could flip int an offensive one (short weak-momentum tokens).
+
+The same $R^2 \cdot (a_1 - 1)$ momentum signal becomes a short-entry signal when negated, and the inverse-volatility weighting carries over directly.
+
+Currently `top_n=1` picks PAXG; with futures the specialist can profit from crashes instead of just hiding.
+
+The open questions are funding-rate cost vs. the current 30 bps fee budget, sizing under leverage, and whether the Calmar hard-rejection gate still makes sense once shorting is allowed.
