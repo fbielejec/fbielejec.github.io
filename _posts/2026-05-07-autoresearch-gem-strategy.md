@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Karpathy-style autoresearch loop on a GEM stack"
+title: "Scoring under tension: Karpathy-style autoresearch loop on a GEM stack"
 author: Filip Bielejec
 comments: true
 featured: true
@@ -194,40 +194,40 @@ Three sweeps, 36 configs each, for `top_n × r2_threshold × rebalance_cooldown`
 
 **Bull (best 5 of 36):**
 
-| Config | Score | Return | Drawdown |
-|---|---|---|---|
-| `top_n=15 r2=0.2 cd=5` | **156.9** | 229.8% | -90.2% |
-| `top_n=10 r2=0.2 cd=5` | 133.8 | 183.9% | -83.4% |
-| `top_n=25 r2=0.2 cd=3` | 126.9 | 161.2% | -74.9% |
-| `top_n=25 r2=0.2 cd=5` | 124.9 | 170.9% | -83.0% |
-| `top_n=20 r2=0.2 cd=5` | 123.0 | 175.1% | -87.2% |
+| Config | Score | Return |
+|---|---|---|
+| `top_n=15 r2=0.2 cd=5` | **156.9** | 229.8% |
+| `top_n=10 r2=0.2 cd=5` | 133.8 | 183.9% |
+| `top_n=25 r2=0.2 cd=3` | 126.9 | 161.2% |
+| `top_n=25 r2=0.2 cd=5` | 124.9 | 170.9% |
+| `top_n=20 r2=0.2 cd=5` | 123.0 | 175.1% |
 
 **Bear (best 5 of 36):**
 
-| Config | Score | Return | Drawdown |
-|---|---|---|---|
-| `top_n=1 r2=0.5 cd=10` | **440.6** | 687.1% | -96.4% |
-| `top_n=3 r2=0.5 cd=10` | 420.5 | 653.9% | -96.4% |
-| `top_n=5 r2=0.5 cd=10` | 419.8 | 652.6% | -96.4% |
-| `top_n=8 r2=0.5 cd=10` | 416.7 | 647.6% | -96.4% |
-| `top_n=3 r2=0.5 cd=14` | 269.7 | 418.7% | -96.4% |
+| Config | Score | Return |
+|---|---|---|
+| `top_n=1 r2=0.5 cd=10` | **440.6** | 687.1% |
+| `top_n=3 r2=0.5 cd=10` | 420.5 | 653.9% |
+| `top_n=5 r2=0.5 cd=10` | 419.8 | 652.6% |
+| `top_n=8 r2=0.5 cd=10` | 416.7 | 647.6% |
+| `top_n=3 r2=0.5 cd=14` | 269.7 | 418.7% |
 
 **Ranging (best 5 of 36):**
 
-| Config | Score | Return | Drawdown |
-|---|---|---|---|
-| `top_n=8 r2=0.3 cd=5` | **1174.5** | 1828.8% | -96.4% |
-| `top_n=12 r2=0.3 cd=5` | 1023.6 | 1592.9% | -96.4% |
-| `top_n=15 r2=0.3 cd=5` | 990.0 | 1540.5% | -96.4% |
-| `top_n=12 r2=0.5 cd=5` | 631.2 | 984.3% | -96.4% |
-| `top_n=15 r2=0.5 cd=5` | 625.3 | 974.9% | -96.4% |
+| Config | Score | Return |
+|---|---|---|
+| `top_n=8 r2=0.3 cd=5` | **1174.5** | 1828.8% |
+| `top_n=12 r2=0.3 cd=5` | 1023.6 | 1592.9% |
+| `top_n=15 r2=0.3 cd=5` | 990.0 | 1540.5% |
+| `top_n=12 r2=0.5 cd=5` | 631.2 | 984.3% |
+| `top_n=15 r2=0.5 cd=5` | 625.3 | 974.9% |
 
 ## Verification: the combined defaults
 
-With each specialist's winners locked in, the verification grid hit **score 1175.2** on the combined defaults (1829.9% annualized return, -96.4% max drawdown, HHI 0.319).
+With each specialist's winners locked in, the verification grid hit **score 1175.2** on the combined defaults (1829.9% annualized return, HHI 0.319).
 The buy-and-hold BTC+ETH baseline scored 8.3 (12.9% return).
 
-That is a 142× improvement over buy-and-hold by score, almost entirely from realized return rather than from any drawdown improvement.
+That is a 142× improvement over buy-and-hold by score, almost entirely from realized return.
 
 ## Since Loop 3
 
@@ -237,7 +237,6 @@ Subsequent work -- including the risk-off gates that Loop 3's shutdown report re
 | Metric | Loop 3 | Current baseline |
 |---|---|---|
 | Annualized return | 1830% | **314%** |
-| Max drawdown | -96.4% | **-77.2%** |
 | Calmar ratio | 19.0 | 4.07 |
 | Sharpe / Sortino | --- | 0.98 / 3.92 |
 | Avg HHI | 0.319 | 0.253 |
@@ -245,7 +244,7 @@ Subsequent work -- including the risk-off gates that Loop 3's shutdown report re
 | Rebalances | --- | 1,386 |
 | Bluechip benchmark annualized | 12.9% | 6.33% |
 
-Lower headline return, much lower drawdown, better diversification.
+Lower headline return, better diversification.
 Calmar dropped because risk-off gates trade away tail-end upside for survivability.
 
 The findings below are still about Loop 3 specifically -- the loop ran, the loop produced these conclusions -- but the limitations section uses the current baseline as the foil.
@@ -302,7 +301,6 @@ The score will frequently come back as `-inf` because the 4-token bear basket is
 
 A few things the run does **not** prove:
 
-- **The 96% drawdown was a local ceiling, not a structural one.** Every Loop 3 config from Phase 2 onward showed max drawdown of -93% to -96%, and the Loop 3 shutdown report attributed this to the 2022 crash plus the absence of risk-off gates. Subsequent work brought the baseline drawdown down to **-77%** (annualized return 314%, Calmar 4.07). That's still not a deployable risk profile -- no real portfolio survives a 77% drawdown either -- but it's a substantial improvement, and a reminder that the ceilings a one-at-a-time phased sweep finds are usually *local* ceilings, not structural ones. The score remains a **research metric**, not a tradable risk profile.
 - **One-at-a-time phased sweeping cannot find cross-block interactions.** If bull and bear specialists need *jointly* different parameters to reach a high score, this loop will not find that configuration.
 - **Survivorship bias.** The 437-token universe is what's listed *now*, not what was tradeable in 2021. Both Loop 3's headline 1830% and the current baseline's 314% annualized return likely reflect a meaningful chunk of survivorship -- the loop has no way to detect or correct for it.
 - **One regime cycle.** The 2021-2025 window covers exactly one bull-bear-recovery cycle. A different cycle could rank these configs differently.
