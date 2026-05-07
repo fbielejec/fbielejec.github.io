@@ -80,8 +80,7 @@ The full Loop 3 run was executed against a Rust implementation over a much large
 The full ensemble has three GEM specialists (bull / bear / ranging) gated by a 3-state HMM regime detector, plus a meta-allocator model that blends specialist portfolios when the HMM outcome is uncertain (< 90%).
 That is roughly 15 sweepable parameters.
 
-A grid over all 15 is combinatorially hopeless.
-The autoresearch loop instead sweeps in phases:
+A grid over all 15 is combinatorially prohibitive, which is why the autoresearch loop instead sweeps in phases:
 
 1. **Phase 1 -- HMM hyperparameters** (refit interval, hard-switch threshold, min observations). Specialists held at defaults.
 2. **Phase 2 -- per-specialist GemParams** (`top_n`, $R^2$ threshold, rebalance cooldown). One specialist at a time, the other two at the Phase 1 winner.
