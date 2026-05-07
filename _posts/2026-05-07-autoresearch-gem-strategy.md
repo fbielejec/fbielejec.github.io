@@ -30,12 +30,6 @@ On the full Binance + DefiLlama universe (437 tokens, 5 years), an LLM-driven au
 
 Three structural findings emerged: two were genuinely new, one was a confirmation of an earlier 4-token result, but this time at scale.
 
-The one-at-a-time phased sweep cannot discover cross-block parameter interactions, which is the next problem worth solving.
-
-The scaled-down Python version at [trader-research](https://github.com/fbielejec/trader-research) shows the methodology used -- the contract surface, the modifiable interior, the program.md spec the agent operates under -- on a 4-token, bear-specialist-only, 2022-only subset.
-It is a small runnable example with the same scoring and loop structure -- perfect to clone and run on a laptop in minutes.
-The full Loop 3 run was executed against a Rust implementation over a much larger token universe -- not something you can clone and run on a laptop without the Rust codebase and ~18 hours of compute.
-
 # <a name="autoresearch"/> The Autoresearch Loop
 
 The pattern is borrowed from Andrej Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) experiment.
@@ -74,6 +68,12 @@ One more loop rule is a hard rejection (`-inf`) on either one of:
 
 The hard-rejection gate adds one more tension: a config can't game the dampener by accepting a moderate base-fee drawdown that collapses into a negative-Calmar disaster the moment slippage gets worse.
 Both conditions have to hold: positive expected return at the base 30 bps round-trip, *and* survive a fee-and-slippage shock.
+
+# <a name="repro"/> Reproducibility note
+
+The scaled-down Python version at [trader-research](https://github.com/fbielejec/trader-research) shows the methodology used -- the contract surface, the modifiable interior, the program.md spec the agent operates under -- on a 4-token, bear-specialist-only, 2022-only subset.
+It is a small runnable example with the same scoring and loop structure -- perfect to clone and run on a laptop in minutes.
+The full Loop 3 run was executed against a Rust implementation over a much larger token universe -- not something you can clone and run on a laptop without the Rust codebase and ~18 hours of compute.
 
 # <a name="phases"/> Phased Sweeping
 
