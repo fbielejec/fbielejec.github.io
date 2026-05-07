@@ -13,18 +13,23 @@ description: "Applying the Karpathy-style autoresearch loop to an HMM + per-regi
 In the [previous post]({{ site.baseurl }}{% post_url 2026-04-24-gem-bear-market-models %}) I compared exponential vs. linear regression GEM models on a hand-curated 4-token bear portfolio.
 The headline finding from that post: the choice of regression model was almost irrelevant; the **fitting window** was the dominant knob.
 
-That experiment had two limitations.
-First, the universe was tiny -- four safe-haven tokens picked by hand.
-Second, the parameter sweep was hand-driven: I picked window sizes, ran them, eyeballed the results, picked again.
+That experiment had two limitations:
+- The universe was tiny -- four hand-picked safe-haven tokens.
+- The manual parameter sweep -- I picked window sizes, ran the sweep code, verified the results, iterated again.
 <!-- That's fine for a blog post but not how you actually search a multi-dimensional parameter space. -->
 
-This post is about what happens when you replace the human-in-the-loop with an LLM agent following a written methodology contract.
-The agent picks hypotheses, edits the strategy code, runs the sweep, scores the result, keeps or reverts.
-Sleep, wake up, read the results.
+This post is about replacing the human-in-the-loop with an LLM agent following a written experimental research recipe.
+The agentiterates on: picks a hypotheses, edits the allowed part of the codebase, run the experiment, score the results, keep or revert.
+Human goes to sleep and wakes up to read the overnight results.
 
-*TL;DR* On the full Binance + DefiLlama universe (437 tokens, 5 years), an LLM-driven autoresearch loop ran 215 configurations across 18 hours, lifted the ensemble score from `-inf` (every config failing under realistic fees) to **1175.2**, and beat a BTC+ETH buy-and-hold baseline by **142×**.
+---
 
-Three structural findings emerged: two were genuinely new, one was a confirmation of an earlier 4-token result at scale.
+*TL;DR*
+On the full Binance + DefiLlama universe (437 tokens, 5 years), an LLM-driven autoresearch loop ran 215 configurations across 18 hours, lifted the ensemble score from `-inf` (every config failing under realistic fees) to **1175.2**, and beat a BTC+ETH buy-and-hold baseline by **142×**.
+
+---
+
+Three structural findings emerged: two were genuinely new, one was a confirmation of an earlier 4-token result, but this time at scale.
 
 The one-at-a-time phased sweep cannot discover cross-block parameter interactions, which is the next problem worth solving.
 
@@ -330,7 +335,7 @@ Three test cases worth running:
 2. **Does "deletion wins" survive?** The earlier autoresearch loops found that the largest gains came from deleting active components, not adding new ones. Was that a real architectural finding, or an artifact of the hand-coded one-at-a-time methodology that biases towards small local moves? Joint-space search is the way to find out.
 3. **Sample efficiency.** Each backtest is the dominant cost (~5 minutes per config in Loop 3). A naive RL setup needs thousands of episodes; the budget for this problem is more like hundreds. The practical hurdle is reward shaping plus a cheap surrogate (Bayesian or learned) so the policy can plan when to spend an expensive real evaluation vs. a cheap predicted one.
 
-A second, parallel direction is to relax the long-only constraint via dYdX perpetual futures.
+A second, parallel direction is to relax the long-only constraint via perpetual futures.
 The bear specialist currently sits in cash when no token has a positive trend; with perps it could short the tokens it currently filters out.
 The same $R^2 \cdot (a_1 - 1)$ momentum signal becomes a short-entry signal when negated, and the inverse-volatility weighting carries over directly.
 
