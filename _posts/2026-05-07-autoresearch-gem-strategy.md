@@ -34,6 +34,7 @@ The one-at-a-time phased sweep cannot discover cross-block parameter interaction
 
 The scaled-down Python version at [trader-research](https://github.com/fbielejec/trader-research) shows the methodology used -- the contract surface, the modifiable interior, the program.md spec the agent operates under -- on a 4-token, bear-specialist-only, 2022-only subset.
 It is a small runnable example with the same scoring and loop structure -- perfect to clone and run on a laptop in minutes.
+The full Loop 3 run was executed against a Rust implementation over a much larger token universe -- not something you can clone and run on a laptop without the Rust codebase and ~18 hours of compute.
 
 # <a name="autoresearch"/> The Autoresearch Loop
 
@@ -214,31 +215,6 @@ This isn't a new discovery, but it's a non-trivial confirmation -- the loop arri
 
 The first finding -- soft-blend dominance -- is the kind of result that's worth more than any specific parameter value.
 It tells you the ensemble's architecture is over-relying on a part of the system (binary regime calls) that the data doesn't support.
-
-<!-- # <a name="reproduce"/> The Public Reproduction -->
-
-<!-- The full Loop 3 run was executed against a Rust implementation of the trading stack over a much larger token universe -- not something you can clone and run on a laptop without the Rust codebase and ~18 hours of compute. -->
-<!-- The artifact at [trader-research](https://github.com/fbielejec/trader-research) is the scaled-down Python version of the same idea, intentionally narrower: -->
-
-<!-- | Dimension | Loop 3 (Rust, full universe) | trader-research (Python, scaled-down) | -->
-<!-- |---|---|---| -->
-<!-- | Universe | 437 tokens (Binance + DefiLlama) | 4 safe-haven tokens (PAXG, EUR, USDC, TUSD) | -->
-<!-- | Window | 2021-01-01 to 2025-12-31 | May 1 to Dec 31, 2022 | -->
-<!-- | Specialists | bull + bear + ranging + HMM + meta-allocator | bear specialist only | -->
-<!-- | Driver | LLM-driven over 18 hours | LLM-driven over a single sweep | -->
-
-<!-- This is the same scoring shape, the same file split, the same `program.md` contract. -->
-<!-- What's not reproduced is the headline number -- 4 tokens over 8 months in a single regime cannot scale to 437 tokens over 5 years across multiple regimes, and shouldn't pretend to. -->
-
-<!-- What **is** reproduced: -->
-
-<!-- - The contract surface (`harness.py`). -->
-<!-- - The modifiable interior (`sweep.py`). -->
-<!-- - The single-scalar score with the same hard-rejection gate. -->
-<!-- - The `program.md` the agent follows. -->
-
-<!-- You can clone it, install three Python packages, and watch the autoresearch agent do exactly one parameter sweep against the bear portfolio. -->
-<!-- The score will frequently come back as `-inf` because the 4-token bear basket is genuinely a hostile universe under realistic fees -- which is itself a faithful reproduction of the kind of failure mode the full loop has to navigate. -->
 
 # <a name="limits"/> Limitation
 
