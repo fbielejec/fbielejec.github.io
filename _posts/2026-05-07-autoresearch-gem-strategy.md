@@ -170,25 +170,6 @@ The buy-and-hold BTC+ETH baseline scored 8.3.
 That is a 142× improvement over the buy-and-hold.
 <!-- by score, almost entirely from the realized returns. -->
 
-<!-- ## Since Loop 3 -->
-
-<!-- The Loop 3 numbers above are a historical snapshot. -->
-<!-- Subsequent work -- including the risk-off gates that Loop 3's shutdown report recommended as a Loop 4 priority -- has shifted the strategy to a different point on the risk-return frontier: -->
-
-<!-- | Metric | Loop 3 | Current baseline | -->
-<!-- |---|---|---| -->
-<!-- | Annualized return | 1830% | **314%** | -->
-<!-- | Calmar ratio | 19.0 | 4.07 | -->
-<!-- | Sharpe / Sortino | --- | 0.98 / 3.92 | -->
-<!-- | Avg HHI | 0.319 | 0.253 | -->
-<!-- | Tokens selected (of fitted) | --- | 21 of 419 | -->
-<!-- | Rebalances | --- | 1,386 | -->
-<!-- | Bluechip benchmark annualized | 12.9% | 6.33% | -->
-
-<!-- Lower headline return, better diversification. -->
-<!-- Calmar dropped because risk-off gates trade away tail-end upside for survivability. -->
-
-<!-- The findings below are still about Loop 3 specifically -- the loop ran, the loop produced these conclusions -- but the limitations section uses the current baseline as the foil. -->
 
 # <a name="findings"/> What the Loop Found
 
@@ -228,21 +209,7 @@ The search heuristics -- "sweep `top_n` first, then $R^2$ threshold, then sweep 
 
 That's a workaround for the high-dimensional parameter space, yet a different ordering, a different grid resolution, a different fallback when a sweep stalls -- any of these could move the metric meaningfully, and currently there is no no way to discover that.
 
-A natural successor is to replace the loop with a **reinforcement-learning search policy** that learns from the score signal directly.
-A trained policy could reproduce useful patterns like "after finding a good $R^2$ threshold, explore `top_n`", but it could also discover patterns no human had thought to write down.
-
-Sketch of the setup:
-
-- **State**: the current `GemParams` tensor plus a fixed-size summary of past evaluations -- "where am I in the search space?" Some options: an embedding of the last K (params, score) pairs, per-axis quantile positions of already-tried values, or the (params, score) of the current best.
-- **Action**: a parameter edit. Discrete head for axis choice, continuous head for the new value (or a discrete head over a quantized range).
-- **Reward**: `ensemble_score` from `harness.py`, possibly shaped by the delta against the current best to give the policy a denser signal than raw score.
-- **Environment**: a thin wrapper around the same walk-forward causal backtest. The scoring contract stays fixed -- single scalar, hard-rejection gate, untouchable harness. Only the search policy changes.
-
-Three test cases worth running:
-
-1. **Joint-space search.** A one-at-a-time sweep cannot find a configuration where, say, bull and bear specialists need *jointly* different $R^2$ threshold settings to reach a high score. An RL agent acting in the joint space can. How much score lift this unlocks is the headline number to chase.
-2. **Does "deletion wins" survive?** The earlier autoresearch loops found that the largest gains came from deleting active components, not adding new ones. Was that a real architectural finding, or an artifact of the hand-coded one-at-a-time methodology that biases towards small local moves?
-3. **Sample efficiency.** Each backtest is the dominant cost (~5 minutes per config in Loop 3). A naive RL setup needs thousands of episodes; the budget for this problem is more like hundreds. The practical hurdle is reward shaping plus a cheap surrogate (Bayesian or learned), such that the policy can plan when to spend an expensive real evaluation vs. a cheap predicted one.
+A potential successor is to replace the loop with a **reinforcement-learning** approach, with a state.
 
 ## Improving the regime detector
 
