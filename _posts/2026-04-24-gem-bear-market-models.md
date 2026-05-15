@@ -184,7 +184,7 @@ Model kept patiently for six and a half months of in all cash, then entered into
   - The 30-day window picks up a clean uptrend -- R-squared just clears 0.50 -- and the model enters EURUSDT.
   - Over the next 6 weeks, the trend strengthens: R-squared climbs to 0.75, momentum rises, and the portfolio value grows to $10,525.
 - On December 19, PAXG briefly shows a stronger trend (R-squared 0.79) and the model rotates for one brief period before returning to EUR.
-- The strategy finishes at $10,575 -- a 5.75% return in a period where BTC fell 65% from ATH and the equal-weight buy-and-hold benchmark lost 0.65%.
+- The strategy finishes at $10,640 -- a 6.40% return in a period where BTC fell 65% from ATH and the equal-weight buy-and-hold benchmark lost 0.65%.
 
 It waits for a trend that passes strict quality filters, then concentrates its entire portfolio on that single opportunity.
 
