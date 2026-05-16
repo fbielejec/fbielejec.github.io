@@ -957,7 +957,7 @@ print_metrics(f"Naive equal-weight short ({len(TOKENS)} tokens)", naive)
 #+end_example
 
 * Plots
-** Equity curves: all 24 configs + baselines
+** Equity curves: all sweep configs + baselines
 
 #+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
 import matplotlib.pyplot as plt
@@ -979,11 +979,13 @@ bm = sweep_results[best_label]
 dates, vals = zip(*bm["equity_curve"])
 ax.plot(dates, vals, lw=2.0, color="crimson", label=f"Best: {best_label}")
 ax.axhline(INITIAL_CAPITAL, color="black", lw=0.5, ls="--")
-ax.set_title("Short-mode POC: equity curves (24 configs vs baselines)")
+ax.set_title(f"Short-mode POC: equity curves ({len(sweep_results)} configs vs baselines)")
 ax.set_ylabel("Equity ($)")
 ax.legend()
 plt.tight_layout()
-plt.savefig("../images/2026-05-14-gem-bear-short/equity_curves.png", dpi=140, bbox_inches="tight")
+out_dir = "../images/2026-05-15-aggressive-bear-short-gem"
+os.makedirs(out_dir, exist_ok=True)
+plt.savefig(f"{out_dir}/equity_curves.png", dpi=140, bbox_inches="tight")
 plt.show()
 #+END_SRC
 
@@ -1301,6 +1303,110 @@ for date_str, targets in rebalances:
     2022-12-19  LINK (100%)
     2022-12-29  SOL  (100%)
 #+end_example
+
+* Squeeze visualisation: ADA, Oct 2022
+
+The single meaningful drawdown for the best config (`lin-n1-w15`) came
+from an ADA short squeeze in October 2022. The model entered an ADA
+short on Oct 8 and re-entered on Oct 18 with 100% weight, both times
+on a clean negative 15-day trend. Between Oct 18 and Oct 28 the price
+rebounded sharply, costing the position ~-11.7% from peak equity.
+
+This cell plots ADAUSDT daily candles for a window around the event
+with the three rebalance dates annotated. The output is referenced
+from the accompanying blog post.
+
+#+BEGIN_SRC jupyter-python :session llms :kernel llms_kernel :async yes :exports both
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+
+ada = candles_df[candles_df["token"] == "ADAUSDT"].sort_values("timestamp").reset_index(drop=True)
+ada["date"] = pd.to_datetime(ada["timestamp"], unit="ms")
+mask = (ada["date"] >= "2022-09-15") & (ada["date"] <= "2022-11-15")
+win = ada[mask].copy().reset_index(drop=True)
+
+fig, ax = plt.subplots(figsize=(12, 6))
+width = 0.65
+for _, row in win.iterrows():
+    up = row["close"] >= row["open"]
+    body_color = "#2ca02c" if up else "#d62728"
+    # wick
+    ax.plot([row["date"], row["date"]], [row["low"], row["high"]],
+            color="black", lw=0.8, zorder=2)
+    # body
+    body_low  = min(row["open"], row["close"])
+    body_high = max(row["open"], row["close"])
+    height = max(body_high - body_low, (win["high"].max() - win["low"].min()) * 0.001)
+    ax.bar(row["date"], height, bottom=body_low, width=width,
+           color=body_color, edgecolor="black", lw=0.4, zorder=3)
+
+# Annotate the three rebalance events
+events = [
+    ("2022-10-08", "Short entry",                "below"),
+    ("2022-10-18", "Re-entry @ 100% (peak P&L)", "below"),
+    ("2022-10-28", "Forced exit -> CASH",        "above"),
+]
+ymin, ymax = ax.get_ylim()
+yrange = ymax - ymin
+for date_str, label, side in events:
+    ts = pd.Timestamp(date_str)
+    matches = win[win["date"] == ts]
+    if matches.empty:
+        continue
+    row = matches.iloc[0]
+    if side == "above":
+        xy = (ts, row["high"])
+        offset = (0, 32)
+    else:
+        xy = (ts, row["low"])
+        offset = (0, -38)
+    ax.annotate(label, xy=xy, xytext=offset, textcoords="offset points",
+                ha="center", fontsize=10, fontweight="bold",
+                arrowprops=dict(arrowstyle="->", lw=1.2, color="#444"))
+
+# Shaded squeeze interval
+shade_start = pd.Timestamp("2022-10-18")
+shade_end   = pd.Timestamp("2022-10-28")
+ax.axvspan(shade_start, shade_end, color="#d62728", alpha=0.08, zorder=1,
+           label="Squeeze interval (Oct 18 -> Oct 28)")
+
+ax.set_title("ADAUSDT daily candles, Sep 15 - Nov 15 2022\nShort-squeeze event responsible for the model's max drawdown",
+             fontsize=12)
+ax.set_ylabel("Price (USDT)")
+ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
+ax.grid(True, axis="y", alpha=0.3)
+ax.legend(loc="upper left", framealpha=0.95)
+fig.autofmt_xdate()
+plt.tight_layout()
+
+out_dir = "../images/2026-05-15-aggressive-bear-short-gem"
+os.makedirs(out_dir, exist_ok=True)
+out_path = f"{out_dir}/ada_squeeze.png"
+plt.savefig(out_path, dpi=140, bbox_inches="tight")
+print(f"Saved {out_path}")
+
+# Print the moves for the writeup
+oct8  = win[win["date"] == "2022-10-08"]["close"].iloc[0]
+oct18 = win[win["date"] == "2022-10-18"]["close"].iloc[0]
+oct28 = win[win["date"] == "2022-10-28"]["close"].iloc[0]
+print(f"\nADA close prices on the three event dates:")
+print(f"  2022-10-08  ${oct8:.4f}   (short entry)")
+print(f"  2022-10-18  ${oct18:.4f}   (re-entry)   move from Oct 8:  {(oct18-oct8)/oct8*100:+.2f}%")
+print(f"  2022-10-28  ${oct28:.4f}   (exit)       move from Oct 18: {(oct28-oct18)/oct18*100:+.2f}%")
+plt.show()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: Saved ../images/2026-05-15-aggressive-bear-short-gem/ada_squeeze.png
+: 
+: ADA close prices on the three event dates:
+:   2022-10-08  $0.4217   (short entry)
+:   2022-10-18  $0.3621   (re-entry)   move from Oct 8:  -14.13%
+:   2022-10-28  $0.4042   (exit)       move from Oct 18: +11.63%
+[[file:./.ob-jupyter/ec94eeef2c799827ae5508f4abbfd27e77a2fae3.png]]
+:END:
 
 * Follow-up: larger universe re-run
 
