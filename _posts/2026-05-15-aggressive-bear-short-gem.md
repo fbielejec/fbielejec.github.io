@@ -183,7 +183,7 @@ Stage Report:
 The Stage 1 NO-PASS deserves comment, because it would be easy to read it as "the model adds nothing over a naive baseline.", but that is not what is happening.
 The naive equal-weight short holds 11 tokens equally, all the way through.
 Its max drawdown is structurally smaller than any 1-asset short can match -- the diversification across 11 names naturally limits the impact from DD events -- at the cost of lower returns (+57.7% vs +87.2%).
-The GEM short with `top_n=1` is, by construction, more exposed to token event risks (see [next-phase ideas]({{ site.baseurl }}{% post_url 2026-05-15-aggressive-bear-short-gem %}#squeeze)).
+The GEM short with `top_n=1` is, by construction, more exposed to token event risks (see [short squeeze]({{ site.baseurl }}{% post_url 2026-05-15-aggressive-bear-short-gem %}#squeeze)).
 <!-- The naive short earns less return (+57.7% vs +87.2%) but loses less on its worst day, and Calmar rewards that. -->
 
 <!-- So the GEM short *generates more return* than naive ranking would suggest is possible. -->
@@ -283,11 +283,11 @@ An interesting question is what happens when the regime detector decides how muc
 
 Below some ideas:
 
-1. **Wider universe**: 25–35 Binance USDⓈ-M majors that existed in May 2022, filtered by listing date.
-   This is the experiment that decides whether the GEM short is a concentration oracle or a portfolio strategy.
-   Re-derive the long-only bear Calmar on the new universe before comparing Stage 2 -- the 4.6 number is universe-specific.
+1. **Wider universe**: All Binance USDⓈ-M majors that existed in May 2022. See if diversified models start to prevail.
+   <!-- This is the experiment that decides whether the GEM short is a concentration oracle or a portfolio strategy. -->
+   <!-- Re-derive the long-only bear Calmar on the new universe before comparing Stage 2 -- the 4.6 number is universe-specific. -->
 
-2. **Squeeze defenses**: add the funding+OI composite score and a 15% trailing stop.
-   Rerun the same sweep with the defenses on. If the ADA-shaped drawdown shrinks meaningfully without killing return, the defenses earn their place.
+2. **Squeeze defenses**: Add the funding+OI composite score and a trailing stop rules. Akin to liquidation heatmaps.
+   Rerun the same sweep with the defenses on. If the ADA-shaped drawdown shrinks meaningfully without killing the returns, the defenses earn the keep.
 
 3. **Regime-weighted composition**: connect the specialists (bull, rangin, bear-long, bear-short) to the HMM regime probabilities. Bear sub-specialist models could be blended using a tuned parameter - learned on the historical regime exposure.
