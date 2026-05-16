@@ -10,8 +10,8 @@ description: "An aggressive short-mode counterpart to the conservative bear spec
 
 # <a name="intro"/> Introduction
 
-In a previous post we looked at [GEM market bear models]({{ site.baseurl }}{% post_url 2026-04-24-gem-bear-market-models %}), who can show a slight win a market in a adverse conditions.
-The bear specialist GEM model won with the market by *mostly not playing*.
+In a previous post we looked at [GEM market bear models]({{ site.baseurl }}{% post_url 2026-04-24-gem-bear-market-models %}), who can show a win even in a market in a adverse conditions.
+The bear specialist GEM model won by *mostly not playing*.
 It sat in cash for six and a half months of 2022, then entered EURUSDT once a clean uptrend emerged -- with a brief rotation through PAXG (tokenized gold) in late December -- finishing the window at +6.40% while BTC was down roughly 65% from its all-time high.
 
 In this post we research a different, more aggressive strategy.
@@ -23,7 +23,7 @@ We invert the GEM filters, weight by the magnitude of the negative trend, and sh
 *TL;DR*
 On an 11-token mixed bear-market universe, the best aggressive short-mode GEM config (`lin-n1-w15`) returns **+87.2%** over May–Dec 2022 with a **-27.4%** drawdown, for a **Calmar of 5.64** -- beating the long-only bear specialist's Calmar 4.6.
 Yet it loses on Calmar to a naive equal-weight short of the same universe (+57.72% returns, -16.41% max drawdown, Calmar 5.92). The single most meaningful drawdown comes from an ADA short squeeze  - something that a model looking just at the daily candles cannot see coming.
-The signal is real and clustered on `fit_window=15` regardless of regression model.
+<!-- The signal is real and clustered on `fit_window=15` regardless of regression model. -->
 
 ---
 
@@ -41,7 +41,7 @@ Aggregated to daily, mean funding rates over the window ranged from roughly -5% 
 
 **Sign-flipped filters.**
 The GEM core rejects positive $a_1$ candidates and requires $\text{momentum} < -\text{momentum\_floor}$.
-The exponential model now wants $a_1 < 1$ (compounding decline); the linear model wants a negative normalised slope.
+The exponential model also wants $a_1 < 1$ (a compounding decline); the linear model wants a negative normalised slope.
 R-squared and ATR play the same roles as in the bull/bear long specialist models.
 
 **Momentum-magnitude weighting.**
@@ -53,7 +53,7 @@ The rest -- fitting window, R-squared threshold, differential rebalancing, coold
 
 # <a name="setup"/> Experiment Setup
 
-**Window**: Same May 1 – December 31, 2022 window as previously: BTC already down ~50% from ATH, Luna collapsed (May 9), 3AC liquidated (June), FTX collapsed (November). Unambiguously bear market.
+**Window**: Same May 1 – December 31, 2022 window as previously: BTC already down ~50% from ATH, Luna collapsed (May 9), 3AC liquidated (June), FTX collapsed (November). Unambiguously a bear market.
 
 **Universe**: 11 Binance USDⓈ-M perpetuals, deliberately mixing fallers and outperformers over the period, such that the selector has a discrimination problem to solve.
 
@@ -71,12 +71,12 @@ $10,000 starting capital, 0.3% round-trip fee, 10-day rebalance cooldown.
 **Sweep**: 32 configurations.
 
 $$
-\text{fit\_window} \in \{15, 30, 60, 90\} \quad\times\quad
-\text{top\_n} \in \{1, 3, 5, 8\} \quad\times\quad
+\text{fit_window} \in \{15, 30, 60, 90\} \quad\times\quad
+\text{top_n} \in \{1, 3, 5, 8\} \quad\times\quad
 \text{model} \in \{\text{exp}, \text{lin}\}
 $$
 
-**Verdict structure**: not a single label. Three stages, each PASS / NO-PASS:
+**Experiment verdict structure**: Three stages, each PASS / NO-PASS:
 
 - **Stage 1**: best-config Calmar > naive equal-weight short Calmar
 - **Stage 2**: best-config Calmar > long-only bear specialist (Calmar 4.6 from the previous post)
@@ -180,10 +180,9 @@ Stage Report:
 | **Stage 3a** | $\geq$ 1/3 configs positive Calmar | **PASS** (32/32) |
 | **Stage 3b** | dominant `fit_window` in top 6 | **PASS** (w15, 6/6) |
 
-The Stage 1 NO-PASS deserves comment, because it would be easy to read it as "the model adds nothing over a naive baseline."
-That is not what is happening.
+The Stage 1 NO-PASS deserves comment, because it would be easy to read it as "the model adds nothing over a naive baseline.", but that is not what is happening.
 The naive equal-weight short holds 11 tokens equally, all the way through.
-Its max drawdown is structurally smaller than any 1-asset short can match -- the diversification across 11 names naturally floors the DD, at the cost of lower returns (+57.7% vs +87.2%).
+Its max drawdown is structurally smaller than any 1-asset short can match -- the diversification across 11 names naturally limits the impact from DD events -- at the cost of lower returns (+57.7% vs +87.2%).
 The GEM short with `top_n=1` is, by construction, more exposed to token event risks (see [next-phase ideas]({{ site.baseurl }}{% post_url 2026-05-15-aggressive-bear-short-gem %}#squeeze)).
 <!-- The naive short earns less return (+57.7% vs +87.2%) but loses less on its worst day, and Calmar rewards that. -->
 
@@ -194,7 +193,7 @@ The GEM short with `top_n=1` is, by construction, more exposed to token event ri
 Stage 2 confirms the signal is there: the model clears the long-only bear specialist, despite carrying the big drawdown event.
 Stage 3 confirms the signal is clustered, not a single-config artifact: all top 6 configs share the same fit window, and 32 of 32 configurations produce positive Calmar.
 
-# <a name="verdict"/> Verdict: signal real but marginal
+# <a name="verdict"/> Verdict: the signal is real but marginal
 
 The headline number is good but the universe is too small to know if the strategy generalises.
 
@@ -211,11 +210,13 @@ A 25–35 token universe with the same `top_n=5` or `top_n=8` could more than li
 
 <!-- This is what the next experiment needs to test. -->
 
-# <a name="squeeze-defenses"/> Defending against squeezes
+# <a name="defense"/> Defences against squeezes
 
 Daily OHLCV cannot see ADA-style snap-backs coming.
 The model needs information from outside the kline feed.
-Some ideas:
+
+CoinGlass or e.g. Hyblock offer (paid) liquidation heatmaps, but the sam esignal can be hand-built.
+Below are some ideas:
 
 **1. Per-token concentration cap + trailing stop.**
 Cap any single short at 8–10% of NAV. Apply a 15–20% trailing stop from the entry-adjusted peak P&L.
@@ -227,19 +228,17 @@ Binance, Bybit or OKX all publish funding-rate history (already used in the expe
 Potential heuristic: if funding crosses above +0.05% for three consecutive periods on an asset we are short, halve the position, if it crosses +0.1%, exit the position.
 A crowded-short detector.
 
+**3. Intraday volume-spike + reversal exit.**
+If a shorted name prints $\ge 3 \cdot \sigma$ volume on a green candle that reclaims the prior day's high, exit at next bar.
+Requires 1h or 15m kline ingestion.
+
 <!-- **3. Open interest deltas.** -->
 <!-- MOst exchanges publish OI. -->
 <!-- The discriminating signal is OI rising while price drifts sideways or down -- building shorts. -->
 <!-- Combine with funding into a composite "crowded short" score, for example: -->
 <!-- $z(\text{funding}) + z(\Delta\text{OI} / \Delta\text{price})$. -->
-<!-- Together these cover most of what a paid liquidation-heatmap subscription would tell you. -->
 
-**3. Intraday volume-spike + reversal exit.**
-If a shorted name prints $\ge 3 \cdot \sigma$ volume on a green candle that reclaims the prior day's high, exit at next bar.
-Requires 1h or 15m kline ingestion.
-
-<!-- Paid liquidation heatmaps (CoinGlass, Hyblock) approximate the same signal as 2+3 at higher cost and rate-limit pain. -->
-<!-- Skip them unless 2–4 underperform expectations. -->
+Together these cover most of what a paid liquidation-heatmap API service would.
 
 <!-- # <a name="composition"/> Composition with the bear-long specialist -->
 
