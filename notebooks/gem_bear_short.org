@@ -990,7 +990,7 @@ plt.show()
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/0e2faab90218f5d69444b4192bf88baa7d15cec0.png]]
+[[file:./.ob-jupyter/9e36ec222ebbf15ffde41e6858f6c82c047f390d.png]]
 
 ** Holdings trace for best config
 

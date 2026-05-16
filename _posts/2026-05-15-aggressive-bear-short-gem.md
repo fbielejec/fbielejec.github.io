@@ -137,7 +137,7 @@ About 30% of the window is spent in cash.
 
 The most-shorted name was SOL at 17.6% of the window, followed by ETH, ADA, and BNB at ~8% each.
 
-# <a name="ada"/> The short squeeze problem
+# <a name="squeeze"/> The short squeeze problem
 
 The single meaningful drawdown comes from an ADA short squeeze.
 
@@ -175,105 +175,114 @@ Stage Report:
 
 | Stage | Criterion | Result |
 |---|---|---|
-| **Stage 1** | best Calmar > naive Calmar | **NO-PASS** (5.64 vs 5.92, Δ -0.28) |
-| **Stage 2** | best Calmar > long-only bear (4.6) | **PASS** (Δ +1.04) |
-| **Stage 3a** | ≥ 1/3 configs positive Calmar | **PASS** (32/32) |
+| **Stage 1** | best Calmar > naive Calmar | **NO-PASS** (5.64 vs 5.92, $\Delta$ -0.28) |
+| **Stage 2** | best Calmar > long-only bear (4.6) | **PASS** ($\Delta$ +1.04) |
+| **Stage 3a** | $\geq$ 1/3 configs positive Calmar | **PASS** (32/32) |
 | **Stage 3b** | dominant `fit_window` in top 6 | **PASS** (w15, 6/6) |
 
-The Stage 1 NO-PASS deserves comment, because it would be easy to read it as "the model adds nothing over a dumb baseline."
+The Stage 1 NO-PASS deserves comment, because it would be easy to read it as "the model adds nothing over a naive baseline."
 That is not what is happening.
-The naive equal-weight short holds 11 tokens equally, all the way through. Its max drawdown is structurally smaller than any 1-asset short can match -- diversification across 11 names floors the DD at -16.4%.
-The GEM short with `top_n=1` is, by construction, exposed to one-token-event risk (exactly what ADA delivered).
-The naive short earns less return (+57.7% vs +87.2%) but loses less on its worst day, and Calmar rewards that.
+The naive equal-weight short holds 11 tokens equally, all the way through.
+Its max drawdown is structurally smaller than any 1-asset short can match -- the diversification across 11 names naturally floors the DD, at the cost of lower returns (+57.7% vs +87.2%).
+The GEM short with `top_n=1` is, by construction, more exposed to token event risks (see [next-phase ideas]({{ site.baseurl }}{% post_url 2026-05-15-aggressive-bear-short-gem %}#squeeze)).
+<!-- The naive short earns less return (+57.7% vs +87.2%) but loses less on its worst day, and Calmar rewards that. -->
 
-So the GEM short *generates more return* than naive ranking would suggest is possible.
-What it cannot do at `top_n=1` is match a 11-asset portfolio's drawdown floor.
-This is a portfolio-construction limit, not a signal failure.
+<!-- So the GEM short *generates more return* than naive ranking would suggest is possible. -->
+<!-- What it cannot do at `top_n=1` is match a 11-asset portfolio's drawdown floor. -->
+<!-- This is a portfolio-construction limit, not a signal failure. -->
 
-Stage 2 confirms the signal is real: the model clears the long-only bear specialist by a full point of Calmar, despite carrying its only meaningful drawdown event.
+Stage 2 confirms the signal is there: the model clears the long-only bear specialist, despite carrying the big drawdown event.
 Stage 3 confirms the signal is clustered, not a single-config artifact: all top 6 configs share the same fit window, and 32 of 32 configurations produce positive Calmar.
 
-# <a name="verdict"/> Verdict: real but marginal
+# <a name="verdict"/> Verdict: signal real but marginal
 
 The headline number is good but the universe is too small to know if the strategy generalises.
 
-At `top_n=1` the model is a "find the biggest faller" oracle and concentration risk is the cost of concentration return.
+At `top_n=1` the model is a "find the biggest faller" oracle and pays the concentration cost.
+<!-- is the cost of concentration return. -->
 At `top_n=5` and `top_n=8` it dilutes into weaker signals -- but only because there are only seven real fallers in the universe to begin with.
-A 25–35 token universe with the same `top_n=5` or `top_n=8` would let diversification do its work without forcing the selector to short noise.
+A 25–35 token universe with the same `top_n=5` or `top_n=8` could more than likely let the diversification do its work without forcing the selector to short noise.
 
-The Stage 1 gap vs naive likely persists on a wider universe, because the structural diversification floor remains.
-But two things should change:
+<!-- The Stage 1 gap vs naive likely persists on a wider universe, because the structural diversification floor remains. -->
+<!-- But two things should change: -->
 
-- Naive's edge should shrink: 30 tokens diversifies better than 11, but its absolute return depends on average universe drawdown, not number of names.
-- The GEM short at `top_n=5` or higher should retain return *and* shrink DD, possibly enough to flip Stage 1.
+<!-- - Naive's edge should shrink: 30 tokens diversifies better than 11, but its absolute return depends on average universe drawdown, not number of names. -->
+<!-- - The GEM short at `top_n=5` or higher should retain return *and* shrink DD, possibly enough to flip Stage 1. -->
 
-This is what the next experiment needs to test.
+<!-- This is what the next experiment needs to test. -->
 
 # <a name="squeeze-defenses"/> Defending against squeezes
 
 Daily OHLCV cannot see ADA-style snap-backs coming.
 The model needs information from outside the kline feed.
-Ranked by signal-per-unit-of-effort:
+Some ideas:
 
 **1. Per-token concentration cap + trailing stop.**
 Cap any single short at 8–10% of NAV. Apply a 15–20% trailing stop from the entry-adjusted peak P&L.
-Pure portfolio logic, no new data pipeline. Would have capped the ADA hit at roughly half its actual cost.
-Cheapest defense that materially changes the worst-case.
+Pure portfolio logic, no new data pipeline.
+This cheap defense alone would have capped the ADA hit at roughly half of its actual DD cost.
 
 **2. Funding rate signal.**
-Binance, Bybit, OKX all publish funding-rate history via free REST endpoints (we are already using Binance's for the per-position cost accrual).
-Rule: if 8-hour funding crosses above +0.05% (annualised ~55%) for three consecutive prints on a name we are short, halve the position. If it crosses +0.1%, exit.
-A crowded-short detector. One afternoon of pipeline work.
+Binance, Bybit or OKX all publish funding-rate history (already used in the experiment to calculate per-position cost accrual).
+Potential heuristic: if funding crosses above +0.05% for three consecutive periods on an asset we are short, halve the position, if it crosses +0.1%, exit the position.
+A crowded-short detector.
 
-**3. Open interest deltas.**
-The same exchange APIs publish OI.
-The discriminating signal is OI rising while price drifts sideways or down -- building shorts.
-Combine with funding into a composite "crowded short" score: $z(\text{funding}) + z(\Delta\text{OI} / \Delta\text{price})$.
-Together these cover most of what a paid liquidation-heatmap subscription would tell you.
+<!-- **3. Open interest deltas.** -->
+<!-- MOst exchanges publish OI. -->
+<!-- The discriminating signal is OI rising while price drifts sideways or down -- building shorts. -->
+<!-- Combine with funding into a composite "crowded short" score, for example: -->
+<!-- $z(\text{funding}) + z(\Delta\text{OI} / \Delta\text{price})$. -->
+<!-- Together these cover most of what a paid liquidation-heatmap subscription would tell you. -->
 
-**4. Intraday volume-spike + reversal exit.**
-Breaks the daily-close discipline but worth it as a same-day stop: if a shorted name prints >3σ volume on a green candle that reclaims the prior day's high, exit at next bar.
+**3. Intraday volume-spike + reversal exit.**
+If a shorted name prints $\ge 3 \cdot \sigma$ volume on a green candle that reclaims the prior day's high, exit at next bar.
 Requires 1h or 15m kline ingestion.
 
-Paid liquidation heatmaps (CoinGlass, Hyblock) approximate the same signal as 2+3 at higher cost and rate-limit pain.
-Skip them unless 2–4 underperform expectations.
+<!-- Paid liquidation heatmaps (CoinGlass, Hyblock) approximate the same signal as 2+3 at higher cost and rate-limit pain. -->
+<!-- Skip them unless 2–4 underperform expectations. -->
 
-# <a name="composition"/> Composition with the bear-long specialist
+<!-- # <a name="composition"/> Composition with the bear-long specialist -->
 
-This experiment produces a third specialist alongside the bull and bear-long that already exist.
-The orchestration question: how do these compose when the regime detector reports probabilities over `{bull, bear, chop}`?
+<!-- This experiment produces a third specialist alongside the bull and bear-long that already exist. -->
+<!-- The orchestration question: how do these compose when the regime detector reports probabilities over `{bull, bear, chop}`? -->
 
-**Two specialists, not one combined model.**
-A single regression could in principle rank by $|\text{momentum}|$ and use the sign to pick direction.
-That collapses three things worth keeping separate: asymmetric risk parameters (shorts want tighter stops, smaller per-position caps, squeeze filters that do not apply long-side), independent fitting windows (the bear-long specialist prefers `w=30`, the aggressive short prefers `w=15`), and debuggability -- when the combined book bleeds, the source side is not recoverable from a single PnL line.
-The shared GEM regression core can be a library; the specialists differ only in selection, sizing, and risk overlays.
+<!-- **Two specialists, not one combined model.** -->
+<!-- A single regression could in principle rank by $|\text{momentum}|$ and use the sign to pick direction. -->
+<!-- That collapses three things worth keeping separate: asymmetric risk parameters (shorts want tighter stops, smaller per-position caps, squeeze filters that do not apply long-side), independent fitting windows (the bear-long specialist prefers `w=30`, the aggressive short prefers `w=15`), and debuggability -- when the combined book bleeds, the source side is not recoverable from a single PnL line. -->
+<!-- The shared GEM regression core can be a library; the specialists differ only in selection, sizing, and risk overlays. -->
 
-**Three specialists, regime-weighted gross exposure.**
-Let $G_{\max}$ be target gross (e.g. 1.0 of NAV). Given HMM-output probabilities $P_{\text{bull}}, P_{\text{bear}}, P_{\text{chop}}$:
+<!-- **Three specialists, regime-weighted gross exposure.** -->
+<!-- Let $G_{\max}$ be target gross (e.g. 1.0 of NAV). Given HMM-output probabilities $P_{\text{bull}}, P_{\text{bear}}, P_{\text{chop}}$: -->
 
-$$
-\begin{aligned}
-w_{\text{bull}}        &= P_{\text{bull}} \\
-w_{\text{bear-long}}   &= P_{\text{bear}} \cdot (1 - \alpha) \\
-w_{\text{bear-short}}  &= P_{\text{bear}} \cdot \alpha \\
-\text{gross}_{\text{long}}  &= G_{\max} \cdot (w_{\text{bull}} + w_{\text{bear-long}}) \\
-\text{gross}_{\text{short}} &= G_{\max} \cdot w_{\text{bear-short}}
-\end{aligned}
-$$
+<!-- $$ -->
+<!-- \begin{aligned} -->
+<!-- w_{\text{bull}}        &= P_{\text{bull}} \\ -->
+<!-- w_{\text{bear-long}}   &= P_{\text{bear}} \cdot (1 - \alpha) \\ -->
+<!-- w_{\text{bear-short}}  &= P_{\text{bear}} \cdot \alpha \\ -->
+<!-- \text{gross}_{\text{long}}  &= G_{\max} \cdot (w_{\text{bull}} + w_{\text{bear-long}}) \\ -->
+<!-- \text{gross}_{\text{short}} &= G_{\max} \cdot w_{\text{bear-short}} -->
+<!-- \end{aligned} -->
+<!-- $$ -->
 
-$\alpha \in [0.4, 0.6]$ controls bear-mode aggressiveness -- start at $0.5$ and tune on Calmar.
-The bear allocation splits between the conservative long-only specialist (capital preservation) and the aggressive short (offensive return), proportional to confidence in the bear regime.
+<!-- $\alpha \in [0.4, 0.6]$ controls bear-mode aggressiveness -- start at $0.5$ and tune on Calmar. -->
+<!-- The bear allocation splits between the conservative long-only specialist (capital preservation) and the aggressive short (offensive return), proportional to confidence in the bear regime. -->
 
-The alternative -- blend long/short direction first via $P_{\text{bull}} - P_{\text{bear}}$ and then run a single direction-aware specialist -- throws away the bear-long specialist's stablecoin-allocation logic, which is exactly the capital-preservation property that earned the bear specialist its Calmar 4.6 in the first place.
+<!-- The alternative -- blend long/short direction first via $P_{\text{bull}} - P_{\text{bear}}$ and then run a single direction-aware specialist -- throws away the bear-long specialist's stablecoin-allocation logic, which is exactly the capital-preservation property that earned the bear specialist its Calmar 4.6 in the first place. -->
 
-**$P(\text{chop}) \rightarrow$ cash.**
-Momentum ranking degrades in both directions during chop.
-Forcing trades there is where Calmar dies.
-Default: hold $P_{\text{chop}} \cdot \text{NAV}$ in USDT. Whipsaw squeezes -- the regime where ADA-style events are most likely -- live in chop, so the short specialist must not run there.
+<!-- **$P(\text{chop}) \rightarrow$ cash.** -->
+<!-- Momentum ranking degrades in both directions during chop. -->
+<!-- Forcing trades there is where Calmar dies. -->
+<!-- Default: hold $P_{\text{chop}} \cdot \text{NAV}$ in USDT. Whipsaw squeezes -- the regime where ADA-style events are most likely -- live in chop, so the short specialist must not run there. -->
 
 # <a name="next"/> Next Steps
 
-The headline result is real but the universe is the binding constraint.
+<!-- The headline result is real but the universe is the binding constraint. -->
+
+Capital preservation as a strategy works -- the previous post showed that.
+Aggressive shorting works too, with caveats -- as the results of this brief experiment have shown.
+An interesting question is what happens when the regime detector decides how much of each to deploy.
+
+Below some ideas:
 
 1. **Wider universe**: 25–35 Binance USDⓈ-M majors that existed in May 2022, filtered by listing date.
    This is the experiment that decides whether the GEM short is a concentration oracle or a portfolio strategy.
@@ -282,9 +291,4 @@ The headline result is real but the universe is the binding constraint.
 2. **Squeeze defenses**: add the funding+OI composite score and a 15% trailing stop.
    Rerun the same sweep with the defenses on. If the ADA-shaped drawdown shrinks meaningfully without killing return, the defenses earn their place.
 
-3. **Regime-weighted composition**: connect the three specialists (bull, bear-long, bear-short) to the HMM regime probabilities using the three-specialist blend above.
-   Tune `α` on the bear specialist's own historical regime exposure.
-
-Capital preservation as a strategy works -- the previous post showed that.
-Aggressive shorting works too, with caveats -- this post showed that.
-The interesting result is what happens when the regime detector decides how much of each to deploy, and that is what the next experiment in the series is for.
+3. **Regime-weighted composition**: connect the specialists (bull, rangin, bear-long, bear-short) to the HMM regime probabilities. Bear sub-specialist models could be blended using a tuned parameter - learned on the historical regime exposure.
