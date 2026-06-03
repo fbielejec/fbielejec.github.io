@@ -6,9 +6,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Young+Serif&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Young+Serif&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/regimes/regimes.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
 
     <link rel="apple-touch-icon" sizes="180x180" href="{{ site.baseurl }}/images/favicon/apple-touch-icon.png">
@@ -19,15 +20,7 @@
     <meta name="msapplication-TileColor" content="#1a2332">
     <meta name="theme-color" content="#1a2332">
 
-    <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        processEscapes: true
-      }
-    });
-    </script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
   </head>
 
   <body>
@@ -49,11 +42,9 @@
       </div>
     </div>
 
-    <div class="site-layout container-wide">
-      <aside class="sidebar">
-        {% include sidebar.html %}
-      </aside>
-      <main id="main" role="main" class="site-content">
+    <!-- full-width: no sidebar, dashboard needs the room -->
+    <div class="container-wide" style="padding-top:32px;padding-bottom:40px;">
+      <main id="main" role="main">
         {{ content }}
       </main>
     </div>
@@ -69,5 +60,6 @@
     </div>
 
     {% include analytics.html %}
+    <script src="{{ site.baseurl }}/regimes/app.js" defer></script>
   </body>
 </html>
