@@ -1,8 +1,8 @@
 ---
 layout: regimes
-title: BTC Market Regimes
+title: BTC Regime Dashboard
 permalink: /regimes/
-description: "A 3-state hidden Markov model on drawdown-from-rolling-max identifies bear / ranging / bull regimes in Bitcoin, 2017–present. Interactive research dashboard."
+description: "Bitcoin's market cycle is legible from a single causal signal: drawdown from the running high. A 3-state HMM turns that signal into bear, ranging, and bull regimes -- this dashboard shows the tape, the observation, and the model's fitted states."
 ---
 <div class="regimes-app">
 
@@ -15,29 +15,31 @@ description: "A 3-state hidden Markov model on drawdown-from-rolling-max identif
       <span class="mono">BTC market-regime model</span>
     </div>
 
-    <h1 class="hero-title">
-      Bitcoin trades in <span class="ink-bear">bear</span>,
-      <span class="ink-ranging">ranging</span> &amp;
-      <span class="ink-bull">bull</span> regimes —
-      <span class="title-em">a hidden Markov model reads them off the drawdown.</span>
-    </h1>
+    <h1 class="hero-title">BTC Regime Dashboard</h1>
 
     <p class="hero-thesis">
-      Feed a 3-state HMM one strictly-causal number — how far price sits below its
-      running all-time high — and the latent states line up with what a trader
-      would call a bear, a chop, and a bull. No look-ahead, no hand-labelling.
+      Feed a 3-state HMM one strictly-causal number -- how far price sits below its
+      running all-time high -- and the latent states line up with what a trader
+      would call a bear, a chop, and a bull.
     </p>
 
     <div class="hero-meta">
       <div class="regime-now" id="regime-now"></div>
       <div class="meta-badges" id="meta-badges"></div>
     </div>
-
-    <nav class="hero-links mono">
-      <a href="feed.json" id="link-feed">feed.json ↗</a>
-      <a href="https://github.com/fbielejec/trader-research-student-hmm" target="_blank" rel="noopener">research repo ↗</a>
-    </nav>
   </header>
+
+  <!-- NOW STRIP -->
+  <section class="now-strip">
+    <div class="now-col">
+      <h3 class="now-h mono">today · posterior P(regime)</h3>
+      <div class="now-bars" id="now-today"></div>
+    </div>
+    <div class="now-col">
+      <h3 class="now-h mono">tomorrow · one-step-ahead (π · A)</h3>
+      <div class="now-bars" id="now-tomorrow"></div>
+    </div>
+  </section>
 
   <!-- 2. HEADLINE FIGURE -->
   <section class="block">
@@ -59,8 +61,10 @@ description: "A 3-state hidden Markov model on drawdown-from-rolling-max identif
       <span class="block-num mono">02</span>
       <div>
         <h2 class="block-title">The observation</h2>
-        <p class="block-sub" id="diag-sub">The single feature the model sees.
-          Reference lines mark −0.5 (≈ −39% off the high) and −1.0 (≈ −63%).</p>
+        <p class="block-sub" id="diag-sub">The only number the HMM sees: how far
+          log-price sits below its running all-time high. Shallow excursions near
+          zero are where the bull state lives; sustained moves below −0.5 are
+          where the bear takes over.</p>
       </div>
     </div>
     <figure class="fig"><div id="fig-diagnostic"></div></figure>
@@ -72,7 +76,7 @@ description: "A 3-state hidden Markov model on drawdown-from-rolling-max identif
       <span class="block-num mono">03</span>
       <div>
         <h2 class="block-title">Four episodes, same vocabulary</h2>
-        <p class="block-sub">The model never sees these labels — it reconstructs the
+        <p class="block-sub">The model never sees these labels -- it reconstructs the
           cycle's chapters from the drawdown alone.</p>
       </div>
     </div>
@@ -98,8 +102,11 @@ description: "A 3-state hidden Markov model on drawdown-from-rolling-max identif
       <span class="block-num mono">05</span>
       <div>
         <h2 class="block-title">The fitted states</h2>
-        <p class="block-sub">Emission parameters for each latent state, sorted by
-          mean drawdown. The transition matrix is what makes regimes sticky.</p>
+        <p class="block-sub">The HMM learns two things over the full 2017→today
+          window: per-state <b>emission parameters</b> (μ = mean drawdown, σ = spread --
+          bear sits deep below the high, bull hugs zero) and a <b>transition matrix</b>
+          of one-step probabilities. The diagonal dominates -- each self-loop ≈ 0.99 --
+          which is what makes regimes persist for months rather than flicker daily.</p>
       </div>
     </div>
     <div class="params-layout">

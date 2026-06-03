@@ -144,6 +144,39 @@
     document.getElementById("meta-badges").innerHTML = badges;
   }
 
+  // ── now strip: today's posterior + one-step-ahead (π · A) ────────────────
+  function renderNow(feed) {
+    const states = feed.model.states;
+    const post = feed.series.posterior;
+    const n = feed.series.dates.length;
+
+    // today's posterior, in state order
+    const today = states.map((s) => (post[s.name] || [])[n - 1] || 0);
+
+    // tomorrow = today · A   (row vector times transition matrix)
+    const A = feed.model.transition_matrix;
+    const tomorrow = states.map((_, j) =>
+      today.reduce((acc, p_i, i) => acc + p_i * (A[i] ? A[i][j] : 0), 0)
+    );
+
+    function barsHtml(probs) {
+      return states.map((s, i) => {
+        const p = probs[i] || 0;
+        const w = Math.max(p * 100, 0.4); // floor so 0% still shows a hairline
+        return (
+          `<div class="nb-row">` +
+            `<span class="nb-label" style="color:${s.color}">${s.name}</span>` +
+            `<span class="nb-track"><span class="nb-fill" style="width:${w}%;background:${s.color}"></span></span>` +
+            `<span class="nb-pct">${pct1(p)}</span>` +
+          `</div>`
+        );
+      }).join("");
+    }
+
+    document.getElementById("now-today").innerHTML = barsHtml(today);
+    document.getElementById("now-tomorrow").innerHTML = barsHtml(tomorrow);
+  }
+
   // ── legend (data-driven) ─────────────────────────────────────────────────
   function renderLegend(feed) {
     const html = feed.model.states.map((s) =>
@@ -182,8 +215,11 @@
     const S = feed.series;
     const obsLabel = feed.model.observation.label;
     document.getElementById("diag-sub").innerHTML =
-      `The single feature the model sees: <span class="mono">${obsLabel}</span>. ` +
-      `Reference lines mark −0.5 (≈ −39% off the high) and −1.0 (≈ −63%).`;
+      `The only number the HMM sees: <span class="mono">${obsLabel}</span> — how far ` +
+      `log-price sits below its running all-time high. Zero at every new peak, more ` +
+      `negative the deeper the drawdown. Reference lines mark −0.5 (≈ −39% off the high) ` +
+      `and −1.0 (≈ −63%): shallow excursions near zero are where the bull state lives; ` +
+      `sustained moves below −0.5 are where the bear takes over.`;
 
     const trace = {
       x: S.dates, y: S.observation, type: "scattergl", mode: "lines",
@@ -233,6 +269,26 @@
   }
 
   // ── 4. zoom panels ───────────────────────────────────────────────────────
+  // Brief context for each episode — surfaced as a tooltip on the title.
+  const EPISODE_NOTES = {
+    "2018 bear":
+      "After the December 2017 ATH near $19.7K, BTC unwound the ICO bubble: " +
+      "Mt. Gox trustee sales, China's exchange crackdown, and regulatory pressure " +
+      "drove price down ~84% to ~$3.2K by year-end.",
+    "COVID Q1 2020":
+      "The pandemic liquidity shock. On March 12 (\"Black Thursday\") BTC fell ~50% " +
+      "in 24 hours as global markets crashed and leveraged crypto positions cascaded, " +
+      "before recovering through April.",
+    "2020–21 bull":
+      "The institutional adoption wave: MicroStrategy began treasury buys (Aug 2020), " +
+      "Tesla disclosed a $1.5B position (Feb 2021), Coinbase listed on Nasdaq (Apr 2021). " +
+      "BTC ran from ~$10K to its November 2021 ATH near $69K.",
+    "2022 bear":
+      "By May 2022, BTC was already ~50% below its Nov 2021 ATH. The Luna/UST collapse " +
+      "(May 9), 3AC liquidation (June), Celsius freeze, and the FTX collapse (November) " +
+      "all fall within this window.",
+  };
+
   function renderZooms(feed) {
     const grid = document.getElementById("zoom-grid");
     grid.innerHTML = "";
@@ -243,9 +299,12 @@
       const shareHtml = feed.model.states.map((s) =>
         `<span class="s" style="color:${s.color}">${s.name} <b>${pct(shares[s.name] || 0)}</b></span>`
       ).join("");
+      const note = EPISODE_NOTES[w.label] || "";
+      const titleAttr = note ? ` title="${note.replace(/"/g, "&quot;")}"` : "";
+      const titleClass = note ? "zc-title has-note" : "zc-title";
       card.innerHTML =
         `<div class="zc-head">` +
-          `<span class="zc-title">${w.label}</span>` +
+          `<span class="${titleClass}"${titleAttr}>${w.label}</span>` +
           `<span class="zc-dates">${w.start} → ${w.end}</span>` +
         `</div>` +
         `<div class="zc-plot" id="zoom-${k}"></div>` +
@@ -326,6 +385,7 @@
   loadFeed().then((feed) => {
     applyTheme();
     renderHeader(feed);
+    renderNow(feed);
     renderLegend(feed);
     renderHeadline(feed);
     renderDiagnostic(feed);
