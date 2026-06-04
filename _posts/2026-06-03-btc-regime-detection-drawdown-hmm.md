@@ -10,7 +10,7 @@ description: "A 3-state Gaussian Hidden Markov Model identifies bear / ranging /
 
 # <a name="intro"/> Introduction
 
-Perhaps a truism but markets behave differently in different regimes: a momentum strategy that prints in 2021 stops working in mid-2022.
+Perhaps a truism but markets behave differently in different regimes: a momentum strategy that works in 2021 stops working in mid-2022.
 <!-- A short basis trade that's safe through a chop blows up at the first 30% week. -->
 If you want a principled label for "what kind of market is this, right now" evaluated systematically then the obvious tool is a [Hidden Markov Model](https://en.wikipedia.org/wiki/Hidden_Markov_model).
 <!-- The hard part isn't the HMM. -->
@@ -273,7 +273,7 @@ Ranked by expected information gain per effort:
 - **Transition covariates** -- External, time-varying inputs $x_t$ that drive the transition probabilities in an NH-HMM (e.g. $A_{ij}(t) = \mathrm{softmax}_j(\beta_{ij} \cdot x_t)$). Heuristic: transition covariates are quantities the regime *responds to* -- things that don't themselves describe the regime but help predict when it will flip (VIX, USD index, 10Y yield). Putting a variable in the emission says "this is part of what the regime *is*"; putting it in the transition says "this is what makes the regime *change*".
 - **NH-HMM (non-homogeneous HMM)** -- An HMM where the transition matrix $A_t$ depends on time-varying covariates (e.g. $A_{ij}(t) = \mathrm{softmax}_j(\beta_{ij} \cdot x_t)$ with $x_t$ including VIX). Lets external drivers modulate regime crossings.
 - **MS-AR (Markov-switching autoregression)** -- Hamilton's original specification: an AR(q) process whose coefficients (and/or variance) switch with a hidden Markov state. The HMM with an autoregressive observation equation.
-- **MAE (Mean Absolute Error)** -- $\frac{1}{N} \sum_i |y_i - \hat y_i|$. Average absolute deviation between a point forecast $\hat y$ and the realised value $y$. Same units as the target; lower is better. Robust to outliers compared to MSE (which squares errors), and the natural baseline for evaluating a single-number forecast.
+- **MAE (Mean Absolute Error)** -- $\frac{1}{N} \sum_{i} \left|y_{i} - \hat y_i\right|$. Average absolute deviation between a point forecast $\hat y$ and the realised value $y$. Same units as the target; lower is better. More robust to outliers as compared to MSE (which squares errors), and the natural baseline for evaluating a single-number forecast.
 - **CRPS (Continuous Ranked Probability Score)** -- Proper scoring rule for probabilistic forecasts. Generalises MAE to distributions: instead of comparing a point forecast to the realisation, it compares the *full predictive CDF* $F$ to a point mass at the realisation $y$, integrating $(F(z) - \mathbf{1}\{z \geq y\})^2$ over $z$. Reduces to MAE when $F$ is a point mass. Lower is better; used to compare HMMs with different $K$ out-of-sample.
 - **Pólya-Gamma augmentation** -- A latent-variable trick (Polson, Scott, Windle 2013) that makes logistic / multinomial-logit likelihoods conjugate to Gaussian priors. Lets you Gibbs-sample over Bayesian logistic regressions; used here for the NH-HMM's softmax transition parameters.
 <!-- - **PIP (posterior inclusion probability)** -- In Bayesian variable selection (e.g. spike-and-slab priors), the posterior probability that a given covariate has non-zero coefficient. PIP $\approx 1.00$ means the data strongly favours including the covariate. -->
