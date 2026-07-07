@@ -82,9 +82,13 @@ Everything else -- KV-cache quantization, GPU expert offload, more threads, even
 <!-- `IQ4_XS` is the production config now. -->
 Note that this finding is for *my* harware, and will more than likely differ, so I just present it as the methodology more than actual open-weighted model recommendation.
 
+# <a name="repo"/> Setup instructions
+
+Setup instructions, eval and code published in the [repository](https://github.com/fbielejec/local-harness).
+
 <!-- # <a name="next"/> Next: opening it to the household -->
 
-<!-- The coding harness is the hard part, and it works. The other half of the vision is a -->
+<!-- The other half  vision is a -->
 <!-- ChatGPT-like web UI so the rest of the household can use the same model from any device -- -->
 <!-- [Open WebUI](https://github.com/open-webui/open-webui) in a container, LAN-exposed behind a -->
 <!-- login wall, talking to the same loopback-bound `llama-server`. The nice security property: -->
