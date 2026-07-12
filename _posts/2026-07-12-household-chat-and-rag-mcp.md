@@ -27,16 +27,16 @@ That is because eventually more collections will be indexed in the RAG db - e.g.
 The whole security story from last time was that the inference port never touches the LAN -- `llama-server` binds `127.0.0.1:8080` and is *only* reachable over an SSH tunnel. Adding a web UI must not break that.
 
 Open WebUI runs in Docker with `network_mode: host`.
-<!-- That is the load-bearing choice: a normal bridged container cannot reach a *loopback* service on the host, but a host-networked one can use `localhost:8080` directly **and** expose its own port `3000` to the LAN. So -->
-The UI container reaches the model over loopback and exposes its port `3000` to the LAN, is visible on `192.168.1.22:3000`. The `llama-server` port stays as private.
+The UI container reaches the model over loopback and exposes its port `3000` to the LAN, making it visible on `192.168.1.22:3000`.
+The `llama-server` port stays as private as before.
 
 <!-- ![The chat in front of the loopback-bound model]({{ site.baseurl }}/images/2026-07-12-household-chat-and-rag-mcp/chat.svg) -->
 
 ![Open WebUI answering from the local Qwen, with the llama-server journal alongside]({{ site.baseurl }}/images/2026-07-12-household-chat-and-rag-mcp/answer.png)
 
-On the left, the chat at `192.168.1.22:3000` answering from `Qwen3-Coder-30B-A3B-Instruct-IQ4_XS`; on the right, logs on `weebeastie` showing the request stream through the model's slots -- ~100 tokens/s of prompt eval, ~19 tokens/s generated -- with nothing leaving the box.
+On the left, the chat at `192.168.1.22:3000` answering from `Qwen3-Coder-30B-A3B-Instruct-IQ4_XS`; on the right, logs on `weebeastie` showing the request stream through the model's slots -- ~100 tokens/s of prompt eval, ~19 tokens/s generated.
 
-A few decisions worth calling out:
+A few decisions made along the way:
 
 - **Reboot survival for free.** Just a docker container with `restart: unless-stopped` means the chat auto-returns.
 - **Fixed accounts, signup locked.** Three accounts (me as admin, spouse, a shared `guest`), `ENABLE_SIGNUP=false`. Separate accounts give separate, per-user memories automatically.
@@ -49,7 +49,7 @@ The document assistant is a Rust pipeline: fetch EP committee PDFs from the [Ope
 Each query is then embedded under the *identical* recipe as at the insert time, top-k passages are pulled, and the local Qwen is asked to answer **using only those passages, citing each one, or saying "I don't know."**
 
 In my first version the RAG was packaged as an OpenAI-compatible *model* (retrieval and generation coupled together) -- a second entry in the chat's model dropdown that owned the whole loop (embed → Qdrant → ground → call the generator → cited answer).
-It worked, but it **welded retrieval to one specific generator**.
+It worked, but it **welded retrieval to this one specific generator**.
 So eventually it got re-cast as a **shared MCP retrieval server**, `ep-rag-mcp`, attached to the *host* (the thing running the agent loop), not to the model server.
 
 `llama-server` is just a text generator with no MCP client.
@@ -62,7 +62,7 @@ The win is loose coupling: retrieval is implemented once and reused; the generat
 
 Only `:3000` faces the LAN. `:8082` (MCP), `:6334` (Qdrant) and `:8080` (the model) all stay loopback. `ep-rag-mcp` is deployed exactly like `llama-server` -- a loopback systemd unit, `Restart=always`, enabled at boot.
 
-# <a name="routing"/> Tool cal routing: native tool-calling vs. classify-then-answer
+# <a name="routing"/> Tool call routing: native tool-calling vs. classify-then-answer
 
 The household model needs a way to decide whether a message even needs the RAG.
 <!-- Retrieving on a question the model already knows is not free -- the grounding prompt then forces "I don't know" onto an answerable question. So the routing decision matters. -->
@@ -87,6 +87,10 @@ This tracks, as the Open WebUI's own docs warn that small local models are unrel
 
 So the household path pays a **~2.5-second classify turn** to buy a **10/10 vs 8/10** routing score, and does it deterministically -- the model never emits a tool_call in the chat; the *code* decides from parsed JSON, so the routing is as reliable as the classifier and all the grounding logic lives in one place in Rust ("code is law").
 For a spouse asking policy questions, correct-and-a-bit-slower beats fast-and-occasionally-wrong.
+
+Answer and a citation, chunk directly from the Qdrant db:
+
+![Factual answer]({{ site.baseurl }}/images/2026-07-12-household-chat-and-rag-mcp/ragged_answer.png)
 
 <!-- My coding agent takes the other branch: Qwen-Code attaches to the *same* MCP server and uses native tool-calling, because a coding agent has a human in the loop and the occasional over-fire is cheap to shrug off. Same tree, same retrieval server, two evaluators -- the tree is the structure, the evaluator is pluggable. -->
 
