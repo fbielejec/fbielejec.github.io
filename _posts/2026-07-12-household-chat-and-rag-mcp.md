@@ -5,7 +5,7 @@ author: Filip Bielejec
 comments: true
 featured: true
 categories: [llm, local-inference, self-hosting, self-sovereign, rag, mcp, qdrant, open-webui, qwen]
-description: "I deployed Open WebUI "ChatGPT-style" chat UI for every device on the LAN, and a shared RAG-over-MCP retrieval server that both the chat and the coding agent can attach to."
+description: "I deployed Open WebUI ChatGPT-style chat UI for every device on the LAN, and a shared RAG-over-MCP retrieval server that both the chat and the coding agent can attach to."
 ---
 
 # <a name="intro"/> Intro
