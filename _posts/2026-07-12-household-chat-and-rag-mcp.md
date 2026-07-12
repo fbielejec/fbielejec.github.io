@@ -30,11 +30,11 @@ Open WebUI runs in Docker with `network_mode: host`.
 <!-- That is the load-bearing choice: a normal bridged container cannot reach a *loopback* service on the host, but a host-networked one can use `localhost:8080` directly **and** expose its own port `3000` to the LAN. So -->
 The UI container reaches the model over loopback and exposes its port `3000` to the LAN, is visible on `192.168.1.22:3000`. The `llama-server` port stays as private.
 
-![The chat in front of the loopback-bound model]({{ site.baseurl }}/images/2026-07-12-household-chat-and-rag-mcp/chat.svg)
+<!-- ![The chat in front of the loopback-bound model]({{ site.baseurl }}/images/2026-07-12-household-chat-and-rag-mcp/chat.svg) -->
 
 ![Open WebUI answering from the local Qwen, with the llama-server journal alongside]({{ site.baseurl }}/images/2026-07-12-household-chat-and-rag-mcp/answer.png)
 
-On the left, the chat at `192.168.1.22:3000` answering from `Qwen3-Coder-30B-A3B-Instruct-IQ4_XS`; on the right, logs on `weebeastie` showing that exact request stream through the model's slots -- ~100 tokens/s of prompt eval, ~19 tokens/s generated -- with nothing leaving the box.
+On the left, the chat at `192.168.1.22:3000` answering from `Qwen3-Coder-30B-A3B-Instruct-IQ4_XS`; on the right, logs on `weebeastie` showing the request stream through the model's slots -- ~100 tokens/s of prompt eval, ~19 tokens/s generated -- with nothing leaving the box.
 
 A few decisions worth calling out:
 
