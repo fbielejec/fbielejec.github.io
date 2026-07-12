@@ -67,7 +67,7 @@ Only `:3000` faces the LAN. `:8082` (MCP), `:6334` (Qdrant) and `:8080` (the mod
 The household model needs a way to decide whether a message even needs the RAG.
 <!-- Retrieving on a question the model already knows is not free -- the grounding prompt then forces "I don't know" onto an answerable question. So the routing decision matters. -->
 
-Both paths start from the same artefact: a small **decision tree expressed as JSON**, versioned and auditable, whose node questions are natural language the model evaluates ("Is the user asking a substantive question about the content or positions of EMPL/REGI/IMCO committee documents?").
+Both paths start from the same artefact: a small [decision tree expressed as JSON](https://github.com/fbielejec/local-harness/blob/88f800016736fe18778404b0ff48fab99913e35e/rag/data/route_tree.json), versioned and auditable, whose node questions are natural language the model evaluates ("Is the user asking a substantive question about the content or positions of EMPL/REGI/IMCO committee documents?").
 Two ways to consume it are:
 
 - **Mode A -- native tool-calling.** Hand the model the tree as policy plus a `search_ep_committee_docs` tool, and let it emit a `tool_call` when it decides to ground. One turn.
