@@ -1,15 +1,16 @@
 ---
 layout: post
-title: "Self-hosted ChatGPT"
+title: "A self-hosted ChatGPT"
 author: Filip Bielejec
 comments: true
+featured: true
 categories: [llm, local-inference, self-hosting, self-sovereign, rag, mcp, qdrant, open-webui, qwen]
 description: "I deployed Open WebUI "ChatGPT-style" chat UI for every device on the LAN, and a shared RAG-over-MCP retrieval server that both the chat and the coding agent can attach to."
 ---
 
 # <a name="intro"/> Intro
 
-In [the previous post]({{ site.baseurl }}{% post_url 2026-07-07-local-coding-harness %}) I described how I deployed a coding agent running entirely on the home LAN -- a spare box, codenamed `weebeastie`, serving mid-range `Qwen3-Coder-30B-A3B` model over `llama-server`, reached from a laptop by [Qwen-Code](https://github.com/QwenLM/qwen-code) through an SSH tunnel.
+[Previously]({{ site.baseurl }}{% post_url 2026-07-07-local-coding-harness %}) I described how I deployed a coding agent running entirely on the home LAN -- a spare box, codenamed `weebeastie`, serving mid-range `Qwen3-Coder-30B-A3B` model over `llama-server`, reached from a laptop by [Qwen-Code](https://github.com/QwenLM/qwen-code) through an SSH tunnel.
 
 I wanted to make the same model usable by e.g. spouse, hence these two additions, both guaranteeing the same self-sovereign posture (loopback-bound, nothing leaves my LAN):
 
@@ -17,14 +18,17 @@ I wanted to make the same model usable by e.g. spouse, hence these two additions
 2. **A grounded document assistant.** A retrieval-augmented-generation (RAG) server over European Parliament committee documents, built primarily for my spouse's work.
 
 The interesting design decision is that the RAG isn't bolted onto the chat, even though Open WebUI comes with some RAG capabilities.
-Instead it is a **shared RAG server spoken to over [MCP](https://modelcontextprotocol.io/)**, so the *same* server can be used both by the household chat *and* my coding agent.
-That is because eventually more collections will be hosted in the RAG db - e.g. my notes, household documents, TODO list, vacay plans ...
+Instead it is a **shared RAG server spoken to over [MCP](https://modelcontextprotocol.io/)**, so that the *same* server can be used both by the household chat *and* my coding agent.
+
+That is because eventually more collections will be indexed in the RAG db - e.g. my notes, household documents, TODO list, vacay plans ...
 
 # <a name="chat"/> The chat
 
 The whole security story from last time was that the inference port never touches the LAN -- `llama-server` binds `127.0.0.1:8080` and is *only* reachable over an SSH tunnel. Adding a web UI must not break that.
 
-Open WebUI runs in Docker with `network_mode: host`. That is the load-bearing choice: a normal bridged container cannot reach a *loopback* service on the host, but a host-networked one can use `localhost:8080` directly **and** expose its own port `3000` to the LAN. So the container reaches the model over loopback, and only the UI -- which has accounts -- is visible on `192.168.1.22:3000`. The raw model port stays as private as it was.
+Open WebUI runs in Docker with `network_mode: host`.
+<!-- That is the load-bearing choice: a normal bridged container cannot reach a *loopback* service on the host, but a host-networked one can use `localhost:8080` directly **and** expose its own port `3000` to the LAN. So -->
+The UI container reaches the model over loopback and exposes its port `3000` to the LAN, is visible on `192.168.1.22:3000`. The `llama-server` port stays as private.
 
 ![The chat in front of the loopback-bound model]({{ site.baseurl }}/images/2026-07-12-household-chat-and-rag-mcp/chat.svg)
 
@@ -41,18 +45,15 @@ A few decisions worth calling out:
 
 # <a name="rag"/> The RAG MCP server
 
-The document assistant is a Rust pipeline: fetch EP committee PDFs from the [Open Data Portal](https://data.europarl.europa.eu/), parse, chunk, embed and upsert into a [Qdrant](https://qdrant.tech/) vector database.
+The document assistant is a Rust pipeline: fetch EP committee PDFs from the [Open Data Portal](https://data.europarl.europa.eu/), parse, chunk, embed and upsert into a [Qdrant](https://qdrant.tech/) vector database, also hosted locally.
 Each query is then embedded under the *identical* recipe as at the insert time, top-k passages are pulled, and the local Qwen is asked to answer **using only those passages, citing each one, or saying "I don't know."**
 
-<!-- One hard constraint that shapes everything: the index was built under a pinned embedding contract (model, the query-only instruction prefix, CLS pooling, L2-norm). Retrieval is only valid if the query is embedded under the *same* contract. So the server embeds queries **itself** and asserts *live-contract == stored-contract* on boot. If a well-meaning frontend embeds the query with its own model, you get garbage. -->
-<!-- -- the classic RAG failure.  -->
-<!-- This is exactly why Open WebUI is **never** the retriever. -->
+In my first version the RAG was packaged as an OpenAI-compatible *model* (retrieval and generation coupled together) -- a second entry in the chat's model dropdown that owned the whole loop (embed → Qdrant → ground → call the generator → cited answer).
+It worked, but it **welded retrieval to one specific generator**.
+So eventually it got re-cast as a **shared MCP retrieval server**, `ep-rag-mcp`, attached to the *host* (the thing running the agent loop), not to the model server.
 
-The first design made the RAG an OpenAI-compatible *model* -- a second entry in the chat's model dropdown that owned the whole loop (embed → Qdrant → ground → call the generator → cited answer). It worked, but it **welded retrieval to one specific generator** and made retrieval un-reusable: an OpenAI `/v1` endpoint is not something my coding agent can call mid-task.
-
-So it got re-cast as a **shared MCP retrieval server**, `ep-rag-mcp`, attached to the *host* (the thing running the agent loop), not to the model server.
-
-`llama-server` is just a text generator with no MCP client. The decide-to-call → dispatch → feed-back cycle lives *above* the model, in the host.
+`llama-server` is just a text generator with no MCP client.
+The decide-to-call → dispatch → feed-back cycle lives *above* the model, in the host.
 So the two hosts -- Open WebUI and Qwen-Code -- each hold their own MCP client, both point at the **same** retrieval server, and both independently use `llama-server` as their generator.
 <!-- The MCP server and `llama-server` are **siblings, not stacked**.  -->
 The win is loose coupling: retrieval is implemented once and reused; the generator stays a swappable dropdown in the chat.

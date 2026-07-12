@@ -3,6 +3,7 @@ layout: post
 title: "A household coding agent"
 author: Filip Bielejec
 comments: true
+featured: true
 categories: [llm, local-inference, self-hosting, llama-cpp, qwen, agentic-coding]
 description: "Running an open-weights coding agent entirely on the home LAN -- a spare box serves a Qwen3-Coder MoE over llama.cpp to laptops and phones around the house. Why the harness is Qwen-Code, and how a quantization sweep found the fastest model that still codes."
 ---
