@@ -18,7 +18,7 @@ So the goal for this project: an agentic coding assistant, plus a household chat
 
 # <a name="topology"/> One strongish box, many thin clients
 
-I already have a spare desktop -- an i9-10850K with 62 GB of RAM and a modest GTX 1050 Ti codename`weebeastie`.
+I already have a spare desktop -- an i9-10850K with 64 GB of RAM and a modest GTX 1050 Ti codename`weebeastie`.
 The idea was to make it the household's inference engine: it holds the model and does the heavy lifting, while laptops, phones, and tablets on the LAN are just thin clients talking to it.
 
 ```
@@ -52,7 +52,7 @@ Second it is tuned for the Qwen model family -- which is exactly the model famil
 # <a name="model"/> Choosing the model family, then sweeping it
 
 The harsh truth is my modest hardware at the moment rules out most of the field.
-A 355B-class model or a dense 70B simply will not fit in 62 GB
+A 355B-class model or a dense 70B simply will not fit in 64 GB
 <!-- , and even if it did, reading that many bytes per token over DDR4 would make it unusably slow.  -->
 The one path to a responsive agent on this box is a **small-active-parameter MoE** -- e.g. [Qwen3-Coder-30B-A3B-Instruct](https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct) with 30B total parameters but only ~3B active per token, coder-specialized, and well-supported in GGUF.
 
