@@ -1,0 +1,27 @@
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam rectangle {
+  BorderColor #2c3e50
+  BackgroundColor #f7f9fb
+  FontColor #2c3e50
+}
+skinparam node {
+  BorderColor #2c3e50
+  BackgroundColor #eef2f6
+  FontColor #2c3e50
+}
+skinparam ArrowColor #2c3e50
+
+rectangle "Any LAN device\n(browser / phone / tablet)" as client
+
+node "weebeastie  (192.168.1.22, always-on)" as box {
+  rectangle "Open WebUI\n(Docker, network_mode: host)\nbinds 0.0.0.0:3000  << only LAN-facing >>" as owui
+  rectangle "llama-server\n(systemd, 127.0.0.1:8080)\nQwen3-Coder-30B  IQ4_XS" as llama
+}
+
+client -down-> owui : "http://192.168.1.22:3000"
+owui -down-> llama : "http://localhost:8080/v1\n(loopback only)"
+
+@enduml

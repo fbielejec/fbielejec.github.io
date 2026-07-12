@@ -1,0 +1,50 @@
+#+CAPTION: One shared RAG-over-MCP server, two hosts, one generator
+#+LABEL: fig:topology
+#+ATTR_LATEX: :placement [th]
+#+begin_src plantuml :file topology.png
+
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam rectangle {
+  BorderColor #2c3e50
+  BackgroundColor #f7f9fb
+  FontColor #2c3e50
+}
+skinparam database {
+  BorderColor #2c3e50
+  BackgroundColor #eef2f6
+  FontColor #2c3e50
+}
+skinparam node {
+  BorderColor #2c3e50
+  BackgroundColor #fbfcfd
+  FontColor #2c3e50
+}
+skinparam ArrowColor #2c3e50
+
+rectangle "qwen-code (CLI on the laptop)\nover the SSH tunnel" as qwen
+
+node "weebeastie  (192.168.1.22, always-on)" as box {
+  rectangle "Open WebUI\n(Docker, host net)  0.0.0.0:3000\n<< only LAN-facing >>\ninlet filter -> POST /route" as owui
+
+  rectangle "ep-rag-mcp  (systemd, loopback :8082)\n--\nMCP tool  search_ep_committee_docs(query, k)\nPOST /retrieve   grounded context\nPOST /route      classify + retrieve" as mcp
+
+  database "Qdrant\n:6334" as qdrant
+
+  rectangle "llama-server  (systemd, loopback :8080)\nQwen3-Coder-30B  IQ4_XS" as llama
+}
+
+owui -down-> mcp : "/route\n(household)"
+qwen -down-> mcp : "MCP\nStreamable HTTP\n:8082"
+mcp -right-> qdrant : "embed query\n(under pinned contract)"
+mcp -down-> llama : "classify"
+owui -down-> llama : "generate"
+qwen -down-> llama : "generate  :8080"
+
+note bottom of llama : one swappable generator, shared by both hosts
+
+@enduml
+#+RESULTS: fig:topology
+[[file:topology.png][file:topology.png]]
